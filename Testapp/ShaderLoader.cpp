@@ -19,7 +19,7 @@ GLuint ShaderLoader::CreateProgram(const char* vertexShaderFilename, const char*
 	glAttachShader(program, CreateShader(GL_VERTEX_SHADER, vertexShaderFilename));
 	glAttachShader(program, CreateShader(GL_FRAGMENT_SHADER, fragmentShaderFilename));
 	glLinkProgram(program);
-
+	
 	// Check for link errors
 	int link_result = 0;
 	glGetProgramiv(program, GL_LINK_STATUS, &link_result);
