@@ -174,7 +174,7 @@ void Update()
 
 	if (Timer <= 0)
 	{
-		if (Quad1->m_itextureindex >= Quad1->m_textures.size() - 1)
+		if ((size_t)Quad1->m_itextureindex >= Quad1->m_textures.size() - 1)
 		{
 			Quad1->m_itextureindex = 0;
 		}
@@ -182,11 +182,11 @@ void Update()
 		{
 			Quad1->m_itextureindex++;
 		}
-		Timer = 0.05;
+		Timer = 0.05f;
 	}
 	Timer -= DeltaTime;
 
-	glClearColor(((sin(CurrentTime) + 1) * 0.5), ((sin(CurrentTime + 2) + 0.5) * 0.5), ((sin(CurrentTime + 4) + 1) * 0.5), 1.0f);
+	glClearColor(((sin(CurrentTime) + 1.0f) * 0.5f), ((sin(CurrentTime + 2.0f) + 0.5f) * 0.5f), ((sin(CurrentTime + 4.0f) + 1.0f) * 0.5f), 1.0f);
 }
 
 //Render all objects

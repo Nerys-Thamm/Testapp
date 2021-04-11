@@ -15,13 +15,15 @@ public:
 	glm::mat4 GetModelMatrix();
 	GLuint m_VAO;
 	std::vector<GLuint> m_textures;
-	Shape2D();
+	
 	void SetTexture(GLuint _texture);
 	void AddTextures(std::vector<GLuint>& _textures);
 	int m_itextureindex;
 	int m_ifadeindex;
 	int m_verticescount;
 protected:
+	Shape2D();
+	virtual ~Shape2D() = 0;
 	GLfloat m_vertices;
 	GLuint m_indices;
 	GLuint m_VBO;

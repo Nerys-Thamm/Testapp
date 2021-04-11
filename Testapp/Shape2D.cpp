@@ -13,8 +13,20 @@ Shape2D::Shape2D()
 	m_color = glm::vec3(1.0f, 1.0f, 1.0f);
 	m_itextureindex = 0;
 	m_ifadeindex = 0;
-}
+	m_EBO = 0;
+	m_VAO = 0;
+	m_VBO = 0;
+	m_indices = 0;
+	m_rotation = 0;
+	m_vertices = 0;
+	m_verticescount = 0;
 
+
+}
+Shape2D::~Shape2D()
+{
+
+}
 void Shape2D::SetTexture(GLuint _texture)
 {
 	m_textures.push_back(_texture);
