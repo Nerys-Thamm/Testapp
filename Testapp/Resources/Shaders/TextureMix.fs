@@ -1,4 +1,4 @@
-#version 460 core 
+#version 460 core
 
 // Vertex Shader Inputs
 in vec3 FragColor;

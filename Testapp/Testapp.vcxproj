@@ -143,11 +143,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="ShaderLoader.cpp" />
+    <ClCompile Include="Shape2D.cpp" />
     <ClCompile Include="Testapp.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="ShaderLoader.h" />
+    <ClInclude Include="Shape2D.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="Testapp.h" />
   </ItemGroup>
