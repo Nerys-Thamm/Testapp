@@ -1,25 +1,37 @@
+// Bachelor of Software Engineering
+// Media Design School
+// Auckland
+// New Zealand
+// 
+// (c) 2021 Media Design School
+//
+// File Name   : 
+// Description : 
+// Author      : Nerys Thamm
+// Mail        : nerys.thamm@mds.ac.nz
+
 #include "Shape2D.h"
 
 glm::mat4 Shape2D::GetModelMatrix()
 {
-	m_translation_mat = glm::translate(glm::mat4(), m_position);
-	m_rotation_mat = glm::rotate(glm::mat4(), glm::radians(m_rotation), glm::vec3(0.0f, 0.0f, 1.0f));
-	m_scale_mat = glm::scale(glm::mat4(), m_scale);
-	return m_translation_mat * m_rotation_mat * m_scale_mat;
+	m_translationMat = glm::translate(glm::mat4(), m_position);
+	m_rotationMat = glm::rotate(glm::mat4(), glm::radians(m_fRotation), glm::vec3(0.0f, 0.0f, 1.0f));
+	m_scaleMat = glm::scale(glm::mat4(), m_scale);
+	return m_translationMat * m_rotationMat * m_scaleMat;
 }
 
 Shape2D::Shape2D()
 {
 	m_color = glm::vec3(1.0f, 1.0f, 1.0f);
-	m_itextureindex = 0;
-	m_ifadeindex = 0;
+	m_iTextureIndex = 0;
+	m_iFadeIndex = 0;
 	m_EBO = 0;
 	m_VAO = 0;
 	m_VBO = 0;
 	m_indices = 0;
-	m_rotation = 0;
+	m_fRotation = 0;
 	m_vertices = 0;
-	m_verticescount = 0;
+	m_verticesCount = 0;
 
 
 }
@@ -42,10 +54,10 @@ void Shape2D::AddTextures(std::vector<GLuint>& _textures)
 
 Hex2D::Hex2D()
 {
-	m_verticescount = 12;
+	m_verticesCount = 12;
 
 	m_position = glm::vec3(0.0f, 0.0f, 0.0f);
-	m_rotation = 0.0f;
+	m_fRotation = 0.0f;
 	m_scale = glm::vec3(1.0f, 1.0f, 1.0f);
 
 	glGenVertexArrays(1, &m_VAO);
@@ -69,10 +81,10 @@ Hex2D::Hex2D()
 
 Quad2D::Quad2D()
 {
-	m_verticescount = 6;
+	m_verticesCount = 6;
 
 	m_position = glm::vec3(0.0f, 0.0f, 0.0f);
-	m_rotation = 0.0f;
+	m_fRotation = 0.0f;
 	m_scale = glm::vec3(1.0f, 1.0f, 1.0f);
 
 	glGenVertexArrays(1, &m_VAO);
