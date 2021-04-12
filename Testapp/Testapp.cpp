@@ -33,7 +33,7 @@ float Timer;
 Camera* camera = nullptr;
 
 Hex2D* Hex1 = nullptr;
-Hex2D* Hex2 = nullptr;
+
 Quad2D* Quad1 = nullptr;
 
 int main()
@@ -138,7 +138,7 @@ void InitialSetup()
 	camera = new Camera(800, 800, CurrentTime);
 
 	Hex1 = new Hex2D();
-	Hex2 = new Hex2D();
+	
 	Quad1 = new Quad2D();
 
 	Hex1->SetTexture(LoadTexture("Rayman.jpg"));
@@ -156,8 +156,8 @@ void InitialSetup()
 
 	Hex1->m_position = glm::vec3(-200.0f, 0.0f, 0.0f);
 	Hex1->m_scale = glm::vec3(100.0f, 100.0f, 0.0f);
-	Hex2->m_position = glm::vec3(0.0f, 0.0f, 0.0f);
-	Hex2->m_scale = glm::vec3(100.0f, 100.0f, 0.0f);
+	
+	
 	Quad1->m_position = glm::vec3(200.0f, 0.0f, 0.0f);
 	Quad1->m_scale = glm::vec3(100.0f, 200.0f, 0.0f);
 }
@@ -174,15 +174,17 @@ void Update()
 
 	if (Timer <= 0)
 	{
-		if ((size_t)Quad1->m_itextureindex >= Quad1->m_textures.size() - 1)
+		if ((size_t)Quad1->m_ifadeindex >= Quad1->m_textures.size() - 1)
 		{
 			Quad1->m_itextureindex = 0;
+			Quad1->m_ifadeindex = 1;
 		}
 		else
 		{
 			Quad1->m_itextureindex++;
+			Quad1->m_ifadeindex++;
 		}
-		Timer = 0.05f;
+		Timer = 0.04f;
 	}
 	Timer -= DeltaTime;
 
@@ -194,10 +196,11 @@ void Render()
 {
 	//Clear the buffer
 	glClear(GL_COLOR_BUFFER_BIT);
-
+	Hex1->m_position = glm::vec3(-200.0f, 0.0f, 0.0f);
 	camera->Render(*Hex1, Program_TwoTextureInterpolation);
-	camera->Render(*Hex2, Program_FixedColor);
-	camera->Render(*Quad1, Program_Texture);
+	Hex1->m_position = glm::vec3(0.0f, 0.0f, 0.0f);
+	camera->Render(*Hex1, Program_TwoTextureInterpolation);
+	camera->Render(*Quad1, Program_TwoTextureInterpolation);
 
 	//Push buffer to the screen
 	glfwSwapBuffers(Window);
