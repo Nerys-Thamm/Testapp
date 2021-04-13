@@ -5,8 +5,8 @@
 // 
 // (c) 2021 Media Design School
 //
-// File Name   : 
-// Description : 
+// File Name   : Testapp.cpp
+// Description : Main file, has main loop.
 // Author      : Nerys Thamm
 // Mail        : nerys.thamm@mds.ac.nz
 
@@ -136,6 +136,7 @@ void InitialSetup()
 	// Map range of the window size to NDC (-1 -> 1)
 	glViewport(0, 0, 800, 800);
 
+	//Make the programs
 	program_texture = ShaderLoader::CreateProgram("Resources/Shaders/ClipSpace.vs",
 		"Resources/Shaders/Texture.fs");
 
@@ -145,12 +146,16 @@ void InitialSetup()
 	program_fixed_color = ShaderLoader::CreateProgram("Resources/Shaders/ClipSpace.vs",
 		"Resources/Shaders/FixedColor.fs");
 
+	//Make the camera object
 	camera = new Camera(800, 800, current_time);
 
+
+	//Make the shapes
 	shape_hex = new Hex2D();
 	
 	shape_quad = new Quad2D();
 
+	//Set the textures of the shapes
 	shape_hex->SetTexture(LoadTexture("Rayman.jpg"));
 	shape_hex->SetTexture(LoadTexture("AwesomeFace.png"));
 	shape_hex->m_iFadeIndex = 1;
@@ -164,6 +169,7 @@ void InitialSetup()
 	shape_quad->SetTexture(LoadTexture("Walk7.png"));
 	shape_quad->SetTexture(LoadTexture("Walk8.png"));
 
+	//Set the transform of the shapes
 	shape_hex->m_position = glm::vec3(-200.0f, 0.0f, 0.0f);
 	shape_hex->m_scale = glm::vec3(100.0f, 100.0f, 0.0f);
 	
@@ -182,6 +188,7 @@ void Update()
 	current_time = (float)glfwGetTime();
 	delta_time = current_time - delta_time;
 
+	//Change the frame to animate
 	if (timer <= 0)
 	{
 		if ((size_t)shape_quad->m_iFadeIndex >= shape_quad->m_textures.size() - 1)
@@ -198,6 +205,7 @@ void Update()
 	}
 	timer -= delta_time;
 
+	//Rainbow effect
 	glClearColor(((sin(current_time) + 1.0f) * 0.5f), ((sin(current_time + 2.0f) + 0.5f) * 0.5f), ((sin(current_time + 4.0f) + 1.0f) * 0.5f), 1.0f);
 }
 
@@ -206,10 +214,15 @@ void Render()
 {
 	//Clear the buffer
 	glClear(GL_COLOR_BUFFER_BIT);
+	//Move the shape
 	shape_hex->m_position = glm::vec3(-200.0f, 0.0f, 0.0f);
+	//Draw the shape
 	camera->Render(*shape_hex, program_texture_interpolation);
+	//Move the shape again
 	shape_hex->m_position = glm::vec3(0.0f, 0.0f, 0.0f);
+	//Draw the shape
 	camera->Render(*shape_hex, program_texture_interpolation);
+	//Draw the quad
 	camera->Render(*shape_quad, program_texture_interpolation);
 
 	//Push buffer to the screen
