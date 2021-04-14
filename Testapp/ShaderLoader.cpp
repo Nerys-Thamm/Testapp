@@ -5,8 +5,8 @@
 // 
 // (c) 2021 Media Design School
 //
-// File Name   : 
-// Description : 
+// File Name   : ShaderLoader.cpp
+// Description : Loads shader code from files
 // Author      : Nerys Thamm
 // Mail        : nerys.thamm@mds.ac.nz
 

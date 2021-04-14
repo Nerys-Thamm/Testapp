@@ -5,8 +5,8 @@
 // 
 // (c) 2021 Media Design School
 //
-// File Name   : 
-// Description : 
+// File Name   : Testapp.cpp
+// Description : Main file for OpenGL application
 // Author      : Nerys Thamm
 // Mail        : nerys.thamm@mds.ac.nz
 
@@ -36,6 +36,8 @@ GLuint program_texture_interpolation;
 
 GLuint program_fixed_color;
 
+GLuint program_texture_wave;
+
 float current_time;
 float delta_time;
 float timer;
@@ -45,6 +47,8 @@ Camera* camera = nullptr;
 Hex2D* shape_hex = nullptr;
 
 Quad2D* shape_quad = nullptr;
+
+Quad2D* shape_quad2 = nullptr;
 
 int main()
 {
@@ -136,6 +140,7 @@ void InitialSetup()
 	// Map range of the window size to NDC (-1 -> 1)
 	glViewport(0, 0, 800, 800);
 
+	//Create programs
 	program_texture = ShaderLoader::CreateProgram("Resources/Shaders/ClipSpace.vs",
 		"Resources/Shaders/Texture.fs");
 
@@ -145,31 +150,46 @@ void InitialSetup()
 	program_fixed_color = ShaderLoader::CreateProgram("Resources/Shaders/ClipSpace.vs",
 		"Resources/Shaders/FixedColor.fs");
 
+	program_texture_wave = ShaderLoader::CreateProgram("Resources/Shaders/ClipSpace.vs",
+		"Resources/Shaders/TextureWave.fs");
+
+	//Create camera
 	camera = new Camera(800, 800, current_time);
 
+	//Create objects
 	shape_hex = new Hex2D();
 	
 	shape_quad = new Quad2D();
 
-	shape_hex->SetTexture(LoadTexture("Rayman.jpg"));
-	shape_hex->SetTexture(LoadTexture("AwesomeFace.png"));
+	shape_quad2 = new Quad2D();
+
+
+	//Set textures of objects
+	shape_hex->AddTexture(LoadTexture("Rayman.jpg"));
+	shape_hex->AddTexture(LoadTexture("AwesomeFace.png"));
 	shape_hex->m_iFadeIndex = 1;
 
-	shape_quad->SetTexture(LoadTexture("Walk1.png"));
-	shape_quad->SetTexture(LoadTexture("Walk2.png"));
-	shape_quad->SetTexture(LoadTexture("Walk3.png"));
-	shape_quad->SetTexture(LoadTexture("Walk4.png"));
-	shape_quad->SetTexture(LoadTexture("Walk5.png"));
-	shape_quad->SetTexture(LoadTexture("Walk6.png"));
-	shape_quad->SetTexture(LoadTexture("Walk7.png"));
-	shape_quad->SetTexture(LoadTexture("Walk8.png"));
+	shape_quad->AddTexture(LoadTexture("Walk1.png"));
+	shape_quad->AddTexture(LoadTexture("Walk2.png"));
+	shape_quad->AddTexture(LoadTexture("Walk3.png"));
+	shape_quad->AddTexture(LoadTexture("Walk4.png"));
+	shape_quad->AddTexture(LoadTexture("Walk5.png"));
+	shape_quad->AddTexture(LoadTexture("Walk6.png"));
+	shape_quad->AddTexture(LoadTexture("Walk7.png"));
+	shape_quad->AddTexture(LoadTexture("Walk8.png"));
 
+	shape_quad2->AddTexture(LoadTexture("Rayman.jpg"));
+
+	//Set initiaal position of objects
 	shape_hex->m_position = glm::vec3(-200.0f, 0.0f, 0.0f);
 	shape_hex->m_scale = glm::vec3(100.0f, 100.0f, 0.0f);
 	
 	
 	shape_quad->m_position = glm::vec3(200.0f, 0.0f, 0.0f);
 	shape_quad->m_scale = glm::vec3(100.0f, 200.0f, 0.0f);
+
+	shape_quad2->m_position = glm::vec3(0.0f, -200.0f, 0.0f);
+	shape_quad2->m_scale = glm::vec3(100.0f, 100.0f, 0.0f);
 }
 
 //Update all objects and run the processes
@@ -182,6 +202,7 @@ void Update()
 	current_time = (float)glfwGetTime();
 	delta_time = current_time - delta_time;
 
+	//Animate the texture
 	if (timer <= 0)
 	{
 		if ((size_t)shape_quad->m_iFadeIndex >= shape_quad->m_textures.size() - 1)
@@ -198,6 +219,7 @@ void Update()
 	}
 	timer -= delta_time;
 
+	//Rainbow background
 	glClearColor(((sin(current_time) + 1.0f) * 0.5f), ((sin(current_time + 2.0f) + 0.5f) * 0.5f), ((sin(current_time + 4.0f) + 1.0f) * 0.5f), 1.0f);
 }
 
@@ -206,11 +228,16 @@ void Render()
 {
 	//Clear the buffer
 	glClear(GL_COLOR_BUFFER_BIT);
+	//Set position of shape and render it
 	shape_hex->m_position = glm::vec3(-200.0f, 0.0f, 0.0f);
 	camera->Render(*shape_hex, program_texture_interpolation);
+	//Set position of shape to second position and render it
 	shape_hex->m_position = glm::vec3(0.0f, 0.0f, 0.0f);
 	camera->Render(*shape_hex, program_texture_interpolation);
+	//Render the animated quad
 	camera->Render(*shape_quad, program_texture_interpolation);
+	//Render the Quad with the distorted texture
+	camera->Render(*shape_quad2, program_texture_wave);
 
 	//Push buffer to the screen
 	glfwSwapBuffers(main_window);

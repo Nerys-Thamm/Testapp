@@ -5,8 +5,8 @@
 // 
 // (c) 2021 Media Design School
 //
-// File Name   : 
-// Description : 
+// File Name   : Camera.h
+// Description : Declares class for opengl camera
 // Author      : Nerys Thamm
 // Mail        : nerys.thamm@mds.ac.nz
 
@@ -19,7 +19,7 @@
 #include "Shape2D.h"
 // --------------------------------------------------------------------------------
 /// <summary>
-/// 
+/// Orthographic camera class
 /// </summary>
 // --------------------------------------------------------------------------------
 class Camera
@@ -29,26 +29,26 @@ public:
 	glm::vec3 m_cameraLookDir = glm::vec3(0.0f, 0.0f, -1.0f);
 	glm::vec3 m_cameraTargetPos = glm::vec3(0.0f, 0.0f, 0.0f);
 	glm::vec3 m_cameraUpDir = glm::vec3(0.0f, 1.0f, 0.0f);
-	glm::mat4 m_viewMat;
-	glm::mat4 m_projectionMat;
+	glm::mat4 m_viewMat = glm::mat4();
+	glm::mat4 m_projectionMat = glm::mat4();
 
 	// ********************************************************************************
 	/// <summary>
-	/// 
+	/// Constructor
 	/// </summary>
-	/// <param name="_fwindowwidth"></param>
-	/// <param name="_fwindowheight"></param>
-	/// <param name="_fcurrtime"></param>
+	/// <param name="_fwindowwidth">Height of the window</param>
+	/// <param name="_fwindowheight">Width of the window</param>
+	/// <param name="_fcurrtime">Pointer to a variable that holds the current time</param>
 	/// <returns></returns>
 	// ********************************************************************************
 	Camera(float _fWindowWidth, float _fWindowHeight, GLfloat& _fCurrTime);
 
 	// ********************************************************************************
 	/// <summary>
-	/// 
+	/// Renders a shape with the provided program
 	/// </summary>
-	/// <param name="_shape"></param>
-	/// <param name="_program"></param>
+	/// <param name="_shape">The shape to be rendered</param>
+	/// <param name="_program">The program to use to render the shape</param>
 	// ********************************************************************************
 	void Render(Shape2D& _shape, GLuint& _program);
 private:

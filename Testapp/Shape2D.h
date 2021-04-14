@@ -5,8 +5,8 @@
 // 
 // (c) 2021 Media Design School
 //
-// File Name   : 
-// Description : 
+// File Name   : Shape2D.h
+// Description : Declares classes for 2d shape rendering
 // Author      : Nerys Thamm
 // Mail        : nerys.thamm@mds.ac.nz
 
@@ -19,7 +19,7 @@
 #include <vector>
 // --------------------------------------------------------------------------------
 /// <summary>
-/// 
+/// Base class for shapes
 /// </summary>
 // --------------------------------------------------------------------------------
 class Shape2D
@@ -31,9 +31,9 @@ public:
 	glm::vec3 m_color;
 	// ********************************************************************************
 	/// <summary>
-	/// 
+	/// Computes and returns the model matrix for the shape
 	/// </summary>
-	/// <returns></returns>
+	/// <returns>The model matrix for the shape as mat4</returns>
 	// ********************************************************************************
 	glm::mat4 GetModelMatrix();
 	GLuint m_VAO;
@@ -41,16 +41,16 @@ public:
 	
 	// ********************************************************************************
 	/// <summary>
-	/// 
+	/// Adds a texture to the texture list
 	/// </summary>
-	/// <param name="_texture"></param>
+	/// <param name="_texture">The texture to add</param>
 	// ********************************************************************************
-	void SetTexture(GLuint _texture);
+	void AddTexture(GLuint _texture);
 	// ********************************************************************************
 	/// <summary>
-	/// 
+	/// Adds multiple textures to the texture list
 	/// </summary>
-	/// <param name="_textures"></param>
+	/// <param name="_textures">A vector of textures to add</param>
 	// ********************************************************************************
 	void AddTextures(std::vector<GLuint>& _textures);
 	int m_iTextureIndex;
@@ -59,14 +59,14 @@ public:
 protected:
 	// ********************************************************************************
 	/// <summary>
-	/// 
+	/// Constructor
 	/// </summary>
 	/// <returns></returns>
 	// ********************************************************************************
 	Shape2D();
 	// ********************************************************************************
 	/// <summary>
-	/// 
+	/// Virtual destructor to prevent instantiation of base class
 	/// </summary>
 	/// <returns></returns>
 	// ********************************************************************************
@@ -85,7 +85,7 @@ private:
 
 // --------------------------------------------------------------------------------
 /// <summary>
-/// 
+/// Hexagon shape class
 /// </summary>
 // --------------------------------------------------------------------------------
 class Hex2D : public Shape2D
@@ -93,7 +93,7 @@ class Hex2D : public Shape2D
 public:
 	// ********************************************************************************
 	/// <summary>
-	/// 
+	/// Constructor
 	/// </summary>
 	/// <returns></returns>
 	// ********************************************************************************
@@ -116,7 +116,7 @@ public:
 };
 // --------------------------------------------------------------------------------
 /// <summary>
-/// 
+/// Quad shape class
 /// </summary>
 // --------------------------------------------------------------------------------
 class Quad2D : public Shape2D
@@ -124,7 +124,7 @@ class Quad2D : public Shape2D
 public:
 	// ********************************************************************************
 	/// <summary>
-	/// 
+	/// Constructor
 	/// </summary>
 	/// <returns></returns>
 	// ********************************************************************************

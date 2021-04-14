@@ -7,10 +7,14 @@ in vec2 FragTexCoords;
 // Uniform Inputs
 uniform sampler2D ImageTexture;
 
+
 // Output
 out vec4 FinalColor;
 
+
+
 void main()
 {
-	FinalColor = texture(ImageTexture, FragTexCoords); // * vec4(FragColor, 1.0f);
+	
+	FinalColor = texture(ImageTexture, FragTexCoords); 
 }
