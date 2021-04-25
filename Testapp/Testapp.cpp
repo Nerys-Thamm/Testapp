@@ -20,6 +20,8 @@
 #include "stb_image.h"
 #include "Shape2D.h"
 #include "Camera.h"
+#include "Config.h"
+#include "TextLabel.h"
 
 //Pointer to window
 GLFWwindow* main_window = nullptr;
@@ -50,8 +52,11 @@ Quad2D* shape_quad = nullptr;
 
 Quad2D* shape_quad2 = nullptr;
 
+TextLabel* text_message = nullptr;
+
 int main()
 {
+	std::cout << "Program compiled " << __DATE__ << " | " << __TIME__ << std::endl;
 	//Init GLFW and setting ver to 4.6 with only core functionality
 	glfwInit();
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
@@ -59,7 +64,7 @@ int main()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 
 	//Create a GLFW controlled context window
-	main_window = glfwCreateWindow(800, 800, "First OpenGL Window", NULL, NULL);
+	main_window = glfwCreateWindow(cfWINDOW_WIDTH(), cfWINDOW_HEIGHT(), "Nerys Thamm OpenGL Summative", NULL, NULL);
 	if (main_window == NULL)
 	{
 		std::cout << "GLFW failed to initialize properly. Terminating program." << std::endl;
@@ -138,7 +143,7 @@ void InitialSetup()
 	glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
 
 	// Map range of the window size to NDC (-1 -> 1)
-	glViewport(0, 0, 800, 800);
+	glViewport(0, 0, cfWINDOW_WIDTH(), cfWINDOW_HEIGHT());
 
 	//Create programs
 	program_texture = ShaderLoader::CreateProgram("Resources/Shaders/ClipSpace.vs",
@@ -154,7 +159,7 @@ void InitialSetup()
 		"Resources/Shaders/TextureWave.fs");
 
 	//Create camera
-	camera = new Camera(800, 800, current_time);
+	camera = new Camera(cfWINDOW_WIDTH(), cfWINDOW_HEIGHT(), current_time);
 
 	//Create objects
 	shape_hex = new Hex2D();
@@ -162,6 +167,10 @@ void InitialSetup()
 	shape_quad = new Quad2D();
 
 	shape_quad2 = new Quad2D();
+
+	//Create Text
+
+	text_message = new TextLabel("Super spicy text!", "Resources/Fonts/ARIAL.ttf", glm::ivec2(0, 48), glm::vec2(100.0f, 100.0f));
 
 
 	//Set textures of objects
@@ -195,6 +204,11 @@ void InitialSetup()
 //Update all objects and run the processes
 void Update()
 {
+	if (cfFLAG("Spam_me_please"))
+	{
+		std::cout << "SPAM ";
+	}
+
 	glfwPollEvents();
 
 	//Get the current time
@@ -238,6 +252,8 @@ void Render()
 	camera->Render(*shape_quad, program_texture_interpolation);
 	//Render the Quad with the distorted texture
 	camera->Render(*shape_quad2, program_texture_wave);
+
+	text_message->Render();
 
 	//Push buffer to the screen
 	glfwSwapBuffers(main_window);
