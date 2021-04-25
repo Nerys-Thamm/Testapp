@@ -244,9 +244,11 @@ void Render()
 	glClear(GL_COLOR_BUFFER_BIT);
 	//Set position of shape and render it
 	shape_hex->m_position = glm::vec3(-200.0f, 0.0f, 0.0f);
+	//Draw the shape
 	camera->Render(*shape_hex, program_texture_interpolation);
 	//Set position of shape to second position and render it
 	shape_hex->m_position = glm::vec3(0.0f, 0.0f, 0.0f);
+	//Draw the shape
 	camera->Render(*shape_hex, program_texture_interpolation);
 	//Render the animated quad
 	camera->Render(*shape_quad, program_texture_interpolation);
