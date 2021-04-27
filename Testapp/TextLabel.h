@@ -28,6 +28,8 @@ private:
 		GLuint Advance = 0;   // How far to move for the next character
 	};
 
+	
+
 	static const int FontCharacterLimit = 128;
 	bool Initialized = false;
 
@@ -43,13 +45,23 @@ private:
 	std::map<GLchar, FontChar> CharacterMap;
 	
 public:
+	enum TextEffect
+	{
+		NONE,
+		MARQUEE,
+		SCALE_BOUNCE,
+	};
 	TextLabel(
 		std::string Text,
 		std::string Font,
 		glm::ivec2 PixelSize,
 		glm::vec2 Pos,
+		TextEffect Effect,
 		glm::vec3 Color = glm::vec3(1.0f, 1.0f, 1.0f),
-		glm::vec2 Scale = glm::vec2(1.0f, 1.0f));
+		glm::vec2 Scale = glm::vec2(1.0f, 1.0f)
+	);
+
+	
 
 	~TextLabel() {};
 

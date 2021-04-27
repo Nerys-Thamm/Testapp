@@ -180,6 +180,12 @@ void InitialSetup()
 	program_texture_wave = ShaderLoader::CreateProgram("Resources/Shaders/ClipSpace.vs",
 		"Resources/Shaders/TextureWave.fs");
 
+	//Cull poly not facing viewport
+	glCullFace(GL_BACK);
+
+	//Enable culling
+	glEnable(GL_CULL_FACE);
+
 	//Create camera
 	camera = new Camera(cfWINDOW_WIDTH(), cfWINDOW_HEIGHT(), current_time);
 
@@ -192,7 +198,7 @@ void InitialSetup()
 
 	//Create Text
 
-	text_message = new TextLabel("Super spicy text!", "Resources/Fonts/ARIAL.ttf", glm::ivec2(0, 48), glm::vec2(100.0f, 100.0f));
+	text_message = new TextLabel("Super spicy text!", "Resources/Fonts/ARIAL.ttf", glm::ivec2(0, 48), glm::vec2(100.0f, 100.0f), TextLabel::MARQUEE);
 
 
 	//Set textures of objects

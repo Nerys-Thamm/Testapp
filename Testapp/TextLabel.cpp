@@ -24,7 +24,7 @@ GLuint TextLabel::GenerateTexture(FT_Face face)
 	return TextureID;
 }
 
-TextLabel::TextLabel(std::string Text, std::string Font, glm::ivec2 PixelSize, glm::vec2 Pos, glm::vec3 Color, glm::vec2 Scale)
+TextLabel::TextLabel(std::string Text, std::string Font, glm::ivec2 PixelSize, glm::vec2 Pos, TextLabel::TextEffect Effect, glm::vec3 Color, glm::vec2 Scale)
 {
 	SetText(Text);
 	SetColor(Color);
@@ -32,7 +32,21 @@ TextLabel::TextLabel(std::string Text, std::string Font, glm::ivec2 PixelSize, g
 	SetPosition(Pos);
 
 	ProjectionMat = glm::ortho(00.0f, (GLfloat)cfWINDOW_WIDTH(), 0.0f, (GLfloat)cfWINDOW_HEIGHT(), 0.0f, 100.0f);
-	Program_Text = ShaderLoader::CreateProgram("Resources/Shaders/Text.vs", "Resources/Shaders/Text.fs");
+	switch (Effect)
+	{
+	case TextLabel::NONE:
+		Program_Text = ShaderLoader::CreateProgram("Resources/Shaders/Text.vs", "Resources/Shaders/Text.fs");
+		break;
+	case TextLabel::MARQUEE:
+		Program_Text = ShaderLoader::CreateProgram("Resources/Shaders/TextMarquee.vs", "Resources/Shaders/TextMarquee.fs");
+		break;
+	case TextLabel::SCALE_BOUNCE:
+		Program_Text = ShaderLoader::CreateProgram("Resources/Shaders/TextScaleBounce.vs", "Resources/Shaders/TextScaleBounce.fs");
+		break;
+	default:
+		break;
+	}
+	
 
 	FT_Library FontLibrary;
 	FT_Face FontFace;
@@ -100,7 +114,12 @@ void TextLabel::Render()
 	glUseProgram(Program_Text);
 	glUniform3fv(glGetUniformLocation(Program_Text, "TextColor"), 1, glm::value_ptr(Color));
 	glUniformMatrix4fv(glGetUniformLocation(Program_Text, "ProjectionMat"), 1, GL_FALSE, glm::value_ptr(ProjectionMat));
+	GLint CurrentTimeLoc = glGetUniformLocation(Program_Text, "CurrentTime");
+	glUniform1f(CurrentTimeLoc, glfwGetTime());
+	GLint ScreenWidthLoc = glGetUniformLocation(Program_Text, "ScreenWidth");
+	glUniform1f(ScreenWidthLoc, cfWINDOW_WIDTH());
 	glBindVertexArray(VAO_Text);
+
 
 	glm::vec2 CharacterOrigin = Position;
 
