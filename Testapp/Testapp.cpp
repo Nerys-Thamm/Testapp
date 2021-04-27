@@ -22,6 +22,7 @@
 #include "Camera.h"
 #include "Config.h"
 #include "TextLabel.h"
+#include <fmod.hpp>
 
 //Pointer to window
 GLFWwindow* main_window = nullptr;
@@ -29,6 +30,27 @@ GLFWwindow* main_window = nullptr;
 void InitialSetup();
 void Update();
 void Render();
+
+//FMOD init stuff
+FMOD::System* AudioSystem;
+FMOD::Sound* FX_Gunshot;
+FMOD::Sound* Track_Dance;
+
+bool AudioInit()
+{
+	if (FMOD::System_Create(&AudioSystem) != FMOD_OK)
+	{
+		std::cout << "FMOD ERROR: Audio System failed to create." << std::endl;
+		return false;
+	}
+	if (AudioSystem->init(100, FMOD_INIT_NORMAL | FMOD_INIT_3D_RIGHTHANDED, 0) != FMOD_OK)
+	{
+		std::cout << "FMOD ERROR: Audio System failed to create." << std::endl;
+		return false;
+	}
+
+	return true;
+}
 
 GLuint program_texture;
 
@@ -199,6 +221,12 @@ void InitialSetup()
 
 	shape_quad2->m_position = glm::vec3(0.0f, -200.0f, 0.0f);
 	shape_quad2->m_scale = glm::vec3(100.0f, 100.0f, 0.0f);
+
+	//Setup sound stuff
+	if (AudioSystem->createSound("Resources/Audio/Gunshot.wav", FMOD_DEFAULT, 0, &FX_Gunshot) != FMOD_OK)
+	{
+		std::cout << "FMOD ERROR: Failed to load sound using createSound(...)" << std::endl;
+	}
 }
 
 //Update all objects and run the processes
@@ -208,7 +236,16 @@ void Update()
 	{
 		std::cout << "SPAM ";
 	}
-
+	if (cfFLAG("Test_Flag"))
+	{
+		text_message->SetText("Test flag is enabled!");
+	}
+	else
+	{
+		text_message->SetText("Test flag is disabled!");
+	}
+	
+	AudioSystem->update();
 	glfwPollEvents();
 
 	//Get the current time
