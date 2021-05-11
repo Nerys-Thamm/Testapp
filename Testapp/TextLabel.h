@@ -38,6 +38,9 @@ private:
 	glm::vec3 Color;
 	glm::vec2 Position;
 
+	float m_LeftBuffer;
+	float m_RightBuffer;
+
 	GLuint VAO_Text;
 	GLuint VBO_DynamicQuad;
 	GLuint Program_Text;
@@ -58,7 +61,9 @@ public:
 		glm::vec2 Pos,
 		TextEffect Effect,
 		glm::vec3 Color = glm::vec3(1.0f, 1.0f, 1.0f),
-		glm::vec2 Scale = glm::vec2(1.0f, 1.0f)
+		glm::vec2 Scale = glm::vec2(1.0f, 1.0f),
+		float LeftBuffer = 0,
+		float RightBuffer = cfWINDOW_WIDTH()
 	);
 
 	

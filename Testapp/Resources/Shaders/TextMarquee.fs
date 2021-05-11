@@ -8,6 +8,8 @@ in vec2 VertexOut;
 uniform sampler2D TextTexture;
 uniform vec3 TextColor;
 uniform float ScreenWidth;
+uniform float LeftBuffer;
+uniform float RightBuffer;
 uniform float CurrentTime;
 
 
@@ -20,7 +22,7 @@ void main()
 {
 	
 	float Alpha = texture(TextTexture, FragTexCoords).r;
-if(mod(VertexOut.x + (CurrentTime*40), ScreenWidth-48)+48 < 0 || mod(VertexOut.x + (CurrentTime*40), ScreenWidth) > ScreenWidth)
+if(VertexOut.x < LeftBuffer || VertexOut.x > RightBuffer)
 {
 	Alpha = 0;
 }

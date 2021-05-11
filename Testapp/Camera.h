@@ -17,6 +17,7 @@
 #include <gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>
 #include "Shape2D.h"
+#include "Mesh3D.h"
 // --------------------------------------------------------------------------------
 /// <summary>
 /// Orthographic camera class
@@ -41,7 +42,7 @@ public:
 	/// <param name="_fcurrtime">Pointer to a variable that holds the current time</param>
 	/// <returns></returns>
 	// ********************************************************************************
-	Camera(float _fWindowWidth, float _fWindowHeight, GLfloat& _fCurrTime);
+	Camera(float _fWindowWidth, float _fWindowHeight, GLfloat& _fCurrTime, bool _bPerspective = true);
 
 	// ********************************************************************************
 	/// <summary>
@@ -51,6 +52,7 @@ public:
 	/// <param name="_program">The program to use to render the shape</param>
 	// ********************************************************************************
 	void Render(Shape2D& _shape, GLuint& _program);
+	void Render(Mesh3D& _shape, GLuint& _program);
 private:
 	GLfloat* m_pCurrentTime;
 };
