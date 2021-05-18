@@ -16,8 +16,7 @@
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>
-#include "Shape2D.h"
-#include "Mesh3D.h"
+
 // --------------------------------------------------------------------------------
 /// <summary>
 /// Orthographic camera class
@@ -44,15 +43,9 @@ public:
 	// ********************************************************************************
 	Camera(float _fWindowWidth, float _fWindowHeight, GLfloat& _fCurrTime, bool _bPerspective = true);
 
-	// ********************************************************************************
-	/// <summary>
-	/// Renders a shape with the provided program
-	/// </summary>
-	/// <param name="_shape">The shape to be rendered</param>
-	/// <param name="_program">The program to use to render the shape</param>
-	// ********************************************************************************
-	void Render(Shape2D& _shape, GLuint& _program);
-	void Render(Mesh3D& _shape, GLuint& _program);
+
+
+	glm::mat4 GetPVM(glm::mat4 _modelmat);
 private:
 	GLfloat* m_pCurrentTime;
 };

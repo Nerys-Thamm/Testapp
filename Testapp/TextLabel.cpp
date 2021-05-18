@@ -122,9 +122,9 @@ void TextLabel::Render()
 	GLint ScreenWidthLoc = glGetUniformLocation(Program_Text, "ScreenWidth");
 	glUniform1f(ScreenWidthLoc, cfWINDOW_WIDTH());
 	GLint LeftBufferLoc = glGetUniformLocation(Program_Text, "LeftBuffer");
-	glUniform1f(ScreenWidthLoc, m_LeftBuffer);
+	glUniform1f(LeftBufferLoc, m_LeftBuffer);
 	GLint RightBufferLoc = glGetUniformLocation(Program_Text, "RightBuffer");
-	glUniform1f(ScreenWidthLoc, m_RightBuffer);
+	glUniform1f(RightBufferLoc, m_RightBuffer);
 	glBindVertexArray(VAO_Text);
 
 

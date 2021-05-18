@@ -21,10 +21,14 @@ out vec4 FinalColor;
 void main()
 {
 	
-	float Alpha = texture(TextTexture, FragTexCoords).r;
-if(VertexOut.x < LeftBuffer || VertexOut.x > RightBuffer)
-{
-	Alpha = 0;
-}
+	float Alpha;
+	if(VertexOut.x < LeftBuffer || VertexOut.x > RightBuffer)
+	{
+		Alpha = 0;
+	}
+	else
+	{
+		Alpha = texture(TextTexture, FragTexCoords).r;
+	}
 	FinalColor = vec4(TextColor, Alpha); 
 }

@@ -20,72 +20,11 @@ Camera::Camera(float _fWindowWidth, float _fWindowHeight, GLfloat& _fcurrtime, b
 	m_pCurrentTime = &_fcurrtime;
 }
 
-void Camera::Render(Shape2D& _shape, GLuint& _program)
+
+
+
+
+glm::mat4 Camera::GetPVM(glm::mat4 _modelmat)
 {
-	//Calculate the PVM matrix
-	glm::mat4 PVMMat = m_projectionMat * m_viewMat * _shape.GetModelMatrix();
-
-	//Bind program and VAO
-	glUseProgram(_program);
-	glBindVertexArray(_shape.m_VAO);
-
-	//Send Vars to shaders via Uniform
-	GLint CurrentTimeLoc = glGetUniformLocation(_program, "CurrentTime");
-	glUniform1f(CurrentTimeLoc, *m_pCurrentTime);
-	GLint PVMMatLoc = glGetUniformLocation(_program, "PVMMat");
-	glUniformMatrix4fv(PVMMatLoc, 1, GL_FALSE, glm::value_ptr(PVMMat));
-
-	//If the shape has textures provided
-	if (!_shape.m_textures.empty())
-	{
-		//Set texture uniforms
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, _shape.m_textures[_shape.m_iTextureIndex]);
-		glUniform1i(glGetUniformLocation(_program, "ImageTexture"), 0);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, _shape.m_textures[_shape.m_iFadeIndex]);
-		glUniform1i(glGetUniformLocation(_program, "ImageTexture1"), 1);
-	}
-
-	//Render the Shape
-	glDrawElements(GL_TRIANGLES, _shape.m_verticesCount, GL_UNSIGNED_INT, 0);
-
-	//Unbind assets
-	glBindVertexArray(0);
-	glUseProgram(0);
-}
-
-void Camera::Render(Mesh3D& _shape, GLuint& _program)
-{
-	//Calculate the PVM matrix
-	glm::mat4 PVMMat = m_projectionMat * m_viewMat * _shape.GetModelMatrix();
-
-	//Bind program and VAO
-	glUseProgram(_program);
-	glBindVertexArray(_shape.m_VAO);
-
-	//Send Vars to shaders via Uniform
-	GLint CurrentTimeLoc = glGetUniformLocation(_program, "CurrentTime");
-	glUniform1f(CurrentTimeLoc, *m_pCurrentTime);
-	GLint PVMMatLoc = glGetUniformLocation(_program, "PVMMat");
-	glUniformMatrix4fv(PVMMatLoc, 1, GL_FALSE, glm::value_ptr(PVMMat));
-
-	//If the shape has textures provided
-	if (!_shape.m_textures.empty())
-	{
-		//Set texture uniforms
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, _shape.m_textures[_shape.m_iTextureIndex]);
-		glUniform1i(glGetUniformLocation(_program, "ImageTexture"), 0);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, _shape.m_textures[_shape.m_iFadeIndex]);
-		glUniform1i(glGetUniformLocation(_program, "ImageTexture1"), 1);
-	}
-
-	//Render the Shape
-	glDrawElements(GL_TRIANGLES, _shape.m_verticesCount, GL_UNSIGNED_INT, 0);
-
-	//Unbind assets
-	glBindVertexArray(0);
-	glUseProgram(0);
+	return m_projectionMat * m_viewMat * _modelmat;
 }

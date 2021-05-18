@@ -17,6 +17,7 @@
 #include <gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>
 #include <vector>
+#include "Camera.h"
 // --------------------------------------------------------------------------------
 /// <summary>
 /// Base class for shapes
@@ -29,6 +30,19 @@ public:
 	float m_fRotation;
 	glm::vec3 m_scale;
 	glm::vec3 m_color;
+
+	glm::vec3 Position();
+	glm::vec3 Rotation();
+	glm::vec3 Scale();
+	glm::vec3 Color();
+
+	void Position(glm::vec3 _pos);
+	void Rotation(glm::vec3 _rot);
+	void Scale(glm::vec3 _scl);
+	void Color(glm::vec3 _col);
+
+	void Render(Camera _camera, GLuint _program);
+
 	// ********************************************************************************
 	/// <summary>
 	/// Computes and returns the model matrix for the shape

@@ -118,3 +118,78 @@ Quad2D::Quad2D()
 	glVertexAttribPointer(2, 2, GL_FLOAT, false, 8 * sizeof(GLfloat), (GLvoid*)(6 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(2);
 }
+
+glm::vec3 Shape2D::Position()
+{
+	return m_position;
+}
+
+glm::vec3 Shape2D::Rotation()
+{
+	return glm::vec3(0.0f, 0.0f, m_fRotation);
+}
+
+glm::vec3 Shape2D::Scale()
+{
+	return m_scale;
+}
+
+glm::vec3 Shape2D::Color()
+{
+	return m_color;
+}
+
+void Shape2D::Position(glm::vec3 _pos)
+{
+	m_position = _pos;
+}
+
+void Shape2D::Rotation(glm::vec3 _rot)
+{
+	m_fRotation = _rot.z;
+}
+
+void Shape2D::Scale(glm::vec3 _scl)
+{
+	m_scale = _scl;
+}
+
+void Shape2D::Color(glm::vec3 _col)
+{
+	m_color = _col;
+}
+
+void Shape2D::Render(Camera _camera, GLuint _program)
+{
+	//Calculate the PVM matrix
+	glm::mat4 PVMMat = _camera.GetPVM(GetModelMatrix());
+
+	//Bind program and VAO
+	glUseProgram(_program);
+	glBindVertexArray(m_VAO);
+
+	//Send Vars to shaders via Uniform
+	GLint CurrentTimeLoc = glGetUniformLocation(_program, "CurrentTime");
+	glUniform1f(CurrentTimeLoc, glfwGetTime());
+	GLint PVMMatLoc = glGetUniformLocation(_program, "PVMMat");
+	glUniformMatrix4fv(PVMMatLoc, 1, GL_FALSE, glm::value_ptr(PVMMat));
+
+	//If the shape has textures provided
+	if (!m_textures.empty())
+	{
+		//Set texture uniforms
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, m_textures[m_iTextureIndex]);
+		glUniform1i(glGetUniformLocation(_program, "ImageTexture"), 0);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, m_textures[m_iFadeIndex]);
+		glUniform1i(glGetUniformLocation(_program, "ImageTexture1"), 1);
+	}
+
+	//Render the Shape
+	glDrawElements(GL_TRIANGLES, m_verticesCount, GL_UNSIGNED_INT, 0);
+
+	//Unbind assets
+	glBindVertexArray(0);
+	glUseProgram(0);
+}
