@@ -22,6 +22,7 @@
 #include "Camera.h"
 #include "Config.h"
 #include "TextLabel.h"
+#include "Mesh3D.h"
 #include <fmod.hpp>
 
 //Pointer to window
@@ -75,6 +76,12 @@ Quad2D* shape_quad = nullptr;
 Quad2D* shape_quad2 = nullptr;
 
 TextLabel* text_message = nullptr;
+
+Pyramid3D* shape_pyramid = nullptr;
+
+Mesh3D* shape_cube = nullptr;
+
+Sphere3D* shape_sphere = nullptr;
 
 int main()
 {
@@ -156,6 +163,8 @@ GLuint LoadTexture(std::string _filename)
 void InitialSetup()
 {
 	stbi_set_flip_vertically_on_load(true);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
 
 	current_time = 0;
 	delta_time = 0;
@@ -180,6 +189,9 @@ void InitialSetup()
 	program_texture_wave = ShaderLoader::CreateProgram("Resources/Shaders/ClipSpace.vs",
 		"Resources/Shaders/TextureWave.fs");
 
+	program_worldspace = ShaderLoader::CreateProgram("Resources/Shaders/ClipSpace.vs",
+		"Resources/Shaders/FixedColor.fs");
+
 	//Cull poly not facing viewport
 	glCullFace(GL_BACK);
 
@@ -187,7 +199,7 @@ void InitialSetup()
 	glEnable(GL_CULL_FACE);
 
 	//Create camera
-	camera = new Camera(cfWINDOW_WIDTH(), cfWINDOW_HEIGHT(), current_time);
+	camera = new Camera(cfWINDOW_WIDTH(), cfWINDOW_HEIGHT(), current_time, true);
 
 	//Create objects
 	shape_hex = new Hex2D();
@@ -196,9 +208,15 @@ void InitialSetup()
 
 	shape_quad2 = new Quad2D();
 
+	shape_pyramid = new Pyramid3D();
+
+	shape_cube = new Cube3D();
+
+	shape_sphere = new Sphere3D(20.0f, 1);
+
 	//Create Text
 
-	text_message = new TextLabel("Super spicy text!", "Resources/Fonts/ARIAL.ttf", glm::ivec2(0, 48), glm::vec2(100.0f, 100.0f), TextLabel::MARQUEE);
+	text_message = new TextLabel("Super spicy text!", "Resources/Fonts/ARIAL.ttf", glm::ivec2(0, 40), glm::vec2(200.0f, 100.0f), TextLabel::MARQUEE, glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f,1.0f), 200.0f, 600.0f);
 
 
 	//Set textures of objects
@@ -217,16 +235,13 @@ void InitialSetup()
 
 	shape_quad2->AddTexture(LoadTexture("Rayman.jpg"));
 
-	//Set initiaal position of objects
-	shape_hex->m_position = glm::vec3(-200.0f, 0.0f, 0.0f);
-	shape_hex->m_scale = glm::vec3(100.0f, 100.0f, 0.0f);
 	
 	
-	shape_quad->m_position = glm::vec3(200.0f, 0.0f, 0.0f);
-	shape_quad->m_scale = glm::vec3(100.0f, 200.0f, 0.0f);
-
-	shape_quad2->m_position = glm::vec3(0.0f, -200.0f, 0.0f);
-	shape_quad2->m_scale = glm::vec3(100.0f, 100.0f, 0.0f);
+	
+	
+	
+	shape_cube->Position(glm::vec3(-0.5f, -0.5f, -0.5f));
+	//shape_sphere->Position(glm::vec3(0.5f, 0.5f, -0.5f));
 
 	//Setup sound stuff
 	if (AudioSystem->createSound("Resources/Audio/Gunshot.wav", FMOD_DEFAULT, 0, &FX_Gunshot) != FMOD_OK)
@@ -276,27 +291,36 @@ void Update()
 	}
 	timer -= delta_time;
 
+	
+	shape_pyramid->Rotation(glm::vec3(delta_time * 10, 0.0f, 0.0f) + shape_pyramid->Rotation());
+	shape_cube->Rotation(glm::vec3(delta_time * -10, delta_time * -10, 0.0f) + shape_cube->Rotation());
+
 	//Rainbow background
 	glClearColor(((sin(current_time) + 1.0f) * 0.5f), ((sin(current_time + 2.0f) + 0.5f) * 0.5f), ((sin(current_time + 4.0f) + 1.0f) * 0.5f), 1.0f);
+
+	
 }
 
 //Render all objects
 void Render()
 {
 	//Clear the buffer
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	//Set position of shape and render it
-	shape_hex->m_position = glm::vec3(-200.0f, 0.0f, 0.0f);
+	
+	
 	//Draw the shape
-	camera->Render(*shape_hex, program_texture_interpolation);
-	//Set position of shape to second position and render it
-	shape_hex->m_position = glm::vec3(0.0f, 0.0f, 0.0f);
-	//Draw the shape
-	camera->Render(*shape_hex, program_texture_interpolation);
-	//Render the animated quad
-	camera->Render(*shape_quad, program_texture_interpolation);
-	//Render the Quad with the distorted texture
-	camera->Render(*shape_quad2, program_texture_wave);
+	
+	shape_hex->Render(*camera, program_texture_interpolation);
+	
+	
+	shape_pyramid->Render(*camera, program_worldspace);
+	if (cfFLAG("Render_Cube"))
+	{
+		shape_cube->Render(*camera, program_worldspace);
+	}
+
+	shape_sphere->Render(*camera, program_worldspace);
 
 	text_message->Render();
 
