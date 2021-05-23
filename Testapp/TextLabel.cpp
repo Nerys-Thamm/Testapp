@@ -24,12 +24,15 @@ GLuint TextLabel::GenerateTexture(FT_Face face)
 	return TextureID;
 }
 
-TextLabel::TextLabel(std::string Text, std::string Font, glm::ivec2 PixelSize, glm::vec2 Pos, TextLabel::TextEffect Effect, glm::vec3 Color, glm::vec2 Scale)
+TextLabel::TextLabel(std::string Text, std::string Font, glm::ivec2 PixelSize, glm::vec2 Pos, TextLabel::TextEffect Effect, glm::vec3 Color, glm::vec2 Scale, float LeftBuffer, float RightBuffer)
 {
 	SetText(Text);
 	SetColor(Color);
 	SetScale(Scale);
 	SetPosition(Pos);
+
+	m_LeftBuffer = LeftBuffer;
+	m_RightBuffer = RightBuffer;
 
 	ProjectionMat = glm::ortho(00.0f, (GLfloat)cfWINDOW_WIDTH(), 0.0f, (GLfloat)cfWINDOW_HEIGHT(), 0.0f, 100.0f);
 	switch (Effect)
@@ -118,6 +121,10 @@ void TextLabel::Render()
 	glUniform1f(CurrentTimeLoc, glfwGetTime());
 	GLint ScreenWidthLoc = glGetUniformLocation(Program_Text, "ScreenWidth");
 	glUniform1f(ScreenWidthLoc, cfWINDOW_WIDTH());
+	GLint LeftBufferLoc = glGetUniformLocation(Program_Text, "LeftBuffer");
+	glUniform1f(LeftBufferLoc, m_LeftBuffer);
+	GLint RightBufferLoc = glGetUniformLocation(Program_Text, "RightBuffer");
+	glUniform1f(RightBufferLoc, m_RightBuffer);
 	glBindVertexArray(VAO_Text);
 
 
