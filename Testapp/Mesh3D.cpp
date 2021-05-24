@@ -39,6 +39,8 @@ Mesh3D::Mesh3D()
 	m_fRotationZ = 0;
 	m_vertices = 0;
 	m_verticesCount = 0;
+	m_position = glm::vec3(0.0f, 0.0f, 0.0f);
+	m_scale = glm::vec3(1.0f, 1.0f, 1.0f);
 }
 Mesh3D::~Mesh3D()
 {
@@ -111,7 +113,7 @@ void Mesh3D::Render(Camera _camera, GLuint _program)
 {
 	//Calculate the PVM matrix
 	glm::mat4 PVMMat = _camera.GetPVM(GetModelMatrix());
-
+	glm::mat4 ModelMat = GetModelMatrix();
 	//Bind program and VAO
 	glUseProgram(_program);
 	glBindVertexArray(m_VAO);
@@ -121,6 +123,8 @@ void Mesh3D::Render(Camera _camera, GLuint _program)
 	glUniform1f(CurrentTimeLoc, glfwGetTime());
 	GLint PVMMatLoc = glGetUniformLocation(_program, "PVMMat");
 	glUniformMatrix4fv(PVMMatLoc, 1, GL_FALSE, glm::value_ptr(PVMMat));
+	GLint ModelLoc = glGetUniformLocation(_program, "Model");
+	glUniformMatrix4fv(ModelLoc, 1, GL_FALSE, glm::value_ptr(ModelMat));
 
 	//If the shape has textures provided
 	if (!m_textures.empty())
@@ -258,14 +262,14 @@ Sphere3D::Sphere3D(float Radius, int Fidelity)
 	}
 
 	// Create the Vertex Array and associated buffers
-	GLuint VBO, EBO;
+	
 	glGenVertexArrays(1, &m_VAO);
 	glBindVertexArray(m_VAO);
-	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glGenBuffers(1, &m_VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
 	glBufferData(GL_ARRAY_BUFFER, VertexCount * sizeof(GLfloat), Vertices, GL_STATIC_DRAW);
-	glGenBuffers(1, &EBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glGenBuffers(1, &m_EBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, IndexCount * sizeof(GLuint), Indices, GL_STATIC_DRAW);
 
 	// Vertex Information (Position, Texture Coords and Normals)

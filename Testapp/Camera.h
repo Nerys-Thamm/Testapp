@@ -31,6 +31,7 @@ public:
 	glm::vec3 m_cameraUpDir = glm::vec3(0.0f, 1.0f, 0.0f);
 	glm::mat4 m_viewMat = glm::mat4();
 	glm::mat4 m_projectionMat = glm::mat4();
+	bool m_lookAtTarget = false;
 
 	// ********************************************************************************
 	/// <summary>

@@ -24,6 +24,8 @@
 #include "TextLabel.h"
 #include "Mesh3D.h"
 #include <fmod.hpp>
+#include "GameObject.h"
+#include "Character.h"
 
 //Pointer to window
 GLFWwindow* main_window = nullptr;
@@ -63,6 +65,8 @@ GLuint program_fixed_color;
 
 GLuint program_texture_wave;
 
+GLuint program_normals;
+
 float current_time;
 float delta_time;
 float timer;
@@ -81,7 +85,15 @@ Pyramid3D* shape_pyramid = nullptr;
 
 Mesh3D* shape_cube = nullptr;
 
-Sphere3D* shape_sphere = nullptr;
+Mesh3D* shape_sphere = nullptr;
+
+Mesh3D* shape_cube2 = nullptr;
+
+Mesh3D* shape_floor = nullptr;
+
+Character* char_test = nullptr;
+
+TextLabel* text_cursorpos = nullptr;
 
 int main()
 {
@@ -190,7 +202,10 @@ void InitialSetup()
 		"Resources/Shaders/TextureWave.fs");
 
 	program_worldspace = ShaderLoader::CreateProgram("Resources/Shaders/ClipSpace.vs",
-		"Resources/Shaders/FixedColor.fs");
+		"Resources/Shaders/Texture.fs");
+
+	program_normals = ShaderLoader::CreateProgram("Resources/Shaders/3D_Normals.vs",
+		"Resources/Shaders/Texture.fs");
 
 	//Cull poly not facing viewport
 	glCullFace(GL_BACK);
@@ -211,13 +226,20 @@ void InitialSetup()
 	shape_pyramid = new Pyramid3D();
 
 	shape_cube = new Cube3D();
+	shape_cube2 = new Cube3D();
 
-	shape_sphere = new Sphere3D(20.0f, 1);
+	shape_sphere = new Sphere3D(1.0f, 20);
+
+	shape_floor = new Cube3D();
+
+	//Create character
+	char_test = new Character(main_window);
 
 	//Create Text
 
 	text_message = new TextLabel("Super spicy text!", "Resources/Fonts/ARIAL.ttf", glm::ivec2(0, 40), glm::vec2(200.0f, 100.0f), TextLabel::MARQUEE, glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f,1.0f), 200.0f, 600.0f);
 
+	text_cursorpos = new TextLabel("Default", "Resources/Fonts/ARIAL.ttf", glm::ivec2(0, 40), glm::vec2(0.0f, 0.0f), TextLabel::NONE);
 
 	//Set textures of objects
 	shape_hex->AddTexture(LoadTexture("Rayman.jpg"));
@@ -235,13 +257,19 @@ void InitialSetup()
 
 	shape_quad2->AddTexture(LoadTexture("Rayman.jpg"));
 
+	shape_sphere->AddTexture(LoadTexture("Rayman.jpg"));
+	shape_cube->AddTexture(LoadTexture("Rayman.jpg"));
+	shape_cube2->AddTexture(LoadTexture("Rayman.jpg"));
+	shape_floor->AddTexture(LoadTexture("grid.jpg"));
 	
-	
-	
-	
+	shape_floor->Position(glm::vec3(0.0f, -0.8f, 0.0f));
+	shape_floor->Scale(glm::vec3(14.0f, 0.1f, 14.0f));
 	
 	shape_cube->Position(glm::vec3(-0.5f, -0.5f, -0.5f));
-	//shape_sphere->Position(glm::vec3(0.5f, 0.5f, -0.5f));
+	shape_sphere->Position(glm::vec3(0.5f, 0.5f, -0.5f));
+	shape_sphere->Scale(glm::vec3(0.5f, 0.5f, 0.5f));
+
+	camera->m_cameraPos = glm::vec3(0.0f, 0.0f, -8.0f);
 
 	//Setup sound stuff
 	if (AudioSystem->createSound("Resources/Audio/Gunshot.wav", FMOD_DEFAULT, 0, &FX_Gunshot) != FMOD_OK)
@@ -250,9 +278,36 @@ void InitialSetup()
 	}
 }
 
+void ProcessInput(float _deltatime)
+{
+	if (glfwGetKey(main_window, GLFW_KEY_W) == GLFW_PRESS)
+	{
+
+	}
+	if (glfwGetKey(main_window, GLFW_KEY_A) == GLFW_PRESS)
+	{
+
+	}
+	if (glfwGetKey(main_window, GLFW_KEY_S) == GLFW_PRESS)
+	{
+
+	}
+	if (glfwGetKey(main_window, GLFW_KEY_D) == GLFW_PRESS)
+	{
+
+	}
+}
+
 //Update all objects and run the processes
 void Update()
 {
+	CObjectController::UpdateObjects();
+
+	double xpos;
+	double ypos;
+	glfwGetCursorPos(main_window, &xpos, &ypos);
+	text_cursorpos->SetText("Pos: ( " + std::to_string(xpos) + " , " + std::to_string(ypos) + " )");
+
 	if (cfFLAG("Spam_me_please"))
 	{
 		std::cout << "SPAM ";
@@ -292,8 +347,16 @@ void Update()
 	timer -= delta_time;
 
 	
-	shape_pyramid->Rotation(glm::vec3(delta_time * 10, 0.0f, 0.0f) + shape_pyramid->Rotation());
-	shape_cube->Rotation(glm::vec3(delta_time * -10, delta_time * -10, 0.0f) + shape_cube->Rotation());
+	//shape_pyramid->Rotation(glm::vec3(delta_time * 10, 0.0f, 0.0f) + shape_pyramid->Rotation());
+	shape_cube->Rotation(glm::vec3(0.0f, delta_time * 70, 0.0f) + shape_cube->Rotation());
+	shape_cube2->Rotation(glm::vec3(0.0f, delta_time * 70, 0.0f) + shape_cube2->Rotation());
+	//shape_sphere->Rotation(glm::vec3(delta_time * -10, delta_time * -10, 0.0f) + shape_sphere->Rotation());
+
+	//camera->m_cameraPos = glm::vec3( 4 *cos(current_time*2), 0.0f, 4 * sin(current_time*2));
+	camera->m_lookAtTarget = true;
+
+	shape_cube->Position(glm::vec3(cos(current_time * 2), 0.0f,  sin(current_time * 2)));
+	shape_cube2->Position(glm::vec3( cos((current_time+1.57) * 2), 0.0f,  sin((current_time+1.57) * 2)));
 
 	//Rainbow background
 	glClearColor(((sin(current_time) + 1.0f) * 0.5f), ((sin(current_time + 2.0f) + 0.5f) * 0.5f), ((sin(current_time + 4.0f) + 1.0f) * 0.5f), 1.0f);
@@ -311,18 +374,21 @@ void Render()
 	
 	//Draw the shape
 	
-	shape_hex->Render(*camera, program_texture_interpolation);
+	//shape_hex->Render(*camera, program_texture_interpolation);
 	
-	
-	shape_pyramid->Render(*camera, program_worldspace);
+	shape_floor->Render(*camera, program_worldspace);
+
 	if (cfFLAG("Render_Cube"))
 	{
 		shape_cube->Render(*camera, program_worldspace);
 	}
+	shape_cube2->Render(*camera, program_worldspace);
 
-	shape_sphere->Render(*camera, program_worldspace);
+	char_test->Render(*camera, program_fixed_color);
 
 	text_message->Render();
+
+	text_cursorpos->Render();
 
 	//Push buffer to the screen
 	glfwSwapBuffers(main_window);
