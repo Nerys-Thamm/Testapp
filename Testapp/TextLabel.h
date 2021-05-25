@@ -43,9 +43,15 @@ private:
 
 	GLuint VAO_Text;
 	GLuint VBO_DynamicQuad;
+	GLuint EBO_Text;
 	GLuint Program_Text;
 	glm::mat4 ProjectionMat;
 	std::map<GLchar, FontChar> CharacterMap;
+
+	GLuint indices[6] = {
+		0,1,2,
+		0,2,3,
+	};
 	
 public:
 	enum TextEffect

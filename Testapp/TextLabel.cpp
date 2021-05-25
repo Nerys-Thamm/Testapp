@@ -92,9 +92,14 @@ TextLabel::TextLabel(std::string Text, std::string Font, glm::ivec2 PixelSize, g
 	glGenVertexArrays(1, &VAO_Text);
 	glBindVertexArray(VAO_Text);
 
+	//Generate and bind EBO
+	glGenBuffers(1, &EBO_Text);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO_Text);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
 	glGenBuffers(1, &VBO_DynamicQuad);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO_DynamicQuad);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 4 * 4, NULL, GL_DYNAMIC_DRAW);
 
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), 0);
 	glEnableVertexAttribArray(0);
@@ -138,9 +143,9 @@ void TextLabel::Render()
 		GLfloat Width = FontCharacter.Size.x * Scale.x;
 		GLfloat Height = FontCharacter.Size.y * Scale.y;
 
-		GLfloat vertices[6][4] = {
-			{PosX, PosY + Height, 0.0, 0.0}, {PosX, PosY, 0.0, 1.0 }, {PosX + Width, PosY, 1.0, 1.0 },
-			{PosX, PosY + Height, 0.0, 0.0}, {PosX + Width, PosY, 1.0, 1.0 }, {PosX + Width, PosY + Height, 1.0, 0.0 },
+		GLfloat vertices[4][4] = {
+			{PosX, PosY + Height, 0.0, 0.0}, {PosX, PosY, 0.0, 1.0},
+			{PosX + Width, PosY, 1.0, 1.0}, {PosX + Width, PosY + Height, 1.0, 0.0},
 		};
 
 		glBindBuffer(GL_ARRAY_BUFFER, VBO_DynamicQuad);
@@ -149,7 +154,7 @@ void TextLabel::Render()
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, FontCharacter.TextureID);
 		glUniform1i(glGetUniformLocation(Program_Text, "TextTexture"), 0);
-		glDrawArrays(GL_TRIANGLES, 0, 6);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 		CharacterOrigin.x += FontCharacter.Advance * Scale.x;
 	}

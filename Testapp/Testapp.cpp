@@ -26,6 +26,7 @@
 #include <fmod.hpp>
 #include "GameObject.h"
 #include "Character.h"
+#include "SceneManager.h"
 
 //Pointer to window
 GLFWwindow* main_window = nullptr;
@@ -38,6 +39,8 @@ void Render();
 FMOD::System* AudioSystem;
 FMOD::Sound* FX_Gunshot;
 FMOD::Sound* Track_Dance;
+
+SceneManager* manager = nullptr;
 
 bool AudioInit()
 {
@@ -94,6 +97,8 @@ Mesh3D* shape_floor = nullptr;
 Character* char_test = nullptr;
 
 TextLabel* text_cursorpos = nullptr;
+
+TextLabel* text_username = nullptr;
 
 int main()
 {
@@ -178,6 +183,8 @@ void InitialSetup()
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 
+	manager = new SceneManager(main_window);
+
 	current_time = 0;
 	delta_time = 0;
 	timer = 1 / 24;
@@ -240,6 +247,8 @@ void InitialSetup()
 	text_message = new TextLabel("Super spicy text!", "Resources/Fonts/ARIAL.ttf", glm::ivec2(0, 40), glm::vec2(200.0f, 100.0f), TextLabel::MARQUEE, glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f,1.0f), 200.0f, 600.0f);
 
 	text_cursorpos = new TextLabel("Default", "Resources/Fonts/ARIAL.ttf", glm::ivec2(0, 40), glm::vec2(0.0f, 0.0f), TextLabel::NONE);
+
+	text_username = new TextLabel("Press Enter to type!", "Resources/Fonts/ARIAL.ttf", glm::ivec2(0, 40), glm::vec2(0.0f, 700.0f), TextLabel::MARQUEE);
 
 	//Set textures of objects
 	shape_hex->AddTexture(LoadTexture("Rayman.jpg"));
@@ -320,9 +329,11 @@ void Update()
 	{
 		text_message->SetText("Test flag is disabled!");
 	}
-	
+
 	AudioSystem->update();
 	glfwPollEvents();
+
+	text_username->SetText(SceneManager::GetTextInputBuffer());
 
 	//Get the current time
 	delta_time = current_time;
@@ -389,6 +400,8 @@ void Render()
 	text_message->Render();
 
 	text_cursorpos->Render();
+
+	text_username->Render();
 
 	//Push buffer to the screen
 	glfwSwapBuffers(main_window);
