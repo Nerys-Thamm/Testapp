@@ -4,24 +4,29 @@
 #include <glfw3.h>
 #include <glm.hpp>
 #include <vector>
+#include "GameObject.h"
 class Collider2D
 {
 	friend class Collision2D;
+public:
+	unsigned int m_layerMask = 0x0;
+	glm::vec3* m_pos;
+	glm::vec3* m_scale;
+	CGameObject* GetParentObject();
 protected:
 	Collider2D();
-	unsigned int m_layerMask = 0x0;
-	glm::vec2 m_pos;
-	glm::vec2 m_scale;
+	CGameObject* m_parentObj = nullptr;
 };
 
 class RectCollider2D :
-	protected Collider2D
+	public Collider2D
 {
-
+public:
+	RectCollider2D(CGameObject* _parentObj, glm::vec3* _objPos, glm::vec3* _objScale);
 };
 
 class OvalCollider2D :
-	protected Collider2D
+	public Collider2D
 {
 
 };

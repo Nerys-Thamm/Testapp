@@ -126,6 +126,12 @@ public:
 	/// </para></param>
 	// ********************************************************************************
 	static void LateUpdate(float _fDeltaTime);
+
+	
+
+	static void SetMainWindow(GLFWwindow* _window);
+
+	static GLFWwindow* GetMainWindow();
 private:
 	
 
@@ -175,4 +181,6 @@ private:
 	/// <returns>Value of type: CGameObject Pointer</returns>
 	// ********************************************************************************
 	static CGameObject** GetHead();
+
+	static GLFWwindow* m_mainwindow;
 };

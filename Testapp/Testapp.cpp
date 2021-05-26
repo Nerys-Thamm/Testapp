@@ -27,6 +27,7 @@
 #include "GameObject.h"
 #include "Character.h"
 #include "SceneManager.h"
+#include "FadingRect.h"
 
 //Pointer to window
 GLFWwindow* main_window = nullptr;
@@ -99,6 +100,8 @@ Character* char_test = nullptr;
 TextLabel* text_cursorpos = nullptr;
 
 TextLabel* text_username = nullptr;
+
+FadingRect* faderect_test = nullptr;
 
 int main()
 {
@@ -182,7 +185,7 @@ void InitialSetup()
 	stbi_set_flip_vertically_on_load(true);
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
-
+	CObjectController::SetMainWindow(main_window);
 	manager = new SceneManager(main_window);
 
 	current_time = 0;
@@ -250,6 +253,10 @@ void InitialSetup()
 
 	text_username = new TextLabel("Press Enter to type!", "Resources/Fonts/ARIAL.ttf", glm::ivec2(0, 40), glm::vec2(0.0f, 700.0f), TextLabel::MARQUEE);
 
+	//Create FadeRect
+
+	faderect_test = new FadingRect(glm::vec3(0, 0, 0), glm::vec3(1, 1, 0), LoadTexture("Rayman.jpg"), LoadTexture("AwesomeFace.png"));
+
 	//Set textures of objects
 	shape_hex->AddTexture(LoadTexture("Rayman.jpg"));
 	shape_hex->AddTexture(LoadTexture("AwesomeFace.png"));
@@ -315,7 +322,7 @@ void Update()
 	double xpos;
 	double ypos;
 	glfwGetCursorPos(main_window, &xpos, &ypos);
-	text_cursorpos->SetText("Pos: ( " + std::to_string(xpos) + " , " + std::to_string(ypos) + " )");
+	text_cursorpos->SetText("Pos: ( " + std::to_string(xpos - cfWINDOW_WIDTH() / 2) + " , " + std::to_string(ypos - cfWINDOW_HEIGHT() / 2) + " )");
 
 	if (cfFLAG("Spam_me_please"))
 	{
@@ -402,6 +409,8 @@ void Render()
 	text_cursorpos->Render();
 
 	text_username->Render();
+
+	faderect_test->m_rect->Render(*camera, program_texture_interpolation);
 
 	//Push buffer to the screen
 	glfwSwapBuffers(main_window);

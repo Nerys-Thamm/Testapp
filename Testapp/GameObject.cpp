@@ -130,3 +130,15 @@ CGameObject** CObjectController::GetHead()
 	static CGameObject* pHead = nullptr;
 	return &pHead; //Return a reference to the current head node
 }
+
+GLFWwindow* CObjectController::m_mainwindow;
+
+void CObjectController::SetMainWindow(GLFWwindow* _window)
+{
+	m_mainwindow = _window;
+}
+
+GLFWwindow* CObjectController::GetMainWindow()
+{
+	return m_mainwindow;
+}
