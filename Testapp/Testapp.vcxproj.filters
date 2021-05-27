@@ -51,6 +51,9 @@
     <ClCompile Include="FadingRect.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Audiosystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Testapp.h">
@@ -90,6 +93,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="FadingRect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Audiosystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -14,6 +14,7 @@ public:
 	void Render(Camera _camera, GLuint _program);
 private:
 	bool m_ishovering = false;
+	bool m_isfading = false;
 
 };
 

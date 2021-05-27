@@ -22,22 +22,22 @@ void Character::Update(float _fDeltaTime)
 	//INPUT
 	if (glfwGetKey(m_currwindow, GLFW_KEY_W) == GLFW_PRESS)
 	{
-		direction += glm::vec3(0.0f, 0.0f, 1.0f);
+		direction += glm::vec3(0.0f, 0.0f, -1.0f);
 		keypressed = true;
 	}
 	if (glfwGetKey(m_currwindow, GLFW_KEY_A) == GLFW_PRESS)
 	{
-		direction += glm::vec3(1.0f, 0.0f, 0.0f);
+		direction += glm::vec3(-1.0f, 0.0f, 0.0f);
 		keypressed = true;
 	}
 	if (glfwGetKey(m_currwindow, GLFW_KEY_S) == GLFW_PRESS)
 	{
-		direction += glm::vec3(0.0f, 0.0f, -1.0f);
+		direction += glm::vec3(0.0f, 0.0f, 1.0f);
 		keypressed = true;
 	}
 	if (glfwGetKey(m_currwindow, GLFW_KEY_D) == GLFW_PRESS)
 	{
-		direction += glm::vec3(-1.0f, 0.0f, 0.0f);
+		direction += glm::vec3(1.0f, 0.0f, 0.0f);
 		keypressed = true;
 	}
 	if (glfwGetKey(m_currwindow, GLFW_KEY_Q) == GLFW_PRESS)

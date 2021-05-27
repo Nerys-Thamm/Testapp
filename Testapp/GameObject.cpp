@@ -25,7 +25,7 @@ void CObjectController::UpdateObjects()
 	currentTime = (float)glfwGetTime();
 	deltaTime = currentTime - deltaTime;
 
-	deltaTime = 
+	
 	fixedTime += deltaTime; //Add the delta time to fixedTime.
 	Update(deltaTime); //Call the Update method on derived classes that have implemented it
 	while (fixedTime >= (1.0f / 60.0f)) //Call FixedUpdate a number of times determined by fixedTime

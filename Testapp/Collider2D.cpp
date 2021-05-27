@@ -2,7 +2,7 @@
 
 bool Collision2D::CheckCollision(RectCollider2D _rect, glm::vec2 _point)
 {
-	if((_point.x < (_rect.m_pos->x + _rect.m_scale->x)) && (_point.y < (_rect.m_pos->y + _rect.m_scale->y)) && (_point.x > (_rect.m_pos->x - _rect.m_scale->x)) && (_point.y > (_rect.m_pos->y - _rect.m_scale->y)))
+	if((_point.x < (_rect.m_pos->x + _rect.m_scale->x/2)) && (-_point.y < (_rect.m_pos->y + _rect.m_scale->y/2)) && (_point.x > (_rect.m_pos->x - _rect.m_scale->x/2)) && (-_point.y > (_rect.m_pos->y - _rect.m_scale->y/2)))
 	{
 		return true;
 	}

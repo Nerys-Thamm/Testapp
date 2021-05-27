@@ -193,3 +193,40 @@ void Shape2D::Render(Camera _camera, GLuint _program)
 	glBindVertexArray(0);
 	glUseProgram(0);
 }
+
+void Shape2D::Render(Camera _camera, GLuint _program, bool _fade)
+{
+	//Calculate the PVM matrix
+	glm::mat4 PVMMat = _camera.GetPVM(GetModelMatrix());
+
+	//Bind program and VAO
+	glUseProgram(_program);
+	glBindVertexArray(m_VAO);
+
+	//Send Vars to shaders via Uniform
+	GLint CurrentTimeLoc = glGetUniformLocation(_program, "CurrentTime");
+	glUniform1f(CurrentTimeLoc, glfwGetTime());
+	GLint PVMMatLoc = glGetUniformLocation(_program, "PVMMat");
+	glUniformMatrix4fv(PVMMatLoc, 1, GL_FALSE, glm::value_ptr(PVMMat));
+	GLint FadeLoc = glGetUniformLocation(_program, "IsFading");
+	glUniform1i(FadeLoc, _fade);
+
+	//If the shape has textures provided
+	if (!m_textures.empty())
+	{
+		//Set texture uniforms
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, m_textures[m_iTextureIndex]);
+		glUniform1i(glGetUniformLocation(_program, "ImageTexture"), 0);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, m_textures[m_iFadeIndex]);
+		glUniform1i(glGetUniformLocation(_program, "ImageTexture1"), 1);
+	}
+
+	//Render the Shape
+	glDrawElements(GL_TRIANGLES, m_verticesCount, GL_UNSIGNED_INT, 0);
+
+	//Unbind assets
+	glBindVertexArray(0);
+	glUseProgram(0);
+}

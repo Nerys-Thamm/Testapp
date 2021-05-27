@@ -42,6 +42,7 @@ public:
 	void Color(glm::vec3 _col);
 
 	void Render(Camera _camera, GLuint _program);
+	void Render(Camera _camera, GLuint _program, bool _fade);
 
 	// ********************************************************************************
 	/// <summary>

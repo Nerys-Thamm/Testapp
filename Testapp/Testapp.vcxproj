@@ -145,6 +145,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Audiosystem.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Character.cpp" />
     <ClCompile Include="Collider2D.cpp" />
@@ -159,6 +160,7 @@
     <ClCompile Include="TextLabel.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Audiosystem.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Character.h" />
     <ClInclude Include="Collider2D.h" />

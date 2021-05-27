@@ -38,6 +38,8 @@ void Render();
 
 //FMOD init stuff
 FMOD::System* AudioSystem;
+FMOD::ChannelGroup* Main_channel;
+FMOD::Channel* Channel1;
 FMOD::Sound* FX_Gunshot;
 FMOD::Sound* Track_Dance;
 
@@ -77,15 +79,11 @@ float timer;
 
 Camera* camera = nullptr;
 
-Hex2D* shape_hex = nullptr;
+Camera* orthocamera = nullptr;
 
-Quad2D* shape_quad = nullptr;
-
-Quad2D* shape_quad2 = nullptr;
 
 TextLabel* text_message = nullptr;
 
-Pyramid3D* shape_pyramid = nullptr;
 
 Mesh3D* shape_cube = nullptr;
 
@@ -108,6 +106,7 @@ int main()
 	std::cout << "Program compiled " << __DATE__ << " | " << __TIME__ << std::endl;
 	//Init GLFW and setting ver to 4.6 with only core functionality
 	glfwInit();
+	AudioInit();
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
@@ -182,6 +181,8 @@ GLuint LoadTexture(std::string _filename)
 //Setup initial elements of program
 void InitialSetup()
 {
+	
+	
 	stbi_set_flip_vertically_on_load(true);
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
@@ -225,15 +226,9 @@ void InitialSetup()
 
 	//Create camera
 	camera = new Camera(cfWINDOW_WIDTH(), cfWINDOW_HEIGHT(), current_time, true);
+	orthocamera = new Camera(cfWINDOW_WIDTH(), cfWINDOW_HEIGHT(), current_time, false);
 
 	//Create objects
-	shape_hex = new Hex2D();
-	
-	shape_quad = new Quad2D();
-
-	shape_quad2 = new Quad2D();
-
-	shape_pyramid = new Pyramid3D();
 
 	shape_cube = new Cube3D();
 	shape_cube2 = new Cube3D();
@@ -255,23 +250,14 @@ void InitialSetup()
 
 	//Create FadeRect
 
-	faderect_test = new FadingRect(glm::vec3(0, 0, 0), glm::vec3(1, 1, 0), LoadTexture("Rayman.jpg"), LoadTexture("AwesomeFace.png"));
+	faderect_test = new FadingRect(glm::vec3(300, 300, 4), glm::vec3(200, 200, 1), LoadTexture("Rayman.jpg"), LoadTexture("AwesomeFace.png"));
 
 	//Set textures of objects
-	shape_hex->AddTexture(LoadTexture("Rayman.jpg"));
-	shape_hex->AddTexture(LoadTexture("AwesomeFace.png"));
-	shape_hex->m_iFadeIndex = 1;
+	
 
-	shape_quad->AddTexture(LoadTexture("Walk1.png"));
-	shape_quad->AddTexture(LoadTexture("Walk2.png"));
-	shape_quad->AddTexture(LoadTexture("Walk3.png"));
-	shape_quad->AddTexture(LoadTexture("Walk4.png"));
-	shape_quad->AddTexture(LoadTexture("Walk5.png"));
-	shape_quad->AddTexture(LoadTexture("Walk6.png"));
-	shape_quad->AddTexture(LoadTexture("Walk7.png"));
-	shape_quad->AddTexture(LoadTexture("Walk8.png"));
+	
 
-	shape_quad2->AddTexture(LoadTexture("Rayman.jpg"));
+	
 
 	shape_sphere->AddTexture(LoadTexture("Rayman.jpg"));
 	shape_cube->AddTexture(LoadTexture("Rayman.jpg"));
@@ -285,13 +271,17 @@ void InitialSetup()
 	shape_sphere->Position(glm::vec3(0.5f, 0.5f, -0.5f));
 	shape_sphere->Scale(glm::vec3(0.5f, 0.5f, 0.5f));
 
-	camera->m_cameraPos = glm::vec3(0.0f, 0.0f, -8.0f);
+	camera->m_cameraPos = glm::vec3(0.0f, 0.0f, 8.0f);
+	orthocamera->m_cameraPos = glm::vec3(0.0f, 0.0f, 8.0f);
 
 	//Setup sound stuff
-	if (AudioSystem->createSound("Resources/Audio/Gunshot.wav", FMOD_DEFAULT, 0, &FX_Gunshot) != FMOD_OK)
+	if (AudioSystem->createSound("Resources/Audio/DanceTrack.mp3", FMOD_DEFAULT, 0, &Track_Dance) != FMOD_OK)
 	{
 		std::cout << "FMOD ERROR: Failed to load sound using createSound(...)" << std::endl;
 	}
+	AudioSystem->createChannelGroup("Main", &Main_channel);
+	Main_channel->getChannel(0, &Channel1);
+	AudioSystem->playSound(Track_Dance, Main_channel, false, &Channel1);
 }
 
 void ProcessInput(float _deltatime)
@@ -347,22 +337,7 @@ void Update()
 	current_time = (float)glfwGetTime();
 	delta_time = current_time - delta_time;
 
-	//Animate the texture
-	if (timer <= 0)
-	{
-		if ((size_t)shape_quad->m_iFadeIndex >= shape_quad->m_textures.size() - 1)
-		{
-			shape_quad->m_iTextureIndex = 0;
-			shape_quad->m_iFadeIndex = 1;
-		}
-		else
-		{
-			shape_quad->m_iTextureIndex++;
-			shape_quad->m_iFadeIndex++;
-		}
-		timer = 0.04f;
-	}
-	timer -= delta_time;
+	
 
 	
 	//shape_pyramid->Rotation(glm::vec3(delta_time * 10, 0.0f, 0.0f) + shape_pyramid->Rotation());
@@ -371,7 +346,7 @@ void Update()
 	//shape_sphere->Rotation(glm::vec3(delta_time * -10, delta_time * -10, 0.0f) + shape_sphere->Rotation());
 
 	//camera->m_cameraPos = glm::vec3( 4 *cos(current_time*2), 0.0f, 4 * sin(current_time*2));
-	camera->m_lookAtTarget = true;
+	camera->m_lookAtTarget = false;
 
 	shape_cube->Position(glm::vec3(cos(current_time * 2), 0.0f,  sin(current_time * 2)));
 	shape_cube2->Position(glm::vec3( cos((current_time+1.57) * 2), 0.0f,  sin((current_time+1.57) * 2)));
@@ -392,7 +367,7 @@ void Render()
 	
 	//Draw the shape
 	
-	//shape_hex->Render(*camera, program_texture_interpolation);
+	
 	
 	shape_floor->Render(*camera, program_worldspace);
 
@@ -402,6 +377,8 @@ void Render()
 	}
 	shape_cube2->Render(*camera, program_worldspace);
 
+	faderect_test->m_rect->Render(*orthocamera, program_texture_interpolation);
+
 	char_test->Render(*camera, program_fixed_color);
 
 	text_message->Render();
@@ -410,7 +387,7 @@ void Render()
 
 	text_username->Render();
 
-	faderect_test->m_rect->Render(*camera, program_texture_interpolation);
+	
 
 	//Push buffer to the screen
 	glfwSwapBuffers(main_window);
