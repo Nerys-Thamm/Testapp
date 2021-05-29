@@ -1,10 +1,35 @@
+// Bachelor of Software Engineering
+// Media Design School
+// Auckland
+// New Zealand
+//
+// (c) 2021 Media Design School
+//
+// File Name   : GameObject.cpp
+// Description : Implementation file for the CGameobject and CObjectController classes
+// Author      : Nerys Thamm
+// Mail        : nerys.thamm@mds.ac.nz
+
 #include "GameObject.h"
 
+// ********************************************************************************
+/// <summary>
+/// Constructor for CGameObject
+/// </summary>
+/// <param name="true"></param>
+/// <returns></returns>
+// ********************************************************************************
 CGameObject::CGameObject() : m_pNext(nullptr), m_pPrev(nullptr), bIsEnabled(true)
 {
 	CObjectController::AddUpdater(this); //Add the object to the list of Updatables
 }
 
+// ********************************************************************************
+/// <summary>
+/// Destructor
+/// </summary>
+/// <returns></returns>
+// ********************************************************************************
 CGameObject::~CGameObject()
 {
 	CObjectController::RemoveUpdater(this); //Remove the object from the list of Updatables
@@ -12,20 +37,22 @@ CGameObject::~CGameObject()
 
 //CObjectController
 
-
 float CObjectController::deltaTime = 0.0f;
 float CObjectController::fixedTime = 0.0f;
 float CObjectController::currentTime = 0.0f;
 
+// ********************************************************************************
+/// <summary>
+/// Updates all Active gameobjects
+/// </summary>
+// ********************************************************************************
 void CObjectController::UpdateObjects()
 {
-
 	//Get the current time
 	deltaTime = currentTime;
 	currentTime = (float)glfwGetTime();
 	deltaTime = currentTime - deltaTime;
 
-	
 	fixedTime += deltaTime; //Add the delta time to fixedTime.
 	Update(deltaTime); //Call the Update method on derived classes that have implemented it
 	while (fixedTime >= (1.0f / 60.0f)) //Call FixedUpdate a number of times determined by fixedTime
@@ -33,9 +60,15 @@ void CObjectController::UpdateObjects()
 		FixedUpdate();
 		fixedTime -= (1.0f / 60.0f);
 	}
-	LateUpdate(deltaTime + ((float)glfwGetTime()-currentTime)); //Call LastUpdate on classes that have implemented it
+	LateUpdate(deltaTime + ((float)glfwGetTime() - currentTime)); //Call LastUpdate on classes that have implemented it
 }
 
+// ********************************************************************************
+/// <summary>
+/// Standard update called every frame
+/// </summary>
+/// <param name="_fDeltaTime"></param>
+// ********************************************************************************
 void CObjectController::Update(float _fDeltaTime)
 {
 	//Traverse until the starting node is reached
@@ -54,6 +87,11 @@ void CObjectController::Update(float _fDeltaTime)
 	}
 }
 
+// ********************************************************************************
+/// <summary>
+/// Fixed update is called 60 times a second
+/// </summary>
+// ********************************************************************************
 void CObjectController::FixedUpdate()
 {
 	//Traverse until the starting node is reached
@@ -72,6 +110,13 @@ void CObjectController::FixedUpdate()
 	}
 }
 
+// ********************************************************************************
+/// <summary>
+/// Lateupdate is called after the other update functions, use this when you require 
+/// the update function to have already run.
+/// </summary>
+/// <param name="_fDeltaTime"></param>
+// ********************************************************************************
 void CObjectController::LateUpdate(float _fDeltaTime)
 {
 	//Traverse until the starting node is reached
@@ -90,6 +135,12 @@ void CObjectController::LateUpdate(float _fDeltaTime)
 	}
 }
 
+// ********************************************************************************
+/// <summary>
+/// Adds an updater to the Linked List
+/// </summary>
+/// <param name="_updateable"></param>
+// ********************************************************************************
 void CObjectController::AddUpdater(CGameObject* _updateable)
 {
 	CGameObject** m_pHead = GetHead(); //get the head node
@@ -108,6 +159,12 @@ void CObjectController::AddUpdater(CGameObject* _updateable)
 	*m_pHead = _updateable; //make the new node into the new Head
 }
 
+// ********************************************************************************
+/// <summary>
+/// Removes an Updater from the linked list
+/// </summary>
+/// <param name="_updateable"></param>
+// ********************************************************************************
 void CObjectController::RemoveUpdater(CGameObject* _updateable)
 {
 	CGameObject** m_pHead = GetHead(); //get the head node
@@ -125,6 +182,12 @@ void CObjectController::RemoveUpdater(CGameObject* _updateable)
 	_updateable->m_pPrev = nullptr;
 }
 
+// ********************************************************************************
+/// <summary>
+/// Gets the current head of the linked list
+/// </summary>
+/// <returns></returns>
+// ********************************************************************************
 CGameObject** CObjectController::GetHead()
 {
 	static CGameObject* pHead = nullptr;
@@ -133,11 +196,23 @@ CGameObject** CObjectController::GetHead()
 
 GLFWwindow* CObjectController::m_mainwindow;
 
+// ********************************************************************************
+/// <summary>
+/// Sets the main window of the program
+/// </summary>
+/// <param name="_window"></param>
+// ********************************************************************************
 void CObjectController::SetMainWindow(GLFWwindow* _window)
 {
 	m_mainwindow = _window;
 }
 
+// ********************************************************************************
+/// <summary>
+/// Gets the main window of the program
+/// </summary>
+/// <returns></returns>
+// ********************************************************************************
 GLFWwindow* CObjectController::GetMainWindow()
 {
 	return m_mainwindow;

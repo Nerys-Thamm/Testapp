@@ -1,3 +1,15 @@
+// Bachelor of Software Engineering
+// Media Design School
+// Auckland
+// New Zealand
+//
+// (c) 2021 Media Design School
+//
+// File Name   :
+// Description :
+// Author      : Nerys Thamm
+// Mail        : nerys.thamm@mds.ac.nz
+
 #pragma once
 #include <iostream>
 #include <glew.h>
@@ -10,8 +22,8 @@ class Collider2D
 	friend class Collision2D;
 public:
 	unsigned int m_layerMask = 0x0;
-	glm::vec3* m_pos;
-	glm::vec3* m_scale;
+	glm::vec3* m_pos = nullptr;
+	glm::vec3* m_scale = nullptr;
 	CGameObject* GetParentObject();
 protected:
 	Collider2D();
@@ -28,7 +40,6 @@ public:
 class OvalCollider2D :
 	public Collider2D
 {
-
 };
 
 class Collision2D
@@ -36,11 +47,11 @@ class Collision2D
 	friend class Collider2D;
 public:
 	static bool CheckCollision(RectCollider2D _rect, glm::vec2 _point);
-	static bool CheckCollision(RectCollider2D _rect, RectCollider2D _otherRect);
+
+	//TODO: Implement these Collision Checks:
+	/*static bool CheckCollision(RectCollider2D _rect, RectCollider2D _otherRect);
 	static bool CheckCollision(OvalCollider2D _oval, glm::vec2 _point);
 	static bool CheckCollision(OvalCollider2D _oval, OvalCollider2D _otherOval);
 	static bool CheckCollision(OvalCollider2D _oval, RectCollider2D _rect);
-	static bool CheckCollision(RectCollider2D _rect, OvalCollider2D _oval);
+	static bool CheckCollision(RectCollider2D _rect, OvalCollider2D _oval);*/
 };
-
-

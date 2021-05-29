@@ -1,11 +1,37 @@
+// Bachelor of Software Engineering
+// Media Design School
+// Auckland
+// New Zealand
+//
+// (c) 2021 Media Design School
+//
+// File Name   : Config.cpp
+// Description : Implementation file for the config class
+// Author      : Nerys Thamm
+// Mail        : nerys.thamm@mds.ac.nz
+
 #include "Config.h"
 
+// ********************************************************************************
+/// <summary>
+/// Checks whether a flag in the config.ini file is true or false
+/// </summary>
+/// <param name="_flag_name"></param>
+/// <returns></returns>
+// ********************************************************************************
 bool Config::GetFlag(std::string _flag_name)
 {
 	if (!m_loaded) { ReadData(); }
 	return m_flags[_flag_name];
 }
 
+// ********************************************************************************
+/// <summary>
+/// Sets a flag to true or false in the config.ini file
+/// </summary>
+/// <param name="_flag_name"></param>
+/// <param name="_value"></param>
+// ********************************************************************************
 void Config::SetFlag(std::string _flag_name, bool _value)
 {
 	if (!m_loaded) { ReadData(); }
@@ -13,12 +39,24 @@ void Config::SetFlag(std::string _flag_name, bool _value)
 	WriteData();
 }
 
+// ********************************************************************************
+/// <summary>
+/// Gets the height of the window from the config.ini file
+/// </summary>
+/// <returns></returns>
+// ********************************************************************************
 float Config::GetWindowHeight()
 {
 	if (!m_loaded) { ReadData(); }
 	return m_window_height;
 }
 
+// ********************************************************************************
+/// <summary>
+/// Gets the width of the window from the config.ini file
+/// </summary>
+/// <returns></returns>
+// ********************************************************************************
 float Config::GetWindowWidth()
 {
 	if (!m_loaded) { ReadData(); }
@@ -30,6 +68,11 @@ float Config::m_window_height = 0;
 float Config::m_window_width = 0;
 std::map<std::string, bool> Config::m_flags;
 
+// ********************************************************************************
+/// <summary>
+/// Reads the data of the config.ini file into memory
+/// </summary>
+// ********************************************************************************
 void Config::ReadData()
 {
 	m_flags.clear();
@@ -101,6 +144,11 @@ void Config::ReadData()
 	m_loaded = true;
 }
 
+// ********************************************************************************
+/// <summary>
+/// Writes the data stored in memory into the config.ini file
+/// </summary>
+// ********************************************************************************
 void Config::WriteData()
 {
 	std::ofstream Writer;

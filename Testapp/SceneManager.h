@@ -1,9 +1,21 @@
+// Bachelor of Software Engineering
+// Media Design School
+// Auckland
+// New Zealand
+//
+// (c) 2021 Media Design School
+//
+// File Name   :
+// Description :
+// Author      : Nerys Thamm
+// Mail        : nerys.thamm@mds.ac.nz
+
 #pragma once
 #include "GameObject.h"
 #include <glm.hpp>
 #include "Config.h"
 #include "Audiosystem.h"
-class SceneManager:
+class SceneManager :
 	public CGameObject
 {
 public:
@@ -19,6 +31,4 @@ private:
 	static std::string m_textinputbuffer;
 	static void OnKeyPress(GLFWwindow* InputWindow, int Key, int ScanCode, int Action, int Mods);
 	static void TextInput(GLFWwindow* InputWindow, unsigned int CodePoint);
-
 };
-

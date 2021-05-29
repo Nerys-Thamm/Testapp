@@ -2,7 +2,7 @@
 // Media Design School
 // Auckland
 // New Zealand
-// 
+//
 // (c) 2021 Media Design School
 //
 // File Name   : Camera.h
@@ -43,8 +43,6 @@ public:
 	/// <returns></returns>
 	// ********************************************************************************
 	Camera(float _fWindowWidth, float _fWindowHeight, GLfloat& _fCurrTime, bool _bPerspective = true);
-
-
 
 	glm::mat4 GetPVM(glm::mat4 _modelmat);
 private:

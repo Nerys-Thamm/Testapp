@@ -1,9 +1,20 @@
+// Bachelor of Software Engineering
+// Media Design School
+// Auckland
+// New Zealand
+//
+// (c) 2021 Media Design School
+//
+// File Name   :
+// Description :
+// Author      : Nerys Thamm
+// Mail        : nerys.thamm@mds.ac.nz
+
 #pragma once
 #include <iostream>
 #include <glew.h>
 #include <glfw3.h>
 #include <vector>
-
 
 class CGameObject
 {
@@ -127,13 +138,10 @@ public:
 	// ********************************************************************************
 	static void LateUpdate(float _fDeltaTime);
 
-	
-
 	static void SetMainWindow(GLFWwindow* _window);
 
 	static GLFWwindow* GetMainWindow();
 private:
-	
 
 	/// <summary>The amount of time since the last frame</summary>
 	static float deltaTime;

@@ -2,7 +2,7 @@
 // Media Design School
 // Auckland
 // New Zealand
-// 
+//
 // (c) 2021 Media Design School
 //
 // File Name   : Shape2D.h
@@ -42,7 +42,7 @@ public:
 	void Color(glm::vec3 _col);
 
 	void Render(Camera _camera, GLuint _program);
-	void Render(Camera _camera, GLuint _program, bool _fade);
+	
 
 	// ********************************************************************************
 	/// <summary>
@@ -53,7 +53,7 @@ public:
 	glm::mat4 GetModelMatrix();
 	GLuint m_VAO;
 	std::vector<GLuint> m_textures;
-	
+
 	// ********************************************************************************
 	/// <summary>
 	/// Adds a texture to the texture list

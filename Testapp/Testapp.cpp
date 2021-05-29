@@ -2,14 +2,13 @@
 // Media Design School
 // Auckland
 // New Zealand
-// 
+//
 // (c) 2021 Media Design School
 //
 // File Name   : Testapp.cpp
 // Description : Main file for OpenGL application
 // Author      : Nerys Thamm
 // Mail        : nerys.thamm@mds.ac.nz
-
 
 //Lib includes
 #include <iostream>
@@ -36,7 +35,6 @@ GLFWwindow* main_window = nullptr;
 void InitialSetup();
 void Update();
 void Render();
-
 
 //SCENEMANAGER
 SceneManager* manager = nullptr;
@@ -159,8 +157,6 @@ GLuint LoadTexture(std::string _filename)
 //Setup initial elements of program
 void InitialSetup()
 {
-	
-	
 	stbi_set_flip_vertically_on_load(true);
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
@@ -215,10 +211,10 @@ void InitialSetup()
 	char_test = new Character(main_window);
 
 	//Create Text
-	text_message = new TextLabel("Super spicy text!", "Resources/Fonts/ARIAL.ttf", glm::ivec2(0, 40), glm::vec2(200.0f, 100.0f), TextLabel::MARQUEE, glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f,1.0f), 200.0f, 600.0f);
-	text_cursorpos = new TextLabel("Default", "Resources/Fonts/ARIAL.ttf", glm::ivec2(0, 40), glm::vec2(0.0f, 0.0f), TextLabel::NONE);
-	text_username = new TextLabel("Press Enter to type!", "Resources/Fonts/ARIAL.ttf", glm::ivec2(0, 40), glm::vec2(0.0f, 650.0f), TextLabel::MARQUEE, glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 1.0f), 200.0f, 600.0f);
-	text_scalebounce = new TextLabel("Username:", "Resources/Fonts/ARIAL.ttf", glm::ivec2(0, 40), glm::vec2(300.0f, 750.0f), TextLabel::SCALE_BOUNCE);
+	text_message = new TextLabel("Super spicy text!", "Resources/Fonts/ARIAL.ttf", glm::ivec2(0, 40), glm::vec2(200.0f, 100.0f), TextLabel::TextEffect::MARQUEE, glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 1.0f), 200.0f, 600.0f);
+	text_cursorpos = new TextLabel("Default", "Resources/Fonts/ARIAL.ttf", glm::ivec2(0, 40), glm::vec2(0.0f, 0.0f), TextLabel::TextEffect::NONE);
+	text_username = new TextLabel("Press Enter to type!", "Resources/Fonts/ARIAL.ttf", glm::ivec2(0, 40), glm::vec2(0.0f, 650.0f), TextLabel::TextEffect::MARQUEE, glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 1.0f), 200.0f, 600.0f);
+	text_scalebounce = new TextLabel("Username:", "Resources/Fonts/ARIAL.ttf", glm::ivec2(0, 40), glm::vec2(300.0f, 750.0f), TextLabel::TextEffect::SCALE_BOUNCE);
 
 	//Create Buttons
 	button_SoundEffect_Airhorn = new UIButton(glm::vec3(300, 300, 4), glm::vec3(200, 200, 1), LoadTexture("Button_Default.png"), LoadTexture("Button_Hover.png"), LoadTexture("Button_Press.png"));
@@ -228,11 +224,11 @@ void InitialSetup()
 	shape_firstcube->AddTexture(LoadTexture("Rayman.jpg"));
 	shape_secondcube->AddTexture(LoadTexture("Rayman.jpg"));
 	shape_floor->AddTexture(LoadTexture("grid.jpg"));
-	
+
 	//Set position and scale of Environment
 	shape_floor->Position(glm::vec3(0.0f, -0.8f, 0.0f));
 	shape_floor->Scale(glm::vec3(14.0f, 0.1f, 14.0f));
-	
+
 	//Set position of Cameras
 	camera->m_cameraPos = glm::vec3(0.0f, 0.0f, 8.0f);
 	orthocamera->m_cameraPos = glm::vec3(0.0f, 0.0f, 8.0f);
@@ -245,9 +241,7 @@ void InitialSetup()
 	audio_main->AddSoundFromYoutube("https://www.youtube.com/watch?v=UaUa_0qPPgc", "Airhorn");
 	//Start playing background track
 	audio_main->PlaySound("ShowaGroove", 0.1f, true);
-	
 }
-
 
 //Update all objects and run the processes
 void Update()
@@ -272,11 +266,11 @@ void Update()
 	}
 
 	//Play sound if button is pressed
-	if (button_SoundEffect_Airhorn->GetState() == button_SoundEffect_Airhorn->BUTTON_PRESSED)
+	if (button_SoundEffect_Airhorn->GetState() == UIButton::State::BUTTON_PRESSED)
 	{
 		audio_main->PlaySound("Airhorn");
 	}
-	if (button_SoundEffect_Bruh->GetState() == button_SoundEffect_Bruh->BUTTON_PRESSED)
+	if (button_SoundEffect_Bruh->GetState() == UIButton::State::BUTTON_PRESSED)
 	{
 		audio_main->PlaySound("Bruh");
 	}
@@ -295,14 +289,12 @@ void Update()
 	//Rotate and move Cubes
 	shape_firstcube->Rotation(glm::vec3(0.0f, delta_time * 70, 0.0f) + shape_firstcube->Rotation());
 	shape_secondcube->Rotation(glm::vec3(0.0f, delta_time * 70, 0.0f) + shape_secondcube->Rotation());
-	
-	shape_firstcube->Position(glm::vec3(cos(current_time * 2), 0.0f,  sin(current_time * 2)));
-	shape_secondcube->Position(glm::vec3( cos((current_time+1.57) * 2), 0.0f,  sin((current_time+1.57) * 2)));
+
+	shape_firstcube->Position(glm::vec3(cos(current_time * 2), 0.0f, sin(current_time * 2)));
+	shape_secondcube->Position(glm::vec3(cos((current_time + 1.57) * 2), 0.0f, sin((current_time + 1.57) * 2)));
 
 	//Rainbow background
 	glClearColor(((sin(current_time) + 1.0f) * 0.5f), ((sin(current_time + 2.0f) + 0.5f) * 0.5f), ((sin(current_time + 4.0f) + 1.0f) * 0.5f), 1.0f);
-
-	
 }
 
 //Render all objects
@@ -310,7 +302,7 @@ void Render()
 {
 	//Clear the buffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
+
 	//Render the floor
 	shape_floor->Render(*camera, program_worldspace);
 
@@ -337,7 +329,6 @@ void Render()
 	text_username->Render();
 	text_scalebounce->Render();
 
-	
 	//Push buffer to the screen
 	glfwSwapBuffers(main_window);
 }

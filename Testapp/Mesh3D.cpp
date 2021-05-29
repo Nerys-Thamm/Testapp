@@ -1,5 +1,23 @@
+// Bachelor of Software Engineering
+// Media Design School
+// Auckland
+// New Zealand
+//
+// (c) 2021 Media Design School
+//
+// File Name   : Mesh3D.cpp
+// Description : Implementation file for the Mesh3D class
+// Author      : Nerys Thamm
+// Mail        : nerys.thamm@mds.ac.nz
+
 #include "Mesh3D.h"
 
+// ********************************************************************************
+/// <summary>
+/// Gets the model matrix of the mesh
+/// </summary>
+/// <returns>The model matrix of the mesh</returns>
+// ********************************************************************************
 glm::mat4 Mesh3D::GetModelMatrix()
 {
 	//Calculate model matrix
@@ -9,12 +27,24 @@ glm::mat4 Mesh3D::GetModelMatrix()
 	return m_translationMat * m_rotationMat * m_scaleMat;
 }
 
+// ********************************************************************************
+/// <summary>
+/// Adds a texture to the Mesh's texturelist
+/// </summary>
+/// <param name="_texture">The texture to add</param>
+// ********************************************************************************
 void Mesh3D::AddTexture(GLuint _texture)
 {
 	//Add the texture
 	m_textures.push_back(_texture);
 }
 
+// ********************************************************************************
+/// <summary>
+/// Adds a Vector of textures to the mesh's texturelist
+/// </summary>
+/// <param name="_textures">A vector of textures to add</param>
+// ********************************************************************************
 void Mesh3D::AddTextures(std::vector<GLuint>& _textures)
 {
 	//Add all proivided textures
@@ -24,6 +54,12 @@ void Mesh3D::AddTextures(std::vector<GLuint>& _textures)
 	}
 }
 
+// ********************************************************************************
+/// <summary>
+/// Base constructor, should never be called manually
+/// </summary>
+/// <returns></returns>
+// ********************************************************************************
 Mesh3D::Mesh3D()
 {
 	//Initialise variables
@@ -42,11 +78,22 @@ Mesh3D::Mesh3D()
 	m_position = glm::vec3(0.0f, 0.0f, 0.0f);
 	m_scale = glm::vec3(1.0f, 1.0f, 1.0f);
 }
+// ********************************************************************************
+/// <summary>
+/// Destructor
+/// </summary>
+/// <returns></returns>
+// ********************************************************************************
 Mesh3D::~Mesh3D()
 {
-
 }
 
+// ********************************************************************************
+/// <summary>
+/// 3D Pyramid Mesh Constructor
+/// </summary>
+/// <returns></returns>
+// ********************************************************************************
 Pyramid3D::Pyramid3D()
 {
 	m_verticesCount = 18;
@@ -78,9 +125,15 @@ Pyramid3D::Pyramid3D()
 	glEnableVertexAttribArray(2);
 }
 
+// ********************************************************************************
+/// <summary>
+/// 3D Cube Mesh Constructor
+/// </summary>
+/// <returns></returns>
+// ********************************************************************************
 Cube3D::Cube3D()
 {
-	m_verticesCount = sizeof(m_indices)/sizeof(int32_t);
+	m_verticesCount = sizeof(m_indices) / sizeof(int32_t);
 
 	m_position = glm::vec3(0.0f, 0.0f, 0.0f);
 	m_fRotationX = 0.0f;
@@ -109,6 +162,13 @@ Cube3D::Cube3D()
 	glEnableVertexAttribArray(2);
 }
 
+// ********************************************************************************
+/// <summary>
+/// Renders the Mesh
+/// </summary>
+/// <param name="_camera">The camera to use</param>
+/// <param name="_program">The program to use</param>
+// ********************************************************************************
 void Mesh3D::Render(Camera _camera, GLuint _program)
 {
 	//Calculate the PVM matrix
@@ -146,31 +206,67 @@ void Mesh3D::Render(Camera _camera, GLuint _program)
 	glUseProgram(0);
 }
 
+// ********************************************************************************
+/// <summary>
+/// Gets the Position
+/// </summary>
+/// <returns></returns>
+// ********************************************************************************
 glm::vec3 Mesh3D::Position()
 {
 	return m_position;
 }
 
+// ********************************************************************************
+/// <summary>
+/// Gets the Rotation
+/// </summary>
+/// <returns></returns>
+// ********************************************************************************
 glm::vec3 Mesh3D::Rotation()
 {
 	return glm::vec3(m_fRotationX, m_fRotationY, m_fRotationZ);
 }
 
+// ********************************************************************************
+/// <summary>
+/// Gets the Scale
+/// </summary>
+/// <returns></returns>
+// ********************************************************************************
 glm::vec3 Mesh3D::Scale()
 {
 	return m_scale;
 }
 
+// ********************************************************************************
+/// <summary>
+/// Gets the Color
+/// </summary>
+/// <returns></returns>
+// ********************************************************************************
 glm::vec3 Mesh3D::Color()
 {
 	return m_color;
 }
 
+// ********************************************************************************
+/// <summary>
+/// Sets the Position
+/// </summary>
+/// <param name="_pos"></param>
+// ********************************************************************************
 void Mesh3D::Position(glm::vec3 _pos)
 {
 	m_position = _pos;
 }
 
+// ********************************************************************************
+/// <summary>
+/// Sets the Rotation
+/// </summary>
+/// <param name="_rot"></param>
+// ********************************************************************************
 void Mesh3D::Rotation(glm::vec3 _rot)
 {
 	m_fRotationX = _rot.x;
@@ -178,22 +274,42 @@ void Mesh3D::Rotation(glm::vec3 _rot)
 	m_fRotationZ = _rot.z;
 }
 
+// ********************************************************************************
+/// <summary>
+/// Sets the Scale
+/// </summary>
+/// <param name="_scl"></param>
+// ********************************************************************************
 void Mesh3D::Scale(glm::vec3 _scl)
 {
 	m_scale = _scl;
 }
 
+// ********************************************************************************
+/// <summary>
+/// Sets the Color
+/// </summary>
+/// <param name="_col"></param>
+// ********************************************************************************
 void Mesh3D::Color(glm::vec3 _col)
 {
 	m_color = _col;
 }
 
+// ********************************************************************************
+/// <summary>
+/// 3D Sphere Mesh Constructor
+/// </summary>
+/// <param name="Radius">Radius of the sphere</param>
+/// <param name="Fidelity">Quality of the sphere</param>
+/// <returns></returns>
+// ********************************************************************************
 Sphere3D::Sphere3D(float Radius, int Fidelity)
 {
 	int VertexAttrib = 8;	// Float components are needed for each vertex point
 	int IndexPerQuad = 6;	// Indices needed to create a quad
 
-	// Angles to keep track of the sphere points 
+	// Angles to keep track of the sphere points
 	float Phi = 0.0f;
 	float Theta = 0.0f;
 
@@ -262,7 +378,7 @@ Sphere3D::Sphere3D(float Radius, int Fidelity)
 	}
 
 	// Create the Vertex Array and associated buffers
-	
+
 	glGenVertexArrays(1, &m_VAO);
 	glBindVertexArray(m_VAO);
 	glGenBuffers(1, &m_VBO);

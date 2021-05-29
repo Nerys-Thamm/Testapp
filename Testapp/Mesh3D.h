@@ -1,3 +1,15 @@
+// Bachelor of Software Engineering
+// Media Design School
+// Auckland
+// New Zealand
+//
+// (c) 2021 Media Design School
+//
+// File Name   :
+// Description :
+// Author      : Nerys Thamm
+// Mail        : nerys.thamm@mds.ac.nz
+
 #pragma once
 #include <glew.h>
 #include <glfw3.h>
@@ -104,7 +116,6 @@ public:
 		/* 3 */    0.5f, 0.0f, -0.5f,   m_color.x, m_color.y, m_color.z,   1.0f, 1.0f,
 
 		/* 4 */    0.0f, 0.5f, 0.0f,   m_color.x, m_color.y, m_color.z,   0.5f, 0.5f, //Top Point
-		
 	};
 	GLuint m_indices[18] = {
 	0, 4, 3,
@@ -129,37 +140,36 @@ public:
 	Cube3D();
 	GLfloat m_vertices[192] = {
 		// Index   // Position         // Colour                           // Texture Coords
-		           //Front
+				   //Front
 		/* 00 */   -0.5f,  0.5f,  0.5f,   m_color.x, m_color.y, m_color.z,   0.0f, 1.0f,
 		/* 01 */   -0.5f, -0.5f,  0.5f,   m_color.x, m_color.y, m_color.z,   0.0f, 0.0f,
 		/* 02 */    0.5f, -0.5f,  0.5f,   m_color.x, m_color.y, m_color.z,   1.0f, 0.0f,
 		/* 03 */    0.5f,  0.5f,  0.5f,   m_color.x, m_color.y, m_color.z,   1.0f, 1.0f,
-		           //Back
+		//Back
 		/* 04 */    0.5f,  0.5f, -0.5f,   m_color.x, m_color.y, m_color.z,   0.0f, 1.0f,
 		/* 05 */    0.5f, -0.5f, -0.5f,   m_color.x, m_color.y, m_color.z,   0.0f, 0.0f,
 		/* 06 */   -0.5f, -0.5f, -0.5f,   m_color.x, m_color.y, m_color.z,   1.0f, 0.0f,
 		/* 07 */   -0.5f,  0.5f, -0.5f,   m_color.x, m_color.y, m_color.z,   1.0f, 1.0f,
-		           //Right
+		//Right
 		/* 08 */    0.5f,  0.5f,  0.5f,   m_color.x, m_color.y, m_color.z,   0.0f, 1.0f,
 		/* 09 */    0.5f, -0.5f,  0.5f,   m_color.x, m_color.y, m_color.z,   0.0f, 0.0f,
 		/* 10 */    0.5f, -0.5f, -0.5f,   m_color.x, m_color.y, m_color.z,   1.0f, 0.0f,
 		/* 11 */    0.5f,  0.5f, -0.5f,   m_color.x, m_color.y, m_color.z,   1.0f, 1.0f,
-		           //Left
+		//Left
 		/* 12 */   -0.5f,  0.5f, -0.5f,   m_color.x, m_color.y, m_color.z,   0.0f, 1.0f,
 		/* 13 */   -0.5f, -0.5f, -0.5f,   m_color.x, m_color.y, m_color.z,   0.0f, 0.0f,
 		/* 14 */   -0.5f, -0.5f,  0.5f,   m_color.x, m_color.y, m_color.z,   1.0f, 0.0f,
 		/* 15 */   -0.5f,  0.5f,  0.5f,   m_color.x, m_color.y, m_color.z,   1.0f, 1.0f,
-		           //Top
+		//Top
 		/* 16 */   -0.5f,  0.5f, -0.5f,   m_color.x, m_color.y, m_color.z,   0.0f, 1.0f,
 		/* 17 */   -0.5f,  0.5f,  0.5f,   m_color.x, m_color.y, m_color.z,   0.0f, 0.0f,
 		/* 18 */    0.5f,  0.5f,  0.5f,   m_color.x, m_color.y, m_color.z,   1.0f, 0.0f,
 		/* 19 */    0.5f,  0.5f, -0.5f,   m_color.x, m_color.y, m_color.z,   1.0f, 1.0f,
-		           //Bottom
+		//Bottom
 		/* 20 */   -0.5f, -0.5f,  0.5f,   m_color.x, m_color.y, m_color.z,   0.0f, 1.0f,
 		/* 21 */   -0.5f, -0.5f, -0.5f,   m_color.x, m_color.y, m_color.z,   0.0f, 0.0f,
 		/* 22 */    0.5f, -0.5f, -0.5f,   m_color.x, m_color.y, m_color.z,   1.0f, 0.0f,
 		/* 23 */    0.5f, -0.5f,  0.5f,   m_color.x, m_color.y, m_color.z,   1.0f, 1.0f,
-
 	};
 	GLuint m_indices[36] = {
 	0, 1, 2,

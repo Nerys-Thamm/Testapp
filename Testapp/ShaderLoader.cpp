@@ -2,7 +2,7 @@
 // Media Design School
 // Auckland
 // New Zealand
-// 
+//
 // (c) 2021 Media Design School
 //
 // File Name   : ShaderLoader.cpp

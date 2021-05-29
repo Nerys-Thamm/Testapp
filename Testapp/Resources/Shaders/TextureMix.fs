@@ -13,8 +13,6 @@ uniform bool IsFading;
 //Output
 out vec4 FinalColor;
 
-
-
 float Currtime = 0;
 float CurrFadePercent = 0;
 

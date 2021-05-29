@@ -1,3 +1,15 @@
+// Bachelor of Software Engineering
+// Media Design School
+// Auckland
+// New Zealand
+//
+// (c) 2021 Media Design School
+//
+// File Name   :
+// Description :
+// Author      : Nerys Thamm
+// Mail        : nerys.thamm@mds.ac.nz
+
 #pragma once
 #include <string>
 #include <algorithm>
@@ -17,7 +29,6 @@ namespace fs = std::filesystem;
 
 class Config
 {
-	//TODO: Make static config class that reads and writes to INI file
 public:
 	static bool GetFlag(std::string _flag_name);
 	static void SetFlag(std::string _flag_name, bool _value);
@@ -31,6 +42,4 @@ private:
 	static float m_window_width;
 	static float m_window_height;
 	static std::map<std::string, bool> m_flags;
-
-	
 };

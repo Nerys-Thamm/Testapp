@@ -1,5 +1,24 @@
+// Bachelor of Software Engineering
+// Media Design School
+// Auckland
+// New Zealand
+//
+// (c) 2021 Media Design School
+//
+// File Name   : TextLabel.cpp
+// Description : Implementation file for the TextLabel class
+// Author      : Nerys Thamm
+// Mail        : nerys.thamm@mds.ac.nz
+
 #include "TextLabel.h"
 
+// ********************************************************************************
+/// <summary>
+/// Generates a texture for a character
+/// </summary>
+/// <param name="face"></param>
+/// <returns></returns>
+// ********************************************************************************
 GLuint TextLabel::GenerateTexture(FT_Face face)
 {
 	GLuint TextureID;
@@ -24,6 +43,12 @@ GLuint TextLabel::GenerateTexture(FT_Face face)
 	return TextureID;
 }
 
+// ********************************************************************************
+/// <summary>
+/// Is called every frame
+/// </summary>
+/// <param name="_fDeltaTime"></param>
+// ********************************************************************************
 void TextLabel::Update(float _fDeltaTime)
 {
 	if (m_scaleBouncing)
@@ -36,8 +61,8 @@ void TextLabel::Update(float _fDeltaTime)
 			textWidth += FontCharacter.Size.x * Scale.x;
 			textHeight = FontCharacter.Size.y * Scale.y;
 		}
-		glm::vec2 centre = glm::vec2(textWidth/2, textHeight/2);
-		SetScale(glm::vec2(((sin(glfwGetTime()*3) + 1) / 4) + 1, ((sin(glfwGetTime()*3) + 1) / 4) + 1));
+		glm::vec2 centre = glm::vec2(textWidth / 2, textHeight / 2);
+		SetScale(glm::vec2(((sin(glfwGetTime() * 3) + 1) / 4) + 1, ((sin(glfwGetTime() * 3) + 1) / 4) + 1));
 		textWidth = 0.0f;
 		textHeight = 0.0f;
 		for (std::string::const_iterator TextCharacter = TextStr.begin(); TextCharacter != TextStr.end(); TextCharacter++)
@@ -51,6 +76,21 @@ void TextLabel::Update(float _fDeltaTime)
 	}
 }
 
+// ********************************************************************************
+/// <summary>
+/// Constructor
+/// </summary>
+/// <param name="Text">The content of the TextLabel</param>
+/// <param name="Font">The font file</param>
+/// <param name="PixelSize">The size in pixels of the characters</param>
+/// <param name="Pos">The screen position</param>
+/// <param name="Effect">A shader effect for the label</param>
+/// <param name="Color">The color of the label</param>
+/// <param name="Scale">The scale of the label</param>
+/// <param name="LeftBuffer">Label will not render left of this point</param>
+/// <param name="RightBuffer">Label will not render right of this point</param>
+/// <returns></returns>
+// ********************************************************************************
 TextLabel::TextLabel(std::string Text, std::string Font, glm::ivec2 PixelSize, glm::vec2 Pos, TextLabel::TextEffect Effect, glm::vec3 Color, glm::vec2 Scale, float LeftBuffer, float RightBuffer)
 {
 	SetText(Text);
@@ -62,23 +102,26 @@ TextLabel::TextLabel(std::string Text, std::string Font, glm::ivec2 PixelSize, g
 	m_RightBuffer = RightBuffer;
 
 	ProjectionMat = glm::ortho(00.0f, (GLfloat)cfWINDOW_WIDTH(), 0.0f, (GLfloat)cfWINDOW_HEIGHT(), 0.0f, 100.0f);
+
+	//Set the effect
 	switch (Effect)
 	{
-	case TextLabel::NONE:
+	case TextLabel::TextEffect::NONE:
 		Program_Text = ShaderLoader::CreateProgram("Resources/Shaders/Text.vs", "Resources/Shaders/Text.fs");
 		break;
-	case TextLabel::MARQUEE:
+	case TextLabel::TextEffect::MARQUEE:
 		Program_Text = ShaderLoader::CreateProgram("Resources/Shaders/TextMarquee.vs", "Resources/Shaders/TextMarquee.fs");
 		break;
-	case TextLabel::SCALE_BOUNCE:
+	case TextLabel::TextEffect::SCALE_BOUNCE:
 		Program_Text = ShaderLoader::CreateProgram("Resources/Shaders/Text.vs", "Resources/Shaders/Text.fs");
 		m_scaleBouncing = true;
 		break;
 	default:
 		break;
 	}
-	
 
+
+	//Generate the Text
 	FT_Library FontLibrary;
 	FT_Face FontFace;
 
@@ -138,6 +181,11 @@ TextLabel::TextLabel(std::string Text, std::string Font, glm::ivec2 PixelSize, g
 	Initialized = true;
 }
 
+// ********************************************************************************
+/// <summary>
+/// Renders the TextLabel
+/// </summary>
+// ********************************************************************************
 void TextLabel::Render()
 {
 	if (!Initialized)
@@ -151,7 +199,7 @@ void TextLabel::Render()
 	glUniform3fv(glGetUniformLocation(Program_Text, "TextColor"), 1, glm::value_ptr(Color));
 	glUniformMatrix4fv(glGetUniformLocation(Program_Text, "ProjectionMat"), 1, GL_FALSE, glm::value_ptr(ProjectionMat));
 	GLint CurrentTimeLoc = glGetUniformLocation(Program_Text, "CurrentTime");
-	glUniform1f(CurrentTimeLoc, glfwGetTime());
+	glUniform1f(CurrentTimeLoc, (GLfloat)glfwGetTime());
 	GLint ScreenWidthLoc = glGetUniformLocation(Program_Text, "ScreenWidth");
 	glUniform1f(ScreenWidthLoc, cfWINDOW_WIDTH());
 	GLint LeftBufferLoc = glGetUniformLocation(Program_Text, "LeftBuffer");
@@ -159,7 +207,6 @@ void TextLabel::Render()
 	GLint RightBufferLoc = glGetUniformLocation(Program_Text, "RightBuffer");
 	glUniform1f(RightBufferLoc, m_RightBuffer);
 	glBindVertexArray(VAO_Text);
-
 
 	glm::vec2 CharacterOrigin = Position;
 

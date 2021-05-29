@@ -2,7 +2,7 @@
 // Media Design School
 // Auckland
 // New Zealand
-// 
+//
 // (c) 2021 Media Design School
 //
 // File Name   : Camera.cpp
@@ -12,6 +12,16 @@
 
 #include "Camera.h"
 
+// ********************************************************************************
+/// <summary>
+/// Constructor
+/// </summary>
+/// <param name="_fWindowWidth">The width of the window</param>
+/// <param name="_fWindowHeight">The height of the window</param>
+/// <param name="_fcurrtime">Pointer to a currenttime variable</param>
+/// <param name="_bPerspective">Is the camera Perspective? (Orthographic if false)</param>
+/// <returns></returns>
+// ********************************************************************************
 Camera::Camera(float _fWindowWidth, float _fWindowHeight, GLfloat& _fcurrtime, bool _bPerspective)
 {
 	//Set defaults for member variables
@@ -20,10 +30,13 @@ Camera::Camera(float _fWindowWidth, float _fWindowHeight, GLfloat& _fcurrtime, b
 	m_pCurrentTime = &_fcurrtime;
 }
 
-
-
-
-
+// ********************************************************************************
+/// <summary>
+/// Gets the PVM matrix
+/// </summary>
+/// <param name="_modelmat">The model matrix of the mesh being rendered</param>
+/// <returns>The PVM matrix</returns>
+// ********************************************************************************
 glm::mat4 Camera::GetPVM(glm::mat4 _modelmat)
 {
 	m_viewMat = glm::lookAt(m_cameraPos, (m_lookAtTarget ? m_cameraTargetPos : m_cameraPos + m_cameraLookDir), m_cameraUpDir);
