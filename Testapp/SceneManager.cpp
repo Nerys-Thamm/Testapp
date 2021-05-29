@@ -108,11 +108,11 @@ void SceneManager::OnKeyPress(GLFWwindow* InputWindow, int Key, int ScanCode, in
 	//Play sounds on numberkey press
 	if (Key == GLFW_KEY_1 && Action == GLFW_PRESS)
 	{
-		Audiosystem::GetInstance()->PlaySound("Bruh");
+		Audiosystem::GetInstance()->PlaySound("SFX_Bruh");
 	}
 	if (Key == GLFW_KEY_2 && Action == GLFW_PRESS)
 	{
-		Audiosystem::GetInstance()->PlaySound("Airhorn");
+		Audiosystem::GetInstance()->PlaySound("SFX_Airhorn");
 	}
 }
 

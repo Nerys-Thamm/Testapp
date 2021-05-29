@@ -235,12 +235,17 @@ void InitialSetup()
 
 	//Setup Audio
 	audio_main = Audiosystem::GetInstance();
+
 	//Download sounds if they dont already exist
-	audio_main->AddSoundFromYoutube("https://www.youtube.com/watch?v=OoDo7kMbOd8", "ShowaGroove");
-	audio_main->AddSoundFromYoutube("https://www.youtube.com/watch?v=D2_r4q2imnQ", "Bruh");
-	audio_main->AddSoundFromYoutube("https://www.youtube.com/watch?v=UaUa_0qPPgc", "Airhorn");
+	audio_main->AddSoundFromYoutube("https://www.youtube.com/watch?v=OoDo7kMbOd8", "Track_ShowaGroove");
+	audio_main->AddSoundFromYoutube("https://www.youtube.com/watch?v=TKfS5zVfGBc", "Track_Dreamscape");
+	audio_main->AddSoundFromYoutube("https://www.youtube.com/watch?v=UaUa_0qPPgc", "SFX_Airhorn");
+	audio_main->AddSoundFromYoutube("https://www.youtube.com/watch?v=D2_r4q2imnQ", "SFX_Bruh");
+	audio_main->AddSound("Track_PolishCow.mp3", "Track_PolishCow");
+	
+
 	//Start playing background track
-	audio_main->PlaySound("ShowaGroove", 0.1f, true);
+	audio_main->PlaySound("Track_ShowaGroove", 0.1f, true);
 }
 
 //Update all objects and run the processes
@@ -268,11 +273,11 @@ void Update()
 	//Play sound if button is pressed
 	if (button_SoundEffect_Airhorn->GetState() == UIButton::State::BUTTON_PRESSED)
 	{
-		audio_main->PlaySound("Airhorn");
+		audio_main->PlaySound("SFX_Airhorn");
 	}
 	if (button_SoundEffect_Bruh->GetState() == UIButton::State::BUTTON_PRESSED)
 	{
-		audio_main->PlaySound("Bruh");
+		audio_main->PlaySound("SFX_Bruh");
 	}
 
 	//Poll events for GLFW input
