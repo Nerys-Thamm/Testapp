@@ -48,7 +48,7 @@
     <ClCompile Include="Collider2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FadingRect.cpp">
+    <ClCompile Include="UIButton.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Audiosystem.cpp">
@@ -92,7 +92,7 @@
     <ClInclude Include="Collider2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FadingRect.h">
+    <ClInclude Include="UIButton.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Audiosystem.h">

@@ -14,12 +14,19 @@
 // Local Includes
 #include "ShaderLoader.h"
 #include "Config.h"
+#include "GameObject.h"
 
-class TextLabel
+class TextLabel :
+	public CGameObject
 {
+public:
+	enum TextEffect
+	{
+		NONE,
+		MARQUEE,
+		SCALE_BOUNCE,
+	};
 private:
-	GLuint GenerateTexture(FT_Face face);
-
 	struct FontChar
 	{
 		GLuint TextureID = 0; // Texture ID
@@ -28,10 +35,10 @@ private:
 		GLuint Advance = 0;   // How far to move for the next character
 	};
 
-	
-
 	static const int FontCharacterLimit = 128;
 	bool Initialized = false;
+
+	bool m_scaleBouncing = false;
 
 	std::string TextStr;
 	glm::vec2 Scale;
@@ -52,14 +59,9 @@ private:
 		0,1,2,
 		0,2,3,
 	};
-	
+
 public:
-	enum TextEffect
-	{
-		NONE,
-		MARQUEE,
-		SCALE_BOUNCE,
-	};
+
 	TextLabel(
 		std::string Text,
 		std::string Font,
@@ -72,8 +74,6 @@ public:
 		float RightBuffer = cfWINDOW_WIDTH()
 	);
 
-	
-
 	~TextLabel() {};
 
 	void Render();
@@ -81,6 +81,7 @@ public:
 	void SetColor(glm::vec3 Color) { this->Color = Color; };
 	void SetScale(glm::vec2 Scale) { this->Scale = Scale; };
 	void SetPosition(glm::vec2 Position) { this->Position = Position; };
-	
+private:
+	GLuint GenerateTexture(FT_Face face);
+	virtual void Update(float _fDeltaTime);
 };
-

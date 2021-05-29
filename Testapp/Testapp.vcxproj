@@ -150,7 +150,7 @@
     <ClCompile Include="Character.cpp" />
     <ClCompile Include="Collider2D.cpp" />
     <ClCompile Include="Config.cpp" />
-    <ClCompile Include="FadingRect.cpp" />
+    <ClCompile Include="UIButton.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Mesh3D.cpp" />
     <ClCompile Include="SceneManager.cpp" />
@@ -165,7 +165,7 @@
     <ClInclude Include="Character.h" />
     <ClInclude Include="Collider2D.h" />
     <ClInclude Include="Config.h" />
-    <ClInclude Include="FadingRect.h" />
+    <ClInclude Include="UIButton.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Mesh3D.h" />
     <ClInclude Include="SceneManager.h" />

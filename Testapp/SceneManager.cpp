@@ -53,6 +53,14 @@ void SceneManager::OnKeyPress(GLFWwindow* InputWindow, int Key, int ScanCode, in
 		SceneManager::m_isCursorVisible = !SceneManager::m_isCursorVisible;
 		glfwSetInputMode(InputWindow, GLFW_CURSOR, SceneManager::m_isCursorVisible ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_HIDDEN);
 	}
+	if (Key == GLFW_KEY_1 && Action == GLFW_PRESS)
+	{
+		Audiosystem::GetInstance()->PlaySound("Bruh");
+	}
+	if (Key == GLFW_KEY_2 && Action == GLFW_PRESS)
+	{
+		Audiosystem::GetInstance()->PlaySound("Airhorn");
+	}
 
 }
 

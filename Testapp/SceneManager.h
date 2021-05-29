@@ -2,6 +2,7 @@
 #include "GameObject.h"
 #include <glm.hpp>
 #include "Config.h"
+#include "Audiosystem.h"
 class SceneManager:
 	public CGameObject
 {

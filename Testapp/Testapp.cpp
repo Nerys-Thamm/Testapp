@@ -27,7 +27,8 @@
 #include "GameObject.h"
 #include "Character.h"
 #include "SceneManager.h"
-#include "FadingRect.h"
+#include "UIButton.h"
+#include "Audiosystem.h"
 
 //Pointer to window
 GLFWwindow* main_window = nullptr;
@@ -36,83 +37,60 @@ void InitialSetup();
 void Update();
 void Render();
 
-//FMOD init stuff
-FMOD::System* AudioSystem;
-FMOD::ChannelGroup* Main_channel;
-FMOD::Channel* Channel1;
-FMOD::Sound* FX_Gunshot;
-FMOD::Sound* Track_Dance;
 
+//SCENEMANAGER
 SceneManager* manager = nullptr;
 
-bool AudioInit()
-{
-	if (FMOD::System_Create(&AudioSystem) != FMOD_OK)
-	{
-		std::cout << "FMOD ERROR: Audio System failed to create." << std::endl;
-		return false;
-	}
-	if (AudioSystem->init(100, FMOD_INIT_NORMAL | FMOD_INIT_3D_RIGHTHANDED, 0) != FMOD_OK)
-	{
-		std::cout << "FMOD ERROR: Audio System failed to create." << std::endl;
-		return false;
-	}
-
-	return true;
-}
-
+//PROGRAMS
 GLuint program_texture;
-
 GLuint program_worldspace;
-
 GLuint program_texture_interpolation;
-
 GLuint program_fixed_color;
-
 GLuint program_texture_wave;
-
 GLuint program_normals;
 
+//TIME
 float current_time;
 float delta_time;
 float timer;
 
+//CAMERAS
 Camera* camera = nullptr;
-
 Camera* orthocamera = nullptr;
 
-
-TextLabel* text_message = nullptr;
-
-
-Mesh3D* shape_cube = nullptr;
-
-Mesh3D* shape_sphere = nullptr;
-
-Mesh3D* shape_cube2 = nullptr;
-
+//MESHES
+Mesh3D* shape_firstcube = nullptr;
+Mesh3D* shape_secondcube = nullptr;
 Mesh3D* shape_floor = nullptr;
 
+//CONTROLLABLE CHARACTERS
 Character* char_test = nullptr;
 
+//TEXTLABELS
+TextLabel* text_message = nullptr;
 TextLabel* text_cursorpos = nullptr;
-
 TextLabel* text_username = nullptr;
+TextLabel* text_scalebounce = nullptr;
 
-FadingRect* faderect_test = nullptr;
+//BUTTONS
+UIButton* button_SoundEffect_Airhorn = nullptr;
+UIButton* button_SoundEffect_Bruh = nullptr;
+
+//Audio
+Audiosystem* audio_main = nullptr;
 
 int main()
 {
 	std::cout << "Program compiled " << __DATE__ << " | " << __TIME__ << std::endl;
 	//Init GLFW and setting ver to 4.6 with only core functionality
 	glfwInit();
-	AudioInit();
+	//AudioInit();
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 
 	//Create a GLFW controlled context window
-	main_window = glfwCreateWindow(cfWINDOW_WIDTH(), cfWINDOW_HEIGHT(), "Nerys Thamm OpenGL Summative", NULL, NULL);
+	main_window = glfwCreateWindow((int)cfWINDOW_WIDTH(), (int)cfWINDOW_HEIGHT(), "Nerys Thamm OpenGL Summative", NULL, NULL);
 	if (main_window == NULL)
 	{
 		std::cout << "GLFW failed to initialize properly. Terminating program." << std::endl;
@@ -197,7 +175,7 @@ void InitialSetup()
 	glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
 
 	// Map range of the window size to NDC (-1 -> 1)
-	glViewport(0, 0, cfWINDOW_WIDTH(), cfWINDOW_HEIGHT());
+	glViewport(0, 0, (GLsizei)cfWINDOW_WIDTH(), (GLsizei)cfWINDOW_HEIGHT());
 
 	//Create programs
 	program_texture = ShaderLoader::CreateProgram("Resources/Shaders/ClipSpace.vs",
@@ -229,95 +207,61 @@ void InitialSetup()
 	orthocamera = new Camera(cfWINDOW_WIDTH(), cfWINDOW_HEIGHT(), current_time, false);
 
 	//Create objects
-
-	shape_cube = new Cube3D();
-	shape_cube2 = new Cube3D();
-
-	shape_sphere = new Sphere3D(1.0f, 20);
-
+	shape_firstcube = new Cube3D();
+	shape_secondcube = new Cube3D();
 	shape_floor = new Cube3D();
 
 	//Create character
 	char_test = new Character(main_window);
 
 	//Create Text
-
 	text_message = new TextLabel("Super spicy text!", "Resources/Fonts/ARIAL.ttf", glm::ivec2(0, 40), glm::vec2(200.0f, 100.0f), TextLabel::MARQUEE, glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f,1.0f), 200.0f, 600.0f);
-
 	text_cursorpos = new TextLabel("Default", "Resources/Fonts/ARIAL.ttf", glm::ivec2(0, 40), glm::vec2(0.0f, 0.0f), TextLabel::NONE);
+	text_username = new TextLabel("Press Enter to type!", "Resources/Fonts/ARIAL.ttf", glm::ivec2(0, 40), glm::vec2(0.0f, 650.0f), TextLabel::MARQUEE, glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 1.0f), 200.0f, 600.0f);
+	text_scalebounce = new TextLabel("Username:", "Resources/Fonts/ARIAL.ttf", glm::ivec2(0, 40), glm::vec2(300.0f, 750.0f), TextLabel::SCALE_BOUNCE);
 
-	text_username = new TextLabel("Press Enter to type!", "Resources/Fonts/ARIAL.ttf", glm::ivec2(0, 40), glm::vec2(0.0f, 700.0f), TextLabel::MARQUEE);
-
-	//Create FadeRect
-
-	faderect_test = new FadingRect(glm::vec3(300, 300, 4), glm::vec3(200, 200, 1), LoadTexture("Rayman.jpg"), LoadTexture("AwesomeFace.png"));
+	//Create Buttons
+	button_SoundEffect_Airhorn = new UIButton(glm::vec3(300, 300, 4), glm::vec3(200, 200, 1), LoadTexture("Button_Default.png"), LoadTexture("Button_Hover.png"), LoadTexture("Button_Press.png"));
+	button_SoundEffect_Bruh = new UIButton(glm::vec3(-300, 300, 4), glm::vec3(200, 200, 1), LoadTexture("Button_Default.png"), LoadTexture("Button_Hover.png"), LoadTexture("Button_Press.png"));
 
 	//Set textures of objects
-	
-
-	
-
-	
-
-	shape_sphere->AddTexture(LoadTexture("Rayman.jpg"));
-	shape_cube->AddTexture(LoadTexture("Rayman.jpg"));
-	shape_cube2->AddTexture(LoadTexture("Rayman.jpg"));
+	shape_firstcube->AddTexture(LoadTexture("Rayman.jpg"));
+	shape_secondcube->AddTexture(LoadTexture("Rayman.jpg"));
 	shape_floor->AddTexture(LoadTexture("grid.jpg"));
 	
+	//Set position and scale of Environment
 	shape_floor->Position(glm::vec3(0.0f, -0.8f, 0.0f));
 	shape_floor->Scale(glm::vec3(14.0f, 0.1f, 14.0f));
 	
-	shape_cube->Position(glm::vec3(-0.5f, -0.5f, -0.5f));
-	shape_sphere->Position(glm::vec3(0.5f, 0.5f, -0.5f));
-	shape_sphere->Scale(glm::vec3(0.5f, 0.5f, 0.5f));
-
+	//Set position of Cameras
 	camera->m_cameraPos = glm::vec3(0.0f, 0.0f, 8.0f);
 	orthocamera->m_cameraPos = glm::vec3(0.0f, 0.0f, 8.0f);
 
-	//Setup sound stuff
-	if (AudioSystem->createSound("Resources/Audio/DanceTrack.mp3", FMOD_DEFAULT, 0, &Track_Dance) != FMOD_OK)
-	{
-		std::cout << "FMOD ERROR: Failed to load sound using createSound(...)" << std::endl;
-	}
-	AudioSystem->createChannelGroup("Main", &Main_channel);
-	Main_channel->getChannel(0, &Channel1);
-	AudioSystem->playSound(Track_Dance, Main_channel, false, &Channel1);
+	//Setup Audio
+	audio_main = Audiosystem::GetInstance();
+	//Download sounds if they dont already exist
+	audio_main->AddSoundFromYoutube("https://www.youtube.com/watch?v=OoDo7kMbOd8", "ShowaGroove");
+	audio_main->AddSoundFromYoutube("https://www.youtube.com/watch?v=D2_r4q2imnQ", "Bruh");
+	audio_main->AddSoundFromYoutube("https://www.youtube.com/watch?v=UaUa_0qPPgc", "Airhorn");
+	//Start playing background track
+	audio_main->PlaySound("ShowaGroove", 0.1f, true);
+	
 }
 
-void ProcessInput(float _deltatime)
-{
-	if (glfwGetKey(main_window, GLFW_KEY_W) == GLFW_PRESS)
-	{
-
-	}
-	if (glfwGetKey(main_window, GLFW_KEY_A) == GLFW_PRESS)
-	{
-
-	}
-	if (glfwGetKey(main_window, GLFW_KEY_S) == GLFW_PRESS)
-	{
-
-	}
-	if (glfwGetKey(main_window, GLFW_KEY_D) == GLFW_PRESS)
-	{
-
-	}
-}
 
 //Update all objects and run the processes
 void Update()
 {
+	//Update all GameObjects
 	CObjectController::UpdateObjects();
 
+	//Update Cursor position text
 	double xpos;
 	double ypos;
 	glfwGetCursorPos(main_window, &xpos, &ypos);
 	text_cursorpos->SetText("Pos: ( " + std::to_string(xpos - cfWINDOW_WIDTH() / 2) + " , " + std::to_string(ypos - cfWINDOW_HEIGHT() / 2) + " )");
 
-	if (cfFLAG("Spam_me_please"))
-	{
-		std::cout << "SPAM ";
-	}
+	//Update Flag test text
 	if (cfFLAG("Test_Flag"))
 	{
 		text_message->SetText("Test flag is enabled!");
@@ -327,29 +271,33 @@ void Update()
 		text_message->SetText("Test flag is disabled!");
 	}
 
-	AudioSystem->update();
+	//Play sound if button is pressed
+	if (button_SoundEffect_Airhorn->GetState() == button_SoundEffect_Airhorn->BUTTON_PRESSED)
+	{
+		audio_main->PlaySound("Airhorn");
+	}
+	if (button_SoundEffect_Bruh->GetState() == button_SoundEffect_Bruh->BUTTON_PRESSED)
+	{
+		audio_main->PlaySound("Bruh");
+	}
+
+	//Poll events for GLFW input
 	glfwPollEvents();
 
-	text_username->SetText(SceneManager::GetTextInputBuffer());
+	//Update Username test from the Input Buffer
+	text_username->SetText("\"" + SceneManager::GetTextInputBuffer() + "\"");
 
 	//Get the current time
 	delta_time = current_time;
 	current_time = (float)glfwGetTime();
 	delta_time = current_time - delta_time;
 
+	//Rotate and move Cubes
+	shape_firstcube->Rotation(glm::vec3(0.0f, delta_time * 70, 0.0f) + shape_firstcube->Rotation());
+	shape_secondcube->Rotation(glm::vec3(0.0f, delta_time * 70, 0.0f) + shape_secondcube->Rotation());
 	
-
-	
-	//shape_pyramid->Rotation(glm::vec3(delta_time * 10, 0.0f, 0.0f) + shape_pyramid->Rotation());
-	shape_cube->Rotation(glm::vec3(0.0f, delta_time * 70, 0.0f) + shape_cube->Rotation());
-	shape_cube2->Rotation(glm::vec3(0.0f, delta_time * 70, 0.0f) + shape_cube2->Rotation());
-	//shape_sphere->Rotation(glm::vec3(delta_time * -10, delta_time * -10, 0.0f) + shape_sphere->Rotation());
-
-	//camera->m_cameraPos = glm::vec3( 4 *cos(current_time*2), 0.0f, 4 * sin(current_time*2));
-	camera->m_lookAtTarget = false;
-
-	shape_cube->Position(glm::vec3(cos(current_time * 2), 0.0f,  sin(current_time * 2)));
-	shape_cube2->Position(glm::vec3( cos((current_time+1.57) * 2), 0.0f,  sin((current_time+1.57) * 2)));
+	shape_firstcube->Position(glm::vec3(cos(current_time * 2), 0.0f,  sin(current_time * 2)));
+	shape_secondcube->Position(glm::vec3( cos((current_time+1.57) * 2), 0.0f,  sin((current_time+1.57) * 2)));
 
 	//Rainbow background
 	glClearColor(((sin(current_time) + 1.0f) * 0.5f), ((sin(current_time + 2.0f) + 0.5f) * 0.5f), ((sin(current_time + 4.0f) + 1.0f) * 0.5f), 1.0f);
@@ -362,33 +310,34 @@ void Render()
 {
 	//Clear the buffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	//Set position of shape and render it
 	
-	
-	//Draw the shape
-	
-	
-	
+	//Render the floor
 	shape_floor->Render(*camera, program_worldspace);
 
-	if (cfFLAG("Render_Cube"))
+	//Render the cubes
+	if (cfFLAG("Render_First_Cube"))//Check config file
 	{
-		shape_cube->Render(*camera, program_worldspace);
+		shape_firstcube->Render(*camera, program_worldspace);
 	}
-	shape_cube2->Render(*camera, program_worldspace);
+	if (cfFLAG("Render_Second_Cube"))//Check config file
+	{
+		shape_secondcube->Render(*camera, program_worldspace);
+	}
 
-	faderect_test->m_rect->Render(*orthocamera, program_texture_interpolation);
+	//Render the buttons
+	button_SoundEffect_Airhorn->Render(*orthocamera, program_texture);
+	button_SoundEffect_Bruh->Render(*orthocamera, program_texture);
 
+	//Render the Character
 	char_test->Render(*camera, program_fixed_color);
 
+	//Render the textlabels
 	text_message->Render();
-
 	text_cursorpos->Render();
-
 	text_username->Render();
+	text_scalebounce->Render();
 
 	
-
 	//Push buffer to the screen
 	glfwSwapBuffers(main_window);
 }

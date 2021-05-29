@@ -11,6 +11,7 @@
 #define cfWINDOW_HEIGHT() Config::GetWindowHeight()
 #define cfFLAG(var) Config::GetFlag(var)
 #define cfSETFLAG(var, var2) Config::SetFlag(var, var2)
+#define cfAUDIOPATH "Resources/Audio/"
 
 namespace fs = std::filesystem;
 

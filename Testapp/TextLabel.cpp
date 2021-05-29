@@ -24,6 +24,33 @@ GLuint TextLabel::GenerateTexture(FT_Face face)
 	return TextureID;
 }
 
+void TextLabel::Update(float _fDeltaTime)
+{
+	if (m_scaleBouncing)
+	{
+		float textWidth = 0.0f;
+		float textHeight = 0.0f;
+		for (std::string::const_iterator TextCharacter = TextStr.begin(); TextCharacter != TextStr.end(); TextCharacter++)
+		{
+			FontChar FontCharacter = CharacterMap[*TextCharacter];
+			textWidth += FontCharacter.Size.x * Scale.x;
+			textHeight = FontCharacter.Size.y * Scale.y;
+		}
+		glm::vec2 centre = glm::vec2(textWidth/2, textHeight/2);
+		SetScale(glm::vec2(((sin(glfwGetTime()*3) + 1) / 4) + 1, ((sin(glfwGetTime()*3) + 1) / 4) + 1));
+		textWidth = 0.0f;
+		textHeight = 0.0f;
+		for (std::string::const_iterator TextCharacter = TextStr.begin(); TextCharacter != TextStr.end(); TextCharacter++)
+		{
+			FontChar FontCharacter = CharacterMap[*TextCharacter];
+			textWidth += FontCharacter.Size.x * Scale.x;
+			textHeight = FontCharacter.Size.y * Scale.y;
+		}
+		glm::vec2 newcentre = glm::vec2(textWidth / 2, textHeight / 2);
+		SetPosition(Position - (newcentre - centre));
+	}
+}
+
 TextLabel::TextLabel(std::string Text, std::string Font, glm::ivec2 PixelSize, glm::vec2 Pos, TextLabel::TextEffect Effect, glm::vec3 Color, glm::vec2 Scale, float LeftBuffer, float RightBuffer)
 {
 	SetText(Text);
@@ -44,7 +71,8 @@ TextLabel::TextLabel(std::string Text, std::string Font, glm::ivec2 PixelSize, g
 		Program_Text = ShaderLoader::CreateProgram("Resources/Shaders/TextMarquee.vs", "Resources/Shaders/TextMarquee.fs");
 		break;
 	case TextLabel::SCALE_BOUNCE:
-		Program_Text = ShaderLoader::CreateProgram("Resources/Shaders/TextScaleBounce.vs", "Resources/Shaders/TextScaleBounce.fs");
+		Program_Text = ShaderLoader::CreateProgram("Resources/Shaders/Text.vs", "Resources/Shaders/Text.fs");
+		m_scaleBouncing = true;
 		break;
 	default:
 		break;

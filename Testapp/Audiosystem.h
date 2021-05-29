@@ -2,16 +2,28 @@
 #include <fmod.hpp>
 #include "GameObject.h"
 #include <map>
-class Audiosystem
+#include <filesystem>
+#include "Config.h"
+
+class Audiosystem:
+	public CGameObject
 {
 public:
-	Audiosystem();
 	void AddSound(std::string _filename, std::string _name);
+	void AddSound(std::string _filename, std::string _name, int _channel);
+	void AddSoundFromYoutube(std::string _URL, std::string _name);
+	void AddSoundFromYoutube(std::string _URL, std::string _name, int _channel);
 	void RemoveSound(std::string _name);
-	void PlaySound(std::string _name);
+	void PlaySound(std::string _name, float _volume = 1.0f, bool _loop = false);
 	void PauseSound(std::string _name);
+	static Audiosystem* GetInstance();
 private:
-	FMOD::System* m_audioSystem;
-	std::map<FMOD::Sound*, std::string> m_sounds;
+	Audiosystem();
+	static Audiosystem* m_instance;
+	virtual void Update(float _fDeltaTime);
+	FMOD::System* m_audioSystem = nullptr;
+	FMOD::ChannelGroup* m_channelGroup = nullptr;
+	std::map<std::string, FMOD::Sound*> m_sounds;
+	std::map<FMOD::Sound*, FMOD::Channel*> m_channelBindings;
 };
 
