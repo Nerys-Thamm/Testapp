@@ -5,8 +5,8 @@
 //
 // (c) 2021 Media Design School
 //
-// File Name   :
-// Description :
+// File Name   : Config.h
+// Description : Header file for config class
 // Author      : Nerys Thamm
 // Mail        : nerys.thamm@mds.ac.nz
 

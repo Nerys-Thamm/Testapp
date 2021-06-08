@@ -28,6 +28,7 @@
 #include "SceneManager.h"
 #include "UIButton.h"
 #include "Audiosystem.h"
+#include "Renderable3D.h"
 
 //Pointer to window
 GLFWwindow* main_window = nullptr;
@@ -57,9 +58,10 @@ Camera* camera = nullptr;
 Camera* orthocamera = nullptr;
 
 //MESHES
-Mesh3D* shape_firstcube = nullptr;
-Mesh3D* shape_secondcube = nullptr;
-Mesh3D* shape_floor = nullptr;
+Renderable3D* shape_firstcube = nullptr;
+Renderable3D* shape_secondcube = nullptr;
+Renderable3D* shape_floor = nullptr;
+
 
 //CONTROLLABLE CHARACTERS
 Character* char_test = nullptr;
@@ -74,6 +76,11 @@ TextLabel* text_scalebounce = nullptr;
 UIButton* button_SoundEffect_Airhorn = nullptr;
 UIButton* button_SoundEffect_Bruh = nullptr;
 
+//SHAPES
+Renderable3D* shape_cube = nullptr;
+Renderable3D* shape_sphere = nullptr;
+
+
 //Audio
 Audiosystem* audio_main = nullptr;
 
@@ -86,6 +93,7 @@ int main()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+	glfwWindowHint(GLFW_SAMPLES, 4);
 
 	//Create a GLFW controlled context window
 	main_window = glfwCreateWindow((int)cfWINDOW_WIDTH(), (int)cfWINDOW_HEIGHT(), "Nerys Thamm OpenGL Summative", NULL, NULL);
@@ -154,11 +162,20 @@ GLuint LoadTexture(std::string _filename)
 	return out;
 }
 
+void CreateMaterials()
+{
+	//DEFAULT
+	Lighting::AddMaterial("Default");
+
+	//ADD ADDITIONAL MATERIALS HERE:
+}
+
 //Setup initial elements of program
 void InitialSetup()
 {
 	stbi_set_flip_vertically_on_load(true);
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_MULTISAMPLE);
 	glDepthFunc(GL_LESS);
 	CObjectController::SetMainWindow(main_window);
 	manager = new SceneManager(main_window);
@@ -190,7 +207,7 @@ void InitialSetup()
 		"Resources/Shaders/Texture.fs");
 
 	program_normals = ShaderLoader::CreateProgram("Resources/Shaders/3D_Normals.vs",
-		"Resources/Shaders/Texture.fs");
+		"Resources/Shaders/3DLight_Phong.fs");
 
 	//Cull poly not facing viewport
 	glCullFace(GL_BACK);
@@ -198,14 +215,22 @@ void InitialSetup()
 	//Enable culling
 	glEnable(GL_CULL_FACE);
 
+
+	CreateMaterials();
+
 	//Create camera
 	camera = new Camera(cfWINDOW_WIDTH(), cfWINDOW_HEIGHT(), current_time, true);
 	orthocamera = new Camera(cfWINDOW_WIDTH(), cfWINDOW_HEIGHT(), current_time, false);
 
 	//Create objects
-	shape_firstcube = new Cube3D();
-	shape_secondcube = new Cube3D();
-	shape_floor = new Cube3D();
+	shape_firstcube = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Default"));
+	shape_secondcube = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Default"));
+	shape_floor = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Default"));
+	shape_cube = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Default"));
+	shape_sphere = new Renderable3D(Sphere3D::GetMesh(1, 10), Lighting::GetMaterial("Default"));
+
+	shape_cube->Position(glm::vec3(-1.0f, 0.0f, 0.0f));
+	shape_sphere->Position(glm::vec3(1.0f, 0.0f, 0.0f));
 
 	//Create character
 	char_test = new Character(main_window);
@@ -224,6 +249,8 @@ void InitialSetup()
 	shape_firstcube->AddTexture(LoadTexture("Rayman.jpg"));
 	shape_secondcube->AddTexture(LoadTexture("Rayman.jpg"));
 	shape_floor->AddTexture(LoadTexture("grid.jpg"));
+	shape_cube->AddTexture(LoadTexture("Rayman.jpg"));
+	shape_sphere->AddTexture(LoadTexture("Rayman.jpg"));
 
 	//Set position and scale of Environment
 	shape_floor->Position(glm::vec3(0.0f, -0.8f, 0.0f));
@@ -245,7 +272,7 @@ void InitialSetup()
 	
 
 	//Start playing background track
-	audio_main->PlaySound("Track_ShowaGroove", 0.1f, true);
+	audio_main->PlaySound("Track_Dreamscape", 0.1f, true);
 }
 
 //Update all objects and run the processes
@@ -283,6 +310,11 @@ void Update()
 	//Poll events for GLFW input
 	glfwPollEvents();
 
+
+	Lighting::GetMaterial("Default")->Smoothness = ((sin(current_time) + 1) / 2) * 32;
+	Lighting::Global_Illumination_Color = glm::vec3(((sin(current_time) + 1.0f) * 0.5f), ((sin(current_time + 2.0f) + 0.5f) * 0.5f), ((sin(current_time + 4.0f) + 1.0f) * 0.5f));
+	Lighting::Global_Illumination_Strength = ((sin(current_time) + 1) / 2);
+
 	//Update Username test from the Input Buffer
 	text_username->SetText("\"" + SceneManager::GetTextInputBuffer() + "\"");
 
@@ -298,6 +330,8 @@ void Update()
 	shape_firstcube->Position(glm::vec3(cos(current_time * 2), 0.0f, sin(current_time * 2)));
 	shape_secondcube->Position(glm::vec3(cos((current_time + 1.57) * 2), 0.0f, sin((current_time + 1.57) * 2)));
 
+	shape_cube->Rotation(glm::vec3(delta_time * 70, delta_time * 70, delta_time * 70) + shape_cube->Rotation());
+
 	//Rainbow background
 	glClearColor(((sin(current_time) + 1.0f) * 0.5f), ((sin(current_time + 2.0f) + 0.5f) * 0.5f), ((sin(current_time + 4.0f) + 1.0f) * 0.5f), 1.0f);
 }
@@ -309,30 +343,33 @@ void Render()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	//Render the floor
-	shape_floor->Render(*camera, program_worldspace);
+	/*shape_floor->Render(*camera, program_worldspace);*/
 
 	//Render the cubes
-	if (cfFLAG("Render_First_Cube"))//Check config file
-	{
-		shape_firstcube->Render(*camera, program_worldspace);
-	}
-	if (cfFLAG("Render_Second_Cube"))//Check config file
-	{
-		shape_secondcube->Render(*camera, program_worldspace);
-	}
+	//if (cfFLAG("Render_First_Cube"))//Check config file
+	//{
+	//	shape_firstcube->Render(*camera, program_worldspace);
+	//}
+	//if (cfFLAG("Render_Second_Cube"))//Check config file
+	//{
+	//	shape_secondcube->Render(*camera, program_worldspace);
+	//}
 
-	//Render the buttons
-	button_SoundEffect_Airhorn->Render(*orthocamera, program_texture);
-	button_SoundEffect_Bruh->Render(*orthocamera, program_texture);
+	////Render the buttons
+	//button_SoundEffect_Airhorn->Render(*orthocamera, program_texture);
+	//button_SoundEffect_Bruh->Render(*orthocamera, program_texture);
+
+	shape_cube->Render(*camera, program_normals);
+	shape_sphere->Render(*camera, program_normals);
 
 	//Render the Character
-	char_test->Render(*camera, program_fixed_color);
+	/*char_test->Render(*camera, program_fixed_color);*/
 
 	//Render the textlabels
-	text_message->Render();
+	/*text_message->Render();
 	text_cursorpos->Render();
 	text_username->Render();
-	text_scalebounce->Render();
+	text_scalebounce->Render();*/
 
 	//Push buffer to the screen
 	glfwSwapBuffers(main_window);

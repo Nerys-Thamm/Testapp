@@ -5,8 +5,8 @@
 //
 // (c) 2021 Media Design School
 //
-// File Name   :
-// Description :
+// File Name   : Collider2D.h
+// Description : Header file for 2D collision system
 // Author      : Nerys Thamm
 // Mail        : nerys.thamm@mds.ac.nz
 

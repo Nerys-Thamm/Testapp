@@ -5,8 +5,8 @@
 //
 // (c) 2021 Media Design School
 //
-// File Name   :
-// Description :
+// File Name   : UIButton.h
+// Description : Implementation file for Button
 // Author      : Nerys Thamm
 // Mail        : nerys.thamm@mds.ac.nz
 

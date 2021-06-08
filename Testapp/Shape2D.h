@@ -144,12 +144,12 @@ public:
 	/// <returns></returns>
 	// ********************************************************************************
 	Quad2D();
-	GLfloat m_vertices[32] = {
-		// Index   // Position         // Colour                          // Texture Coords
-		/* 1 */   -0.5f, 0.5f, 0.0f,   m_color.x, m_color.y, m_color.z,   0.0f, 1.0f,        // Top - Left
-		/* 2 */   -0.5f,-0.5f, 0.0f,   m_color.x, m_color.y, m_color.z,   0.0f, 0.0f,        // Bot - Left
-		/* 3 */    0.5f,-0.5f, 0.0f,   m_color.x, m_color.y, m_color.z,   1.0f, 0.0f,        // Bot - Right
-		/* 4 */    0.5f, 0.5f, 0.0f,   m_color.x, m_color.y, m_color.z,   1.0f, 1.0f,        // Top - Right
+	GLfloat m_vertices[44] = {
+		// Index   // Position         // Colour                          // Texture Coords   //Normals
+		/* 1 */   -0.5f, 0.5f, 0.0f,   m_color.x, m_color.y, m_color.z,   0.0f, 1.0f,         0.0f, 0.0f, 1.0f,            // Top - Left
+		/* 2 */   -0.5f,-0.5f, 0.0f,   m_color.x, m_color.y, m_color.z,   0.0f, 0.0f,         0.0f, 0.0f, 1.0f,            // Bot - Left
+		/* 3 */    0.5f,-0.5f, 0.0f,   m_color.x, m_color.y, m_color.z,   1.0f, 0.0f,         0.0f, 0.0f, 1.0f,            // Bot - Right
+		/* 4 */    0.5f, 0.5f, 0.0f,   m_color.x, m_color.y, m_color.z,   1.0f, 1.0f,         0.0f, 0.0f, 1.0f,            // Top - Right
 	};
 	GLuint m_indices[6] = {
 	0, 1, 2, // First Triangle (TL -> BL -> BR)

@@ -5,8 +5,8 @@
 //
 // (c) 2021 Media Design School
 //
-// File Name   :
-// Description :
+// File Name   : GameObject.h
+// Description : Header file for CGameObject and CObjectController classes
 // Author      : Nerys Thamm
 // Mail        : nerys.thamm@mds.ac.nz
 

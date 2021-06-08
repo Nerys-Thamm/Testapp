@@ -21,7 +21,7 @@
 // ********************************************************************************
 Character::Character(GLFWwindow* _window)
 {
-	m_charmodel = new Cube3D();
+	m_charmodel = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Default"));
 	m_charmodel->Scale(glm::vec3(0.5f, 1.0f, 0.5f));
 	m_currwindow = _window;
 }

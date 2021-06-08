@@ -12,155 +12,6 @@
 
 #include "Mesh3D.h"
 
-// ********************************************************************************
-/// <summary>
-/// Gets the model matrix of the mesh
-/// </summary>
-/// <returns>The model matrix of the mesh</returns>
-// ********************************************************************************
-glm::mat4 Mesh3D::GetModelMatrix()
-{
-	//Calculate model matrix
-	m_translationMat = glm::translate(glm::mat4(), m_position);
-	m_rotationMat = glm::rotate(glm::mat4(), glm::radians(m_fRotationX), glm::vec3(1.0f, 0.0f, 0.0f)) * glm::rotate(glm::mat4(), glm::radians(m_fRotationY), glm::vec3(0.0f, 1.0f, 0.0f)) * glm::rotate(glm::mat4(), glm::radians(m_fRotationZ), glm::vec3(0.0f, 0.0f, 1.0f));
-	m_scaleMat = glm::scale(glm::mat4(), m_scale);
-	return m_translationMat * m_rotationMat * m_scaleMat;
-}
-
-// ********************************************************************************
-/// <summary>
-/// Adds a texture to the Mesh's texturelist
-/// </summary>
-/// <param name="_texture">The texture to add</param>
-// ********************************************************************************
-void Mesh3D::AddTexture(GLuint _texture)
-{
-	//Add the texture
-	m_textures.push_back(_texture);
-}
-
-// ********************************************************************************
-/// <summary>
-/// Adds a Vector of textures to the mesh's texturelist
-/// </summary>
-/// <param name="_textures">A vector of textures to add</param>
-// ********************************************************************************
-void Mesh3D::AddTextures(std::vector<GLuint>& _textures)
-{
-	//Add all proivided textures
-	for (GLuint t : _textures)
-	{
-		m_textures.push_back(t);
-	}
-}
-
-// ********************************************************************************
-/// <summary>
-/// Base constructor, should never be called manually
-/// </summary>
-/// <returns></returns>
-// ********************************************************************************
-Mesh3D::Mesh3D()
-{
-	//Initialise variables
-	m_color = glm::vec3(1.0f, 1.0f, 1.0f);
-	m_iTextureIndex = 0;
-	m_iFadeIndex = 0;
-	m_EBO = 0;
-	m_VAO = 0;
-	m_VBO = 0;
-	m_indices = 0;
-	m_fRotationX = 0;
-	m_fRotationY = 0;
-	m_fRotationZ = 0;
-	m_vertices = 0;
-	m_verticesCount = 0;
-	m_position = glm::vec3(0.0f, 0.0f, 0.0f);
-	m_scale = glm::vec3(1.0f, 1.0f, 1.0f);
-}
-// ********************************************************************************
-/// <summary>
-/// Destructor
-/// </summary>
-/// <returns></returns>
-// ********************************************************************************
-Mesh3D::~Mesh3D()
-{
-}
-
-// ********************************************************************************
-/// <summary>
-/// 3D Pyramid Mesh Constructor
-/// </summary>
-/// <returns></returns>
-// ********************************************************************************
-Pyramid3D::Pyramid3D()
-{
-	m_verticesCount = 18;
-
-	m_position = glm::vec3(0.0f, 0.0f, 0.0f);
-	m_fRotationX = 0.0f;
-	m_scale = glm::vec3(1.0f, 1.0f, 1.0f);
-
-	//Generate and bind vertex array to VAO
-	glGenVertexArrays(1, &m_VAO);
-	glBindVertexArray(m_VAO);
-
-	//Generate and bind EBO
-	glGenBuffers(1, &m_EBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(m_indices), m_indices, GL_STATIC_DRAW);
-
-	//Generate and bind VBO
-	glGenBuffers(1, &m_VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(m_vertices), m_vertices, GL_STATIC_DRAW);
-
-	//Set attribute pointers
-	glVertexAttribPointer(0, 3, GL_FLOAT, false, 8 * sizeof(GLfloat), (GLvoid*)0);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, false, 8 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(2, 2, GL_FLOAT, false, 8 * sizeof(GLfloat), (GLvoid*)(6 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(2);
-}
-
-// ********************************************************************************
-/// <summary>
-/// 3D Cube Mesh Constructor
-/// </summary>
-/// <returns></returns>
-// ********************************************************************************
-Cube3D::Cube3D()
-{
-	m_verticesCount = sizeof(m_indices) / sizeof(int32_t);
-
-	m_position = glm::vec3(0.0f, 0.0f, 0.0f);
-	m_fRotationX = 0.0f;
-	m_scale = glm::vec3(1.0f, 1.0f, 1.0f);
-
-	//Generate and bind vertex array to VAO
-	glGenVertexArrays(1, &m_VAO);
-	glBindVertexArray(m_VAO);
-
-	//Generate and bind EBO
-	glGenBuffers(1, &m_EBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(m_indices), m_indices, GL_STATIC_DRAW);
-
-	//Generate and bind VBO
-	glGenBuffers(1, &m_VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(m_vertices), m_vertices, GL_STATIC_DRAW);
-
-	//Set attribute pointers
-	glVertexAttribPointer(0, 3, GL_FLOAT, false, 8 * sizeof(GLfloat), (GLvoid*)0);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, false, 8 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(2, 2, GL_FLOAT, false, 8 * sizeof(GLfloat), (GLvoid*)(6 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(2);
-}
 
 // ********************************************************************************
 /// <summary>
@@ -169,11 +20,12 @@ Cube3D::Cube3D()
 /// <param name="_camera">The camera to use</param>
 /// <param name="_program">The program to use</param>
 // ********************************************************************************
-void Mesh3D::Render(Camera _camera, GLuint _program)
+
+void Mesh3D::Render(Camera _camera, GLuint _program, glm::mat4 _modelmat)
 {
 	//Calculate the PVM matrix
-	glm::mat4 PVMMat = _camera.GetPVM(GetModelMatrix());
-	glm::mat4 ModelMat = GetModelMatrix();
+	glm::mat4 PVMMat = _camera.GetPVM(_modelmat);
+	glm::mat4 ModelMat = _modelmat;
 	//Bind program and VAO
 	glUseProgram(_program);
 	glBindVertexArray(m_VAO);
@@ -186,15 +38,70 @@ void Mesh3D::Render(Camera _camera, GLuint _program)
 	GLint ModelLoc = glGetUniformLocation(_program, "Model");
 	glUniformMatrix4fv(ModelLoc, 1, GL_FALSE, glm::value_ptr(ModelMat));
 
+	
+	//Render the Shape
+	glDrawElements(GL_TRIANGLES, m_verticesCount, GL_UNSIGNED_INT, 0);
+
+	//Unbind assets
+	glBindVertexArray(0);
+	glUseProgram(0);
+}
+
+// ********************************************************************************
+/// <summary>
+/// Renders the Mesh
+/// </summary>
+/// <param name="_camera">The camera to use</param>
+/// <param name="_program">The program to use</param>
+// ********************************************************************************
+
+void Mesh3D::Render(Camera _camera, GLuint _program, glm::mat4 _modelmat, std::vector<GLuint> _textures, Material* _material, int _textureindex, int _fadeindex)
+{
+	//Calculate the PVM matrix
+	glm::mat4 PVMMat = _camera.GetPVM(_modelmat);
+	glm::mat4 ModelMat = _modelmat;
+	//Bind program and VAO
+	glUseProgram(_program);
+	glBindVertexArray(m_VAO);
+
+	//Send Vars to shaders via Uniform
+
+	//Time
+	GLint CurrentTimeLoc = glGetUniformLocation(_program, "CurrentTime");
+	glUniform1f(CurrentTimeLoc, glfwGetTime());
+
+	//Matrices
+	GLint PVMMatLoc = glGetUniformLocation(_program, "PVMMat");
+	glUniformMatrix4fv(PVMMatLoc, 1, GL_FALSE, glm::value_ptr(PVMMat));
+	GLint ModelLoc = glGetUniformLocation(_program, "Model");
+	glUniformMatrix4fv(ModelLoc, 1, GL_FALSE, glm::value_ptr(ModelMat));
+
+	//Camera
+	GLint CamLoc = glGetUniformLocation(_program, "CameraPos");
+	glUniform3fv(CamLoc, 1, glm::value_ptr(_camera.m_cameraPos));
+
+	//Lighting
+	//Ambient
+	GLint AmbientStrLoc = glGetUniformLocation(_program, "AmbientStrength");
+	glUniform1f(AmbientStrLoc, Lighting::Global_Illumination_Strength);
+	GLint AmbientClrLoc = glGetUniformLocation(_program, "AmbientColor");
+	glUniform3fv(AmbientClrLoc, 1, glm::value_ptr(Lighting::Global_Illumination_Color));
+	//Material
+	GLint MaterialLoc = glGetUniformLocation(_program, "Shininess");
+	glUniform1f(MaterialLoc, _material->Smoothness);
+
+	
+	
+
 	//If the shape has textures provided
-	if (!m_textures.empty())
+	if (!_textures.empty())
 	{
 		//Set texture uniforms
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, m_textures[m_iTextureIndex]);
+		glBindTexture(GL_TEXTURE_2D, _textures[_textureindex]);
 		glUniform1i(glGetUniformLocation(_program, "ImageTexture"), 0);
 		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, m_textures[m_iFadeIndex]);
+		glBindTexture(GL_TEXTURE_2D, _textures[_fadeindex]);
 		glUniform1i(glGetUniformLocation(_program, "ImageTexture1"), 1);
 	}
 
@@ -208,93 +115,123 @@ void Mesh3D::Render(Camera _camera, GLuint _program)
 
 // ********************************************************************************
 /// <summary>
-/// Gets the Position
+/// Base constructor, should never be called manually
 /// </summary>
 /// <returns></returns>
 // ********************************************************************************
-glm::vec3 Mesh3D::Position()
+Mesh3D::Mesh3D()
 {
-	return m_position;
+	//Initialise variables
+	m_color = glm::vec3(1.0f, 1.0f, 1.0f);
+	m_EBO = 0;
+	m_VAO = 0;
+	m_VBO = 0;
+	m_indices = 0;
+	m_vertices = 0;
+	m_verticesCount = 0;
 }
-
 // ********************************************************************************
 /// <summary>
-/// Gets the Rotation
+/// Destructor
 /// </summary>
 /// <returns></returns>
 // ********************************************************************************
-glm::vec3 Mesh3D::Rotation()
+Mesh3D::~Mesh3D()
 {
-	return glm::vec3(m_fRotationX, m_fRotationY, m_fRotationZ);
+}
+
+Mesh3D* Pyramid3D::GetMesh()
+{
+	if (m_mesh == nullptr)
+	{
+		m_mesh = new Pyramid3D();
+	}
+	return m_mesh;
 }
 
 // ********************************************************************************
 /// <summary>
-/// Gets the Scale
+/// 3D Pyramid Mesh Constructor
 /// </summary>
 /// <returns></returns>
 // ********************************************************************************
-glm::vec3 Mesh3D::Scale()
+Pyramid3D::Pyramid3D()
 {
-	return m_scale;
+	m_verticesCount = 18;
+
+	
+
+	//Generate and bind vertex array to VAO
+	glGenVertexArrays(1, &m_VAO);
+	glBindVertexArray(m_VAO);
+
+	//Generate and bind EBO
+	glGenBuffers(1, &m_EBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(m_indices), m_indices, GL_STATIC_DRAW);
+
+	//Generate and bind VBO
+	glGenBuffers(1, &m_VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(m_vertices), m_vertices, GL_STATIC_DRAW);
+
+	//Set attribute pointers
+	glVertexAttribPointer(0, 3, GL_FLOAT, false, 8 * sizeof(GLfloat), (GLvoid*)0);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, false, 8 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 2, GL_FLOAT, false, 8 * sizeof(GLfloat), (GLvoid*)(6 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(2);
+}
+
+Mesh3D* Cube3D::GetMesh()
+{
+	if (m_mesh == nullptr)
+	{
+		m_mesh = new Cube3D();
+	}
+	return m_mesh;
 }
 
 // ********************************************************************************
 /// <summary>
-/// Gets the Color
+/// 3D Cube Mesh Constructor
 /// </summary>
 /// <returns></returns>
 // ********************************************************************************
-glm::vec3 Mesh3D::Color()
+Cube3D::Cube3D()
 {
-	return m_color;
+	m_verticesCount = sizeof(m_indices) / sizeof(int32_t);
+
+	
+
+	//Generate and bind vertex array to VAO
+	glGenVertexArrays(1, &m_VAO);
+	glBindVertexArray(m_VAO);
+
+	//Generate and bind EBO
+	glGenBuffers(1, &m_EBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(m_indices), m_indices, GL_STATIC_DRAW);
+
+	//Generate and bind VBO
+	glGenBuffers(1, &m_VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(m_vertices), m_vertices, GL_STATIC_DRAW);
+
+	//Set attribute pointers
+	glVertexAttribPointer(0, 3, GL_FLOAT, false, 8 * sizeof(GLfloat), (GLvoid*)0);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 2, GL_FLOAT, false, 8 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 3, GL_FLOAT, false, 8 * sizeof(GLfloat), (GLvoid*)(5 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(2);
+
 }
 
-// ********************************************************************************
-/// <summary>
-/// Sets the Position
-/// </summary>
-/// <param name="_pos"></param>
-// ********************************************************************************
-void Mesh3D::Position(glm::vec3 _pos)
-{
-	m_position = _pos;
-}
 
-// ********************************************************************************
-/// <summary>
-/// Sets the Rotation
-/// </summary>
-/// <param name="_rot"></param>
-// ********************************************************************************
-void Mesh3D::Rotation(glm::vec3 _rot)
-{
-	m_fRotationX = _rot.x;
-	m_fRotationY = _rot.y;
-	m_fRotationZ = _rot.z;
-}
 
-// ********************************************************************************
-/// <summary>
-/// Sets the Scale
-/// </summary>
-/// <param name="_scl"></param>
-// ********************************************************************************
-void Mesh3D::Scale(glm::vec3 _scl)
-{
-	m_scale = _scl;
-}
 
-// ********************************************************************************
-/// <summary>
-/// Sets the Color
-/// </summary>
-/// <param name="_col"></param>
-// ********************************************************************************
-void Mesh3D::Color(glm::vec3 _col)
-{
-	m_color = _col;
-}
 
 // ********************************************************************************
 /// <summary>
@@ -404,3 +341,16 @@ Sphere3D::Sphere3D(float Radius, int Fidelity)
 
 	m_verticesCount = IndexCount;
 }
+
+Mesh3D* Sphere3D::GetMesh(float Radius, int Fidelity)
+{
+	if (m_mesh == nullptr)
+	{
+		m_mesh = new Sphere3D(Radius, Fidelity);
+	}
+	return m_mesh;
+}
+
+Mesh3D* Cube3D::m_mesh = nullptr;
+Mesh3D* Pyramid3D::m_mesh = nullptr;
+Mesh3D* Sphere3D::m_mesh = nullptr;
