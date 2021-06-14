@@ -55,7 +55,7 @@ void Mesh3D::Render(Camera _camera, GLuint _program, glm::mat4 _modelmat)
 /// <param name="_program">The program to use</param>
 // ********************************************************************************
 
-void Mesh3D::Render(Camera _camera, GLuint _program, glm::mat4 _modelmat, std::vector<GLuint> _textures, Material* _material, int _textureindex, int _fadeindex)
+void Mesh3D::Render(Camera _camera, GLuint _program, glm::mat4 _modelmat, std::vector<GLuint> _textures, Material& _material, int _textureindex, int _fadeindex)
 {
 	//Calculate the PVM matrix
 	glm::mat4 PVMMat = _camera.GetPVM(_modelmat);
@@ -80,16 +80,36 @@ void Mesh3D::Render(Camera _camera, GLuint _program, glm::mat4 _modelmat, std::v
 	GLint CamLoc = glGetUniformLocation(_program, "CameraPos");
 	glUniform3fv(CamLoc, 1, glm::value_ptr(_camera.m_cameraPos));
 
-	//Lighting
-	//Ambient
-	GLint AmbientStrLoc = glGetUniformLocation(_program, "AmbientStrength");
-	glUniform1f(AmbientStrLoc, Lighting::Global_Illumination_Strength);
-	GLint AmbientClrLoc = glGetUniformLocation(_program, "AmbientColor");
-	glUniform3fv(AmbientClrLoc, 1, glm::value_ptr(Lighting::Global_Illumination_Color));
 	//Material
-	GLint MaterialLoc = glGetUniformLocation(_program, "Shininess");
-	glUniform1f(MaterialLoc, _material->Smoothness);
+	glUniform1f(glGetUniformLocation(_program, "Mat[0].Smoothness"), _material.Smoothness);
+	glUniform1f(glGetUniformLocation(_program, "Mat[0].Reflectivity"), _material.Reflectivity);
 
+
+	//Lighting
+	//PointLights
+	for (size_t i = 0; i < Lighting::MAX_POINT_LIGHTS; i++)
+	{
+		glUniform3fv(glGetUniformLocation(_program, ("PointLights[" + std::to_string(i) + "].Position").c_str()), 1, glm::value_ptr(Lighting::PointLights[i].Position));
+		glUniform3fv(glGetUniformLocation(_program, ("PointLights[" + std::to_string(i) + "].Color").c_str()), 1, glm::value_ptr(Lighting::PointLights[i].Color));
+		glUniform1f(glGetUniformLocation(_program, ("PointLights[" + std::to_string(i) + "].AmbientStrength").c_str()), Lighting::PointLights[i].AmbientStrength);
+		glUniform1f(glGetUniformLocation(_program, ("PointLights[" + std::to_string(i) + "].SpecularStrength").c_str()), Lighting::PointLights[i].SpecularStrength);
+		glUniform1f(glGetUniformLocation(_program, ("PointLights[" + std::to_string(i) + "].AttenuationConstant").c_str()), Lighting::PointLights[i].AttenuationConstant);
+		glUniform1f(glGetUniformLocation(_program, ("PointLights[" + std::to_string(i) + "].AttenuationExponent").c_str()), Lighting::PointLights[i].AttenuationExponent);
+		glUniform1f(glGetUniformLocation(_program, ("PointLights[" + std::to_string(i) + "].AttenuationLinear").c_str()), Lighting::PointLights[i].AttenuationLinear);
+	}
+
+	//DirectionalLights
+	for (size_t i = 0; i < Lighting::MAX_DIRECTIONAL_LIGHTS; i++)
+	{
+		glUniform3fv(glGetUniformLocation(_program, ("DirectionalLights[" + std::to_string(i) + "].Direction").c_str()), 1, glm::value_ptr(Lighting::DirectionalLights[i].Direction));
+		glUniform3fv(glGetUniformLocation(_program, ("DirectionalLights[" + std::to_string(i) + "].Color").c_str()), 1, glm::value_ptr(Lighting::DirectionalLights[i].Color));
+		glUniform1f(glGetUniformLocation(_program, ("DirectionalLights[" + std::to_string(i) + "].AmbientStrength").c_str()), Lighting::DirectionalLights[i].AmbientStrength);
+		glUniform1f(glGetUniformLocation(_program, ("DirectionalLights[" + std::to_string(i) + "].SpecularStrength").c_str()), Lighting::DirectionalLights[i].SpecularStrength);
+		
+	}
+
+	
+	
 	
 	
 
@@ -104,12 +124,18 @@ void Mesh3D::Render(Camera _camera, GLuint _program, glm::mat4 _modelmat, std::v
 		glBindTexture(GL_TEXTURE_2D, _textures[_fadeindex]);
 		glUniform1i(glGetUniformLocation(_program, "ImageTexture1"), 1);
 	}
+	glActiveTexture(GL_TEXTURE);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, SceneManager::GetCurrentSkybox()->GetCubemap());
+	glUniform1i(glGetUniformLocation(_program, "CubeMap"), SceneManager::GetCurrentSkybox()->GetCubemap());
+
+
 
 	//Render the Shape
 	glDrawElements(GL_TRIANGLES, m_verticesCount, GL_UNSIGNED_INT, 0);
 
 	//Unbind assets
 	glBindVertexArray(0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 	glUseProgram(0);
 }
 

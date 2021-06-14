@@ -25,7 +25,7 @@
 Camera::Camera(float _fWindowWidth, float _fWindowHeight, GLfloat& _fcurrtime, bool _bPerspective)
 {
 	//Set defaults for member variables
-	m_projectionMat = (_bPerspective ? glm::perspective(glm::radians(45.0f), (float)_fWindowWidth / (float)_fWindowHeight, 0.1f, 100.0f) : glm::ortho(-(_fWindowWidth * 0.5f), _fWindowWidth * 0.5f, -(_fWindowHeight * 0.5f), _fWindowHeight * 0.5f, 0.1f, 100.0f));
+	m_projectionMat = (_bPerspective ? glm::perspective(glm::radians(45.0f), (float)_fWindowWidth / (float)_fWindowHeight, 0.1f, 4000.0f) : glm::ortho(-(_fWindowWidth * 0.5f), _fWindowWidth * 0.5f, -(_fWindowHeight * 0.5f), _fWindowHeight * 0.5f, 0.1f, 100.0f));
 	m_viewMat = glm::lookAt(m_cameraPos, m_cameraPos + m_cameraLookDir, m_cameraUpDir);
 	m_pCurrentTime = &_fcurrtime;
 }

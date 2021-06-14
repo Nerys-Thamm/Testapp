@@ -15,6 +15,7 @@
 #include <glm.hpp>
 #include "Config.h"
 #include "Audiosystem.h"
+#include "Skybox.h"
 class SceneManager :
 	public CGameObject
 {
@@ -22,9 +23,13 @@ public:
 	SceneManager(GLFWwindow* _window);
 	static std::string GetTextInputBuffer();
 	static glm::vec2 ScreenToWorldSpace(glm::vec2 _mousePos);
+	static void SetCurrentSkybox(Skybox* _skybox);
+	static Skybox* GetCurrentSkybox();
+
 private:
 	GLFWwindow* m_window = nullptr;
 	virtual void Update(float _fDeltaTime);
+	static Skybox* m_skybox;
 	static bool m_isWireframe;
 	static bool m_isReadingTextInput;
 	static bool m_isCursorVisible;

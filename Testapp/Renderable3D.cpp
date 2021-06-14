@@ -177,5 +177,5 @@ void Renderable3D::Color(glm::vec3 _col)
 // ********************************************************************************
 void Renderable3D::Render(Camera _camera, GLuint _program)
 {
-	m_mesh->Render(_camera, _program, GetModelMatrix(), m_textures, m_material);
+	m_mesh->Render(_camera, _program, GetModelMatrix(), m_textures, *m_material);
 }

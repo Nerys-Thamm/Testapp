@@ -15,8 +15,6 @@
 #include <glew.h>
 #include <glfw3.h>
 #include "ShaderLoader.h"
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
 #include "Shape2D.h"
 #include "Camera.h"
 #include "Config.h"
@@ -29,6 +27,8 @@
 #include "UIButton.h"
 #include "Audiosystem.h"
 #include "Renderable3D.h"
+#include "Skybox.h"
+#include "TextureLoader.h"
 
 //Pointer to window
 GLFWwindow* main_window = nullptr;
@@ -47,6 +47,10 @@ GLuint program_texture_interpolation;
 GLuint program_fixed_color;
 GLuint program_texture_wave;
 GLuint program_normals;
+GLuint program_blinnphong;
+GLuint program_blinnphongrim;
+GLuint program_reflective;
+GLuint program_reflectiverim;
 
 //TIME
 float current_time;
@@ -56,6 +60,8 @@ float timer;
 //CAMERAS
 Camera* camera = nullptr;
 Camera* orthocamera = nullptr;
+
+
 
 //MESHES
 Renderable3D* shape_firstcube = nullptr;
@@ -135,45 +141,29 @@ int main()
 	return 0;
 }
 
-GLuint LoadTexture(std::string _filename)
-{
-	GLuint out;
 
-	// Load the Image data
-	int ImageWidth;
-	int ImageHeight;
-	int ImageComponents;
-	unsigned char* ImageData = stbi_load(("Resources/Textures/" + _filename).c_str(), &ImageWidth, &ImageHeight, &ImageComponents, 0);
-
-	//Create and bind a new texture template
-	glGenTextures(1, &out);
-	glBindTexture(GL_TEXTURE_2D, out);
-
-	// Check how many components the loaded image has (rgb or rgba)
-	GLint LoadedComponents = (ImageComponents == 4) ? GL_RGBA : GL_RGB;
-
-	// Populate the texture with image data
-	glTexImage2D(GL_TEXTURE_2D, 0, LoadedComponents, ImageWidth, ImageHeight, 0, LoadedComponents, GL_UNSIGNED_BYTE, ImageData);
-
-	// Generate mipmaps, free memory and unbind texture
-	glGenerateMipmap(GL_TEXTURE_2D);
-	stbi_image_free(ImageData);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	return out;
-}
 
 void CreateMaterials()
 {
 	//DEFAULT
 	Lighting::AddMaterial("Default");
-
+	Lighting::GetMaterial("Default")->Smoothness = 60;
+	Lighting::GetMaterial("Default")->Reflectivity = 0.0f;
 	//ADD ADDITIONAL MATERIALS HERE:
+	Lighting::AddMaterial("Glossy");
+	Lighting::GetMaterial("Glossy")->Smoothness = 60;
+	Lighting::GetMaterial("Glossy")->Reflectivity = 0.5f;
+	Lighting::AddMaterial("Chrome");
+	Lighting::GetMaterial("Chrome")->Smoothness = 80;
+	Lighting::GetMaterial("Chrome")->Reflectivity = 0.9f;
+
+	
 }
 
 //Setup initial elements of program
 void InitialSetup()
 {
-	stbi_set_flip_vertically_on_load(true);
+	
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_MULTISAMPLE);
 	glDepthFunc(GL_LESS);
@@ -209,6 +199,18 @@ void InitialSetup()
 	program_normals = ShaderLoader::CreateProgram("Resources/Shaders/3D_Normals.vs",
 		"Resources/Shaders/3DLight_Phong.fs");
 
+	program_blinnphong = ShaderLoader::CreateProgram("Resources/Shaders/3D_Normals.vs",
+		"Resources/Shaders/3DLight_BlinnPhong.fs");
+
+	program_blinnphongrim = ShaderLoader::CreateProgram("Resources/Shaders/3D_Normals.vs",
+		"Resources/Shaders/3DLight_BlinnPhongRim.fs");
+
+	program_reflective = ShaderLoader::CreateProgram("Resources/Shaders/3D_Normals.vs",
+		"Resources/Shaders/3DLight_Reflective.fs");
+
+	program_reflectiverim = ShaderLoader::CreateProgram("Resources/Shaders/3D_Normals.vs",
+		"Resources/Shaders/3DLight_ReflectiveRim.fs");
+
 	//Cull poly not facing viewport
 	glCullFace(GL_BACK);
 
@@ -222,12 +224,16 @@ void InitialSetup()
 	camera = new Camera(cfWINDOW_WIDTH(), cfWINDOW_HEIGHT(), current_time, true);
 	orthocamera = new Camera(cfWINDOW_WIDTH(), cfWINDOW_HEIGHT(), current_time, false);
 
+	//Create Skybox
+	std::string SkyboxFilepaths[] = {"MountainOutpost/Right.jpg","MountainOutpost/Left.jpg","MountainOutpost/Top.jpg","MountainOutpost/Bottom.jpg","MountainOutpost/Back.jpg","MountainOutpost/Front.jpg"};
+	
+	SceneManager::SetCurrentSkybox(new Skybox(camera, SkyboxFilepaths));
+
 	//Create objects
-	shape_firstcube = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Default"));
-	shape_secondcube = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Default"));
+	
 	shape_floor = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Default"));
-	shape_cube = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Default"));
-	shape_sphere = new Renderable3D(Sphere3D::GetMesh(1, 10), Lighting::GetMaterial("Default"));
+	shape_cube = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Glossy"));
+	shape_sphere = new Renderable3D(Sphere3D::GetMesh(1, 10), Lighting::GetMaterial("Glossy"));
 
 	shape_cube->Position(glm::vec3(-1.0f, 0.0f, 0.0f));
 	shape_sphere->Position(glm::vec3(1.0f, 0.0f, 0.0f));
@@ -242,15 +248,14 @@ void InitialSetup()
 	text_scalebounce = new TextLabel("Username:", "Resources/Fonts/ARIAL.ttf", glm::ivec2(0, 40), glm::vec2(300.0f, 750.0f), TextLabel::TextEffect::SCALE_BOUNCE);
 
 	//Create Buttons
-	button_SoundEffect_Airhorn = new UIButton(glm::vec3(300, 300, 4), glm::vec3(200, 200, 1), LoadTexture("Button_Default.png"), LoadTexture("Button_Hover.png"), LoadTexture("Button_Press.png"));
-	button_SoundEffect_Bruh = new UIButton(glm::vec3(-300, 300, 4), glm::vec3(200, 200, 1), LoadTexture("Button_Default.png"), LoadTexture("Button_Hover.png"), LoadTexture("Button_Press.png"));
+	button_SoundEffect_Airhorn = new UIButton(glm::vec3(300, 300, 4), glm::vec3(200, 200, 1), TextureLoader::LoadTexture("Button_Default.png"), TextureLoader::LoadTexture("Button_Hover.png"), TextureLoader::LoadTexture("Button_Press.png"));
+	button_SoundEffect_Bruh = new UIButton(glm::vec3(-300, 300, 4), glm::vec3(200, 200, 1), TextureLoader::LoadTexture("Button_Default.png"), TextureLoader::LoadTexture("Button_Hover.png"), TextureLoader::LoadTexture("Button_Press.png"));
 
 	//Set textures of objects
-	shape_firstcube->AddTexture(LoadTexture("Rayman.jpg"));
-	shape_secondcube->AddTexture(LoadTexture("Rayman.jpg"));
-	shape_floor->AddTexture(LoadTexture("grid.jpg"));
-	shape_cube->AddTexture(LoadTexture("Rayman.jpg"));
-	shape_sphere->AddTexture(LoadTexture("Rayman.jpg"));
+	shape_floor->AddTexture(TextureLoader::LoadTexture("grid.jpg"));
+	shape_cube->AddTexture(TextureLoader::LoadTexture("Crate.jpg"));
+	shape_cube->AddTexture(TextureLoader::LoadTexture("Crate-Reflection.png"));
+	shape_sphere->AddTexture(TextureLoader::LoadTexture("Rayman.jpg"));
 
 	//Set position and scale of Environment
 	shape_floor->Position(glm::vec3(0.0f, -0.8f, 0.0f));
@@ -273,6 +278,28 @@ void InitialSetup()
 
 	//Start playing background track
 	audio_main->PlaySound("Track_Dreamscape", 0.1f, true);
+
+	//Setup Lights
+	Lighting::PointLights[0].Position = glm::vec3(-4.0f, 6.0f, 0.0f);
+	Lighting::PointLights[0].Color = glm::vec3(0.0f, 0.5f, 0.7f);
+	Lighting::PointLights[0].AmbientStrength = 0.03f;
+	Lighting::PointLights[0].SpecularStrength = 1.0f;
+	Lighting::PointLights[0].AttenuationConstant = 1.0f;
+	Lighting::PointLights[0].AttenuationLinear = 0.045f;
+	Lighting::PointLights[0].AttenuationExponent = 0.0075f;
+
+	Lighting::PointLights[1].Position = glm::vec3(4.0f, 6.0f, 0.0f);
+	Lighting::PointLights[1].Color = glm::vec3(1.0f, 0.0f, 0.0f);
+	Lighting::PointLights[1].AmbientStrength = 0.03f;
+	Lighting::PointLights[1].SpecularStrength = 1.0f;
+	Lighting::PointLights[1].AttenuationConstant = 1.0f;
+	Lighting::PointLights[1].AttenuationLinear = 0.022f;
+	Lighting::PointLights[1].AttenuationExponent = 0.0019f;
+
+	Lighting::DirectionalLights[0].Direction = glm::vec3(-1.0f, -1.0f, -1.0f);
+	Lighting::DirectionalLights[0].Color = glm::vec3(1.0f, 1.0f, 1.0f);
+	Lighting::DirectionalLights[0].AmbientStrength = 0.02f;
+	Lighting::DirectionalLights[0].SpecularStrength = 1.0f;
 }
 
 //Update all objects and run the processes
@@ -311,9 +338,9 @@ void Update()
 	glfwPollEvents();
 
 
-	Lighting::GetMaterial("Default")->Smoothness = ((sin(current_time) + 1) / 2) * 32;
-	Lighting::Global_Illumination_Color = glm::vec3(((sin(current_time) + 1.0f) * 0.5f), ((sin(current_time + 2.0f) + 0.5f) * 0.5f), ((sin(current_time + 4.0f) + 1.0f) * 0.5f));
-	Lighting::Global_Illumination_Strength = ((sin(current_time) + 1) / 2);
+	
+	//Lighting::Global_Illumination_Color = glm::vec3(((sin(current_time) + 1.0f) * 0.5f), ((sin(current_time + 2.0f) + 0.5f) * 0.5f), ((sin(current_time + 4.0f) + 1.0f) * 0.5f));
+	//Lighting::Global_Illumination_Strength = ((sin(current_time) + 1) / 2);
 
 	//Update Username test from the Input Buffer
 	text_username->SetText("\"" + SceneManager::GetTextInputBuffer() + "\"");
@@ -324,11 +351,9 @@ void Update()
 	delta_time = current_time - delta_time;
 
 	//Rotate and move Cubes
-	shape_firstcube->Rotation(glm::vec3(0.0f, delta_time * 70, 0.0f) + shape_firstcube->Rotation());
-	shape_secondcube->Rotation(glm::vec3(0.0f, delta_time * 70, 0.0f) + shape_secondcube->Rotation());
+	
 
-	shape_firstcube->Position(glm::vec3(cos(current_time * 2), 0.0f, sin(current_time * 2)));
-	shape_secondcube->Position(glm::vec3(cos((current_time + 1.57) * 2), 0.0f, sin((current_time + 1.57) * 2)));
+	
 
 	shape_cube->Rotation(glm::vec3(delta_time * 70, delta_time * 70, delta_time * 70) + shape_cube->Rotation());
 
@@ -342,8 +367,11 @@ void Render()
 	//Clear the buffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	//Render the skybox
+	SceneManager::GetCurrentSkybox()->Render();
+
 	//Render the floor
-	/*shape_floor->Render(*camera, program_worldspace);*/
+	shape_floor->Render(*camera, program_blinnphong);
 
 	//Render the cubes
 	//if (cfFLAG("Render_First_Cube"))//Check config file
@@ -359,8 +387,8 @@ void Render()
 	//button_SoundEffect_Airhorn->Render(*orthocamera, program_texture);
 	//button_SoundEffect_Bruh->Render(*orthocamera, program_texture);
 
-	shape_cube->Render(*camera, program_normals);
-	shape_sphere->Render(*camera, program_normals);
+	shape_cube->Render(*camera, program_reflective);
+	shape_sphere->Render(*camera, program_reflectiverim);
 
 	//Render the Character
 	/*char_test->Render(*camera, program_fixed_color);*/

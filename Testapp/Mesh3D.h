@@ -22,13 +22,16 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include <math.h>
+#include <iostream>
+#include <string>
+#include "SceneManager.h"
 
 class Mesh3D
 {
 public:
 
 	void Render(Camera _camera, GLuint _program, glm::mat4 _modelmat);
-	void Render(Camera _camera, GLuint _program, glm::mat4 _modelmat, std::vector<GLuint> _textures, Material* _material, int _textureindex = 0, int _fadeindex = 1);
+	void Render(Camera _camera, GLuint _program, glm::mat4 _modelmat, std::vector<GLuint> _textures, Material& _material, int _textureindex = 0, int _fadeindex = 1);
 	
 protected:
 	// ********************************************************************************

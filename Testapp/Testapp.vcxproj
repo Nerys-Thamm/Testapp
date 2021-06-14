@@ -152,6 +152,8 @@
     <ClCompile Include="Config.cpp" />
     <ClCompile Include="Lighting.cpp" />
     <ClCompile Include="Renderable3D.cpp" />
+    <ClCompile Include="Skybox.cpp" />
+    <ClCompile Include="TextureLoader.cpp" />
     <ClCompile Include="UIButton.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Mesh3D.cpp" />
@@ -169,6 +171,8 @@
     <ClInclude Include="Config.h" />
     <ClInclude Include="Lighting.h" />
     <ClInclude Include="Renderable3D.h" />
+    <ClInclude Include="Skybox.h" />
+    <ClInclude Include="TextureLoader.h" />
     <ClInclude Include="UIButton.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Mesh3D.h" />

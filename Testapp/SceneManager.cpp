@@ -48,6 +48,18 @@ glm::vec2 SceneManager::ScreenToWorldSpace(glm::vec2 _mousePos)
 	return glm::vec2(_mousePos.x + (cfWINDOW_WIDTH() / 2), _mousePos.y + (cfWINDOW_HEIGHT() / 2));
 }
 
+Skybox* SceneManager::m_skybox = nullptr;
+
+void SceneManager::SetCurrentSkybox(Skybox* _skybox)
+{
+	m_skybox = _skybox;
+}
+
+Skybox* SceneManager::GetCurrentSkybox()
+{
+	return m_skybox;
+}
+
 bool SceneManager::m_isWireframe = false;
 bool SceneManager::m_isCursorVisible = true;
 bool SceneManager::m_isReadingTextInput = false;
