@@ -225,7 +225,7 @@ void InitialSetup()
 	orthocamera = new Camera(cfWINDOW_WIDTH(), cfWINDOW_HEIGHT(), current_time, false);
 
 	//Create Skybox
-	std::string SkyboxFilepaths[] = {"MountainOutpost/Right.jpg","MountainOutpost/Left.jpg","MountainOutpost/Top.jpg","MountainOutpost/Bottom.jpg","MountainOutpost/Back.jpg","MountainOutpost/Front.jpg"};
+	std::string SkyboxFilepaths[] = {"MountainOutpost/Right.jpg","MountainOutpost/Left.jpg","MountainOutpost/Up.jpg","MountainOutpost/Down.jpg","MountainOutpost/Back.jpg","MountainOutpost/Front.jpg"};
 	
 	SceneManager::SetCurrentSkybox(new Skybox(camera, SkyboxFilepaths));
 

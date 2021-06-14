@@ -128,7 +128,7 @@ void main()
     vec4 TexColor = texture(ImageTexture, FragTexCoords);
     vec4 ReflectColor = texture(CubeMap, CalculateReflection());
     float ReflectionAmount = texture(ImageTexture1, FragTexCoords).r;
-    vec4 MixedColor = mix(TexColor, ReflectColor, Mat[0].Reflectivity * ReflectionAmount);
+    vec4 MixedColor = mix(TexColor, ReflectColor, Mat[0].Reflectivity * clamp(ReflectionAmount, 0.0f, 1.0f));
 	FinalColor =  vec4(LightOutput, 1.0f) * MixedColor;
 }
 
