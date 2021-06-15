@@ -29,6 +29,9 @@
 #include "Renderable3D.h"
 #include "Skybox.h"
 #include "TextureLoader.h"
+#include "FreeCam.h"
+#include "PointLightObj.h"
+
 
 //Pointer to window
 GLFWwindow* main_window = nullptr;
@@ -59,6 +62,7 @@ float timer;
 
 //CAMERAS
 Camera* camera = nullptr;
+FreeCam* freecam = nullptr;
 Camera* orthocamera = nullptr;
 
 
@@ -85,6 +89,14 @@ UIButton* button_SoundEffect_Bruh = nullptr;
 //SHAPES
 Renderable3D* shape_cube = nullptr;
 Renderable3D* shape_sphere = nullptr;
+
+std::vector<Renderable3D*> Spheres;
+
+//LIGHTS
+PointLightObj* light_green;
+PointLightObj* light_red;
+PointLightObj* light_blue;
+PointLightObj* light_purple;
 
 
 //Audio
@@ -222,21 +234,31 @@ void InitialSetup()
 
 	//Create camera
 	camera = new Camera(cfWINDOW_WIDTH(), cfWINDOW_HEIGHT(), current_time, true);
+	freecam = new FreeCam(main_window, cfWINDOW_WIDTH(), cfWINDOW_HEIGHT(), current_time, true);
 	orthocamera = new Camera(cfWINDOW_WIDTH(), cfWINDOW_HEIGHT(), current_time, false);
 
 	//Create Skybox
 	std::string SkyboxFilepaths[] = {"MountainOutpost/Right.jpg","MountainOutpost/Left.jpg","MountainOutpost/Up.jpg","MountainOutpost/Down.jpg","MountainOutpost/Back.jpg","MountainOutpost/Front.jpg"};
 	
-	SceneManager::SetCurrentSkybox(new Skybox(camera, SkyboxFilepaths));
+	SceneManager::SetCurrentSkybox(new Skybox(freecam->GetCamera(), SkyboxFilepaths));
 
 	//Create objects
 	
 	shape_floor = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Default"));
-	shape_cube = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Glossy"));
+	shape_cube = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Chrome"));
 	shape_sphere = new Renderable3D(Sphere3D::GetMesh(1, 10), Lighting::GetMaterial("Glossy"));
 
-	shape_cube->Position(glm::vec3(-1.0f, 0.0f, 0.0f));
-	shape_sphere->Position(glm::vec3(1.0f, 0.0f, 0.0f));
+	shape_cube->Position(glm::vec3(0.0f, 8.0f, 0.0f));
+	shape_cube->Scale(glm::vec3(6.0f, 6.0f, 6.0f));
+	shape_sphere->Position(glm::vec3(0.0f, 16.0f, 0.0f));
+	shape_sphere->Scale(glm::vec3(3.0f, 3.0f, 3.0f));
+	for (int i = 0; i < 100; i++)
+	{
+		Renderable3D* sphere = new Renderable3D(Sphere3D::GetMesh(1, 10), Lighting::GetMaterial("Default"));
+		sphere->AddTexture(TextureLoader::LoadTexture("Flushed.png"));
+		sphere->Position(glm::vec3(sin((float)i/4) * 10, (float)i/4 , cos((float)i/4)*10));
+		Spheres.push_back(sphere);
+	}
 
 	//Create character
 	char_test = new Character(main_window);
@@ -255,7 +277,7 @@ void InitialSetup()
 	shape_floor->AddTexture(TextureLoader::LoadTexture("grid.jpg"));
 	shape_cube->AddTexture(TextureLoader::LoadTexture("Crate.jpg"));
 	shape_cube->AddTexture(TextureLoader::LoadTexture("Crate-Reflection.png"));
-	shape_sphere->AddTexture(TextureLoader::LoadTexture("Rayman.jpg"));
+	shape_sphere->AddTexture(TextureLoader::LoadTexture("AwesomeFace.png"));
 
 	//Set position and scale of Environment
 	shape_floor->Position(glm::vec3(0.0f, -0.8f, 0.0f));
@@ -280,21 +302,11 @@ void InitialSetup()
 	audio_main->PlaySound("Track_Dreamscape", 0.1f, true);
 
 	//Setup Lights
-	Lighting::PointLights[0].Position = glm::vec3(-4.0f, 6.0f, 0.0f);
-	Lighting::PointLights[0].Color = glm::vec3(0.0f, 0.5f, 0.7f);
-	Lighting::PointLights[0].AmbientStrength = 0.03f;
-	Lighting::PointLights[0].SpecularStrength = 1.0f;
-	Lighting::PointLights[0].AttenuationConstant = 1.0f;
-	Lighting::PointLights[0].AttenuationLinear = 0.045f;
-	Lighting::PointLights[0].AttenuationExponent = 0.0075f;
-
-	Lighting::PointLights[1].Position = glm::vec3(4.0f, 6.0f, 0.0f);
-	Lighting::PointLights[1].Color = glm::vec3(1.0f, 0.0f, 0.0f);
-	Lighting::PointLights[1].AmbientStrength = 0.03f;
-	Lighting::PointLights[1].SpecularStrength = 1.0f;
-	Lighting::PointLights[1].AttenuationConstant = 1.0f;
-	Lighting::PointLights[1].AttenuationLinear = 0.022f;
-	Lighting::PointLights[1].AttenuationExponent = 0.0019f;
+	light_green = new PointLightObj(&Lighting::PointLights[0], glm::vec3(-5.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.03f, 1.0f, 1.0f, 0.045f, 0.0075f);
+	light_red = new PointLightObj(&Lighting::PointLights[1], glm::vec3(5.0f, 1.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), 0.03f, 1.0f, 1.0f, 0.045f, 0.0075f);
+	light_blue = new PointLightObj(&Lighting::PointLights[2], glm::vec3(5.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), 0.03f, 1.0f, 1.0f, 0.045f, 0.0075f);
+	light_purple = new PointLightObj(&Lighting::PointLights[3], glm::vec3(5.0f, 1.0f, 0.0f), glm::vec3(1.0f, 0.0f, 1.0f), 0.03f, 1.0f, 1.0f, 0.045f, 0.0075f);
+	
 
 	Lighting::DirectionalLights[0].Direction = glm::vec3(-1.0f, -1.0f, -1.0f);
 	Lighting::DirectionalLights[0].Color = glm::vec3(1.0f, 1.0f, 1.0f);
@@ -351,9 +363,15 @@ void Update()
 	delta_time = current_time - delta_time;
 
 	//Rotate and move Cubes
-	
+	for (int i = 0; i < 100; i++)
+	{
+		Spheres[i]->Position(glm::vec3(sin(((float)i + current_time) / 4) * 10, (float)i / 4, cos(((float)i + current_time) / 4) * 10));
+	}
 
-	
+	light_green->SetPosition(glm::vec3(sin((current_time*2)) * 5, (sin(current_time) * 10) + 10, cos((current_time*2)) * 5));
+	light_red->SetPosition(glm::vec3(-sin((current_time*2)) * 5, (-sin(current_time) * 10) + 10, -cos((current_time*2)) * 5));
+	light_blue->SetPosition(glm::vec3(cos((current_time * 2)) * 5, (-cos(current_time) * 10) + 10, -sin((current_time * 2)) * 5));
+	light_purple->SetPosition(glm::vec3(-cos((current_time * 2)) * 5, (cos(current_time) * 10) + 10, sin((current_time * 2)) * 5));
 
 	shape_cube->Rotation(glm::vec3(delta_time * 70, delta_time * 70, delta_time * 70) + shape_cube->Rotation());
 
@@ -371,7 +389,7 @@ void Render()
 	SceneManager::GetCurrentSkybox()->Render();
 
 	//Render the floor
-	shape_floor->Render(*camera, program_blinnphong);
+	shape_floor->Render(*freecam->GetCamera(), program_blinnphong);
 
 	//Render the cubes
 	//if (cfFLAG("Render_First_Cube"))//Check config file
@@ -387,8 +405,18 @@ void Render()
 	//button_SoundEffect_Airhorn->Render(*orthocamera, program_texture);
 	//button_SoundEffect_Bruh->Render(*orthocamera, program_texture);
 
-	shape_cube->Render(*camera, program_reflective);
-	shape_sphere->Render(*camera, program_reflectiverim);
+	shape_cube->Render(*freecam->GetCamera(), program_reflective);
+	shape_sphere->Render(*freecam->GetCamera(), program_reflectiverim);
+
+	for (int i = 0; i < 100; i++)
+	{
+		Spheres[i]->Render(*freecam->GetCamera(), program_blinnphong);
+	}
+
+	light_green->Render(freecam->GetCamera());
+	light_red->Render(freecam->GetCamera());
+	light_blue->Render(freecam->GetCamera());
+	light_purple->Render(freecam->GetCamera());
 
 	//Render the Character
 	/*char_test->Render(*camera, program_fixed_color);*/

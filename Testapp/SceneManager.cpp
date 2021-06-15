@@ -60,6 +60,11 @@ Skybox* SceneManager::GetCurrentSkybox()
 	return m_skybox;
 }
 
+GLFWwindow* SceneManager::GetWindow()
+{
+	return m_window;
+}
+
 bool SceneManager::m_isWireframe = false;
 bool SceneManager::m_isCursorVisible = true;
 bool SceneManager::m_isReadingTextInput = false;

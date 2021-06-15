@@ -150,7 +150,9 @@
     <ClCompile Include="Character.cpp" />
     <ClCompile Include="Collider2D.cpp" />
     <ClCompile Include="Config.cpp" />
+    <ClCompile Include="FreeCam.cpp" />
     <ClCompile Include="Lighting.cpp" />
+    <ClCompile Include="PointLightObj.cpp" />
     <ClCompile Include="Renderable3D.cpp" />
     <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="TextureLoader.cpp" />
@@ -169,7 +171,9 @@
     <ClInclude Include="Character.h" />
     <ClInclude Include="Collider2D.h" />
     <ClInclude Include="Config.h" />
+    <ClInclude Include="FreeCam.h" />
     <ClInclude Include="Lighting.h" />
+    <ClInclude Include="PointLightObj.h" />
     <ClInclude Include="Renderable3D.h" />
     <ClInclude Include="Skybox.h" />
     <ClInclude Include="TextureLoader.h" />

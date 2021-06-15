@@ -25,6 +25,7 @@ public:
 	static glm::vec2 ScreenToWorldSpace(glm::vec2 _mousePos);
 	static void SetCurrentSkybox(Skybox* _skybox);
 	static Skybox* GetCurrentSkybox();
+	GLFWwindow* GetWindow();
 
 private:
 	GLFWwindow* m_window = nullptr;

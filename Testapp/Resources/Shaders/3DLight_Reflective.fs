@@ -35,7 +35,7 @@ struct Material
 
 //Uniform inputs
 uniform sampler2D ImageTexture;
-uniform sampler2D ImageTexture1;
+uniform sampler2D ReflectionMap;
 uniform samplerCube CubeMap;
 uniform vec3 CameraPos;
 uniform Material Mat[1];
@@ -104,17 +104,19 @@ vec3 CalculateLight_Directional(DirectionalLight _light)
     return CombinedLight;
 }
 
-vec3 CalculateReflection()
+vec4 CalculateReflection()
 {
     vec3 Normal = normalize(FragNormal);
     vec3 ViewDir = normalize(FragPos - CameraPos);
     vec3 ReflectDir = reflect(ViewDir, Normal);
-    return ReflectDir;
+    vec4 ReflectColor = texture(CubeMap, ReflectDir);
+    return ReflectColor;
 }
 
 void main()
 {
     vec3 LightOutput = vec3(0.0f, 0.0f, 0.0f);
+    //Calculate lights
     for(int i = 0; i < MAX_POINT_LIGHTS; i++)
     {
         LightOutput += CalculateLight_Point(PointLights[i]);
@@ -125,10 +127,10 @@ void main()
     }
 
     //Calculate final colour
-    vec4 TexColor = texture(ImageTexture, FragTexCoords);
-    vec4 ReflectColor = texture(CubeMap, CalculateReflection());
-    float ReflectionAmount = texture(ImageTexture1, FragTexCoords).r;
-    vec4 MixedColor = mix(TexColor, ReflectColor, Mat[0].Reflectivity * clamp(ReflectionAmount, 0.0f, 1.0f));
-	FinalColor =  vec4(LightOutput, 1.0f) * MixedColor;
+    vec4 TexColor = vec4(LightOutput, 1.0f) * texture(ImageTexture, FragTexCoords);
+    vec4 ReflectColor = CalculateReflection();
+    float ReflectionAmount = texture(ReflectionMap, FragTexCoords).r;
+    
+	FinalColor = mix(TexColor, ReflectColor, Mat[0].Reflectivity * ReflectionAmount);
 }
 

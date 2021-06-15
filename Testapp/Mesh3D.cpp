@@ -21,7 +21,7 @@
 /// <param name="_program">The program to use</param>
 // ********************************************************************************
 
-void Mesh3D::Render(Camera _camera, GLuint _program, glm::mat4 _modelmat)
+void Mesh3D::Render(Camera _camera, GLuint _program, glm::mat4 _modelmat, glm::vec3 _color)
 {
 	//Calculate the PVM matrix
 	glm::mat4 PVMMat = _camera.GetPVM(_modelmat);
@@ -38,7 +38,8 @@ void Mesh3D::Render(Camera _camera, GLuint _program, glm::mat4 _modelmat)
 	GLint ModelLoc = glGetUniformLocation(_program, "Model");
 	glUniformMatrix4fv(ModelLoc, 1, GL_FALSE, glm::value_ptr(ModelMat));
 
-	
+	glUniform3fv(glGetUniformLocation(_program, "Color"), 1, glm::value_ptr(_color));
+
 	//Render the Shape
 	glDrawElements(GL_TRIANGLES, m_verticesCount, GL_UNSIGNED_INT, 0);
 
@@ -46,6 +47,8 @@ void Mesh3D::Render(Camera _camera, GLuint _program, glm::mat4 _modelmat)
 	glBindVertexArray(0);
 	glUseProgram(0);
 }
+
+
 
 // ********************************************************************************
 /// <summary>
@@ -105,12 +108,12 @@ void Mesh3D::Render(Camera _camera, GLuint _program, glm::mat4 _modelmat, std::v
 		glUniform3fv(glGetUniformLocation(_program, ("DirectionalLights[" + std::to_string(i) + "].Color").c_str()), 1, glm::value_ptr(Lighting::DirectionalLights[i].Color));
 		glUniform1f(glGetUniformLocation(_program, ("DirectionalLights[" + std::to_string(i) + "].AmbientStrength").c_str()), Lighting::DirectionalLights[i].AmbientStrength);
 		glUniform1f(glGetUniformLocation(_program, ("DirectionalLights[" + std::to_string(i) + "].SpecularStrength").c_str()), Lighting::DirectionalLights[i].SpecularStrength);
-		
 	}
 
 	
 	
 	
+
 	
 
 	//If the shape has textures provided
@@ -120,14 +123,15 @@ void Mesh3D::Render(Camera _camera, GLuint _program, glm::mat4 _modelmat, std::v
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, _textures[_textureindex]);
 		glUniform1i(glGetUniformLocation(_program, "ImageTexture"), 0);
-		glActiveTexture(GL_TEXTURE1);
+		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, _textures[_fadeindex]);
-		glUniform1i(glGetUniformLocation(_program, "ImageTexture1"), 1);
+		glUniform1i(glGetUniformLocation(_program, "ReflectionMap"), 2);
 	}
-	glActiveTexture(GL_TEXTURE);
+	
+	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, SceneManager::GetCurrentSkybox()->GetCubemap());
-	glUniform1i(glGetUniformLocation(_program, "CubeMap"), SceneManager::GetCurrentSkybox()->GetCubemap());
-
+	glUniform1i(glGetUniformLocation(_program, "CubeMap"), 1);
+	
 
 
 	//Render the Shape
