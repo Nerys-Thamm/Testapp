@@ -1,5 +1,25 @@
+// Bachelor of Software Engineering
+// Media Design School
+// Auckland
+// New Zealand
+//
+// (c) 2021 Media Design School
+//
+// File Name   : Skybox.cpp
+// Description : Implements methods for the Skybox class
+// Author      : Nerys Thamm
+// Mail        : nerys.thamm@mds.ac.nz
+
 #include "Skybox.h"
 
+// ********************************************************************************
+/// <summary>
+/// Constructor
+/// </summary>
+/// <param name="_camera">Camera to use to render the skybox</param>
+/// <param name="_filepaths">File paths of the cubemap images</param>
+/// <returns></returns>
+// ********************************************************************************
 Skybox::Skybox(Camera* _camera, std::string _filepaths[6])
 {
 	//Set camera and program
@@ -7,6 +27,7 @@ Skybox::Skybox(Camera* _camera, std::string _filepaths[6])
 	m_Program = ShaderLoader::CreateProgram("Resources/Shaders/SkyBox.vs",
 		"Resources/Shaders/SkyBox.fs");
 
+	//Load the cubemap
 	m_Cubemap = TextureLoader::LoadCubeMap(_filepaths);
 
 	//Set vertices stuff
@@ -32,12 +53,23 @@ Skybox::Skybox(Camera* _camera, std::string _filepaths[6])
 	
 }
 
+// ********************************************************************************
+/// <summary>
+/// This is called every frame
+/// </summary>
+/// <param name="_fDeltaTime"></param>
+// ********************************************************************************
 void Skybox::Update(float _fDeltaTime)
 {
 	glm::mat4 ModelMat = glm::scale(glm::mat4(), glm::vec3(2000.0f, 2000.0f, 2000.0f));
 	m_PVM = m_Camera->GetPVM(ModelMat);
 }
 
+// ********************************************************************************
+/// <summary>
+/// Renders the skybox
+/// </summary>
+// ********************************************************************************
 void Skybox::Render()
 {
 	//Bind program and VAO
@@ -65,6 +97,12 @@ void Skybox::Render()
 	glUseProgram(0);
 }
 
+// ********************************************************************************
+/// <summary>
+/// Getter for Cubemap texture
+/// </summary>
+/// <returns></returns>
+// ********************************************************************************
 GLuint Skybox::GetCubemap()
 {
 	return m_Cubemap;

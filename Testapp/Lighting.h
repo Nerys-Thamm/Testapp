@@ -1,3 +1,15 @@
+// Bachelor of Software Engineering
+// Media Design School
+// Auckland
+// New Zealand
+//
+// (c) 2021 Media Design School
+//
+// File Name   : Lighting.h
+// Description : Declares structs and methods for Lighting
+// Author      : Nerys Thamm
+// Mail        : nerys.thamm@mds.ac.nz
+
 #pragma once
 #include <iostream>
 #include <glew.h>
@@ -12,32 +24,39 @@
 #include <cmath>
 #include <math.h>
 
+//Struct defining material properties for an object
 struct Material
 {
 	float Smoothness;
 	float Reflectivity;
 };
 
+//Struct defining properties of a Point light with Attenuation
 struct PointLight
 {
+	//Light properties
 	glm::vec3 Position;
 	glm::vec3 Color;
 	float AmbientStrength;
 	float SpecularStrength;
 
+	//Attenuation properties
 	float AttenuationConstant;
 	float AttenuationLinear;
 	float AttenuationExponent;
 };
 
+//Struct defining properties of a Directional Light
 struct DirectionalLight
 {
+	//Light properties
 	glm::vec3 Direction;
 	glm::vec3 Color;
 	float AmbientStrength;
 	float SpecularStrength;
 };
 
+//TODO: Struct defining the properties of a spotlight
 struct SpotLight
 {
 

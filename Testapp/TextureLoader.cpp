@@ -1,7 +1,26 @@
+// Bachelor of Software Engineering
+// Media Design School
+// Auckland
+// New Zealand
+//
+// (c) 2021 Media Design School
+//
+// File Name   : TextureLoader.cpp
+// Description : Implements methods for loading textures from files
+// Author      : Nerys Thamm
+// Mail        : nerys.thamm@mds.ac.nz
+
 #include "TextureLoader.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+// ********************************************************************************
+/// <summary>
+/// Loads a 2D texture
+/// </summary>
+/// <param name="_filename"></param>
+/// <returns></returns>
+// ********************************************************************************
 GLuint TextureLoader::LoadTexture(std::string _filename)
 {
 	
@@ -35,6 +54,13 @@ GLuint TextureLoader::LoadTexture(std::string _filename)
 	
 }
 
+// ********************************************************************************
+/// <summary>
+/// Loads a Cubemap texture
+/// </summary>
+/// <param name="_filepaths"></param>
+/// <returns></returns>
+// ********************************************************************************
 GLuint TextureLoader::LoadCubeMap(std::string _filepaths[6])
 {
 	stbi_set_flip_vertically_on_load(false);

@@ -1,3 +1,15 @@
+// Bachelor of Software Engineering
+// Media Design School
+// Auckland
+// New Zealand
+//
+// (c) 2021 Media Design School
+//
+// File Name   : FreeCam.h
+// Description : Declares methods for the FreeCam class, a freelook camera class
+// Author      : Nerys Thamm
+// Mail        : nerys.thamm@mds.ac.nz
+
 #pragma once
 #include "GameObject.h"
 #include "Camera.h"
@@ -15,6 +27,5 @@ private:
     glm::vec3 m_camerarightvector;
     glm::vec2 m_cameraviewangle;
     virtual void Update(float _fDeltaTime);
-
 };
 

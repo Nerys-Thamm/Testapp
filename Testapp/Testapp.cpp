@@ -237,22 +237,27 @@ void InitialSetup()
 	freecam = new FreeCam(main_window, cfWINDOW_WIDTH(), cfWINDOW_HEIGHT(), current_time, true);
 	orthocamera = new Camera(cfWINDOW_WIDTH(), cfWINDOW_HEIGHT(), current_time, false);
 
+
+
 	//Create Skybox
 	std::string SkyboxFilepaths[] = {"MountainOutpost/Right.jpg","MountainOutpost/Left.jpg","MountainOutpost/Up.jpg","MountainOutpost/Down.jpg","MountainOutpost/Back.jpg","MountainOutpost/Front.jpg"};
 	
 	SceneManager::SetCurrentSkybox(new Skybox(freecam->GetCamera(), SkyboxFilepaths));
 
+
+
 	//Create objects
-	
 	shape_floor = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Default"));
 	shape_cube = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Chrome"));
 	shape_sphere = new Renderable3D(Sphere3D::GetMesh(1, 10), Lighting::GetMaterial("Glossy"));
 
-	shape_cube->Position(glm::vec3(0.0f, 8.0f, 0.0f));
-	shape_cube->Scale(glm::vec3(6.0f, 6.0f, 6.0f));
-	shape_sphere->Position(glm::vec3(0.0f, 16.0f, 0.0f));
-	shape_sphere->Scale(glm::vec3(3.0f, 3.0f, 3.0f));
-	for (int i = 0; i < 100; i++)
+	shape_cube->Position(glm::vec3(0.0f, 20.0f, 0.0f));
+	shape_cube->Scale(glm::vec3(20.0f, 20.0f, 20.0f));
+	shape_sphere->Position(glm::vec3(0.0f, 40.0f, 0.0f));
+	shape_sphere->Scale(glm::vec3(6.0f, 6.0f, 6.0f));
+
+	//Spawn all the spheres
+	for (int i = 0; i < 300; i++)
 	{
 		Renderable3D* sphere = new Renderable3D(Sphere3D::GetMesh(1, 10), Lighting::GetMaterial("Default"));
 		sphere->AddTexture(TextureLoader::LoadTexture("Flushed.png"));
@@ -263,32 +268,46 @@ void InitialSetup()
 	//Create character
 	char_test = new Character(main_window);
 
+
+
 	//Create Text
 	text_message = new TextLabel("Super spicy text!", "Resources/Fonts/ARIAL.ttf", glm::ivec2(0, 40), glm::vec2(200.0f, 100.0f), TextLabel::TextEffect::MARQUEE, glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 1.0f), 200.0f, 600.0f);
 	text_cursorpos = new TextLabel("Default", "Resources/Fonts/ARIAL.ttf", glm::ivec2(0, 40), glm::vec2(0.0f, 0.0f), TextLabel::TextEffect::NONE);
 	text_username = new TextLabel("Press Enter to type!", "Resources/Fonts/ARIAL.ttf", glm::ivec2(0, 40), glm::vec2(0.0f, 650.0f), TextLabel::TextEffect::MARQUEE, glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 1.0f), 200.0f, 600.0f);
 	text_scalebounce = new TextLabel("Username:", "Resources/Fonts/ARIAL.ttf", glm::ivec2(0, 40), glm::vec2(300.0f, 750.0f), TextLabel::TextEffect::SCALE_BOUNCE);
 
+
+
 	//Create Buttons
 	button_SoundEffect_Airhorn = new UIButton(glm::vec3(300, 300, 4), glm::vec3(200, 200, 1), TextureLoader::LoadTexture("Button_Default.png"), TextureLoader::LoadTexture("Button_Hover.png"), TextureLoader::LoadTexture("Button_Press.png"));
 	button_SoundEffect_Bruh = new UIButton(glm::vec3(-300, 300, 4), glm::vec3(200, 200, 1), TextureLoader::LoadTexture("Button_Default.png"), TextureLoader::LoadTexture("Button_Hover.png"), TextureLoader::LoadTexture("Button_Press.png"));
 
+
+
 	//Set textures of objects
 	shape_floor->AddTexture(TextureLoader::LoadTexture("grid.jpg"));
-	shape_cube->AddTexture(TextureLoader::LoadTexture("Crate.jpg"));
-	shape_cube->AddTexture(TextureLoader::LoadTexture("Crate-Reflection.png"));
+	shape_cube->AddTexture(TextureLoader::LoadTexture("SciFi_Albedo.jpg"));
+	shape_cube->AddTexture(TextureLoader::LoadTexture("SciFi_Metallic.jpg"));
 	shape_sphere->AddTexture(TextureLoader::LoadTexture("AwesomeFace.png"));
+
+
 
 	//Set position and scale of Environment
 	shape_floor->Position(glm::vec3(0.0f, -0.8f, 0.0f));
 	shape_floor->Scale(glm::vec3(14.0f, 0.1f, 14.0f));
 
+
+
 	//Set position of Cameras
 	camera->m_cameraPos = glm::vec3(0.0f, 0.0f, 8.0f);
 	orthocamera->m_cameraPos = glm::vec3(0.0f, 0.0f, 8.0f);
 
+
+
 	//Setup Audio
 	audio_main = Audiosystem::GetInstance();
+
+
 
 	//Download sounds if they dont already exist
 	audio_main->AddSoundFromYoutube("https://www.youtube.com/watch?v=OoDo7kMbOd8", "Track_ShowaGroove");
@@ -298,21 +317,25 @@ void InitialSetup()
 	audio_main->AddSound("Track_PolishCow.mp3", "Track_PolishCow");
 	
 
+
 	//Start playing background track
 	audio_main->PlaySound("Track_Dreamscape", 0.1f, true);
 
-	//Setup Lights
-	light_green = new PointLightObj(&Lighting::PointLights[0], glm::vec3(-5.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.03f, 1.0f, 1.0f, 0.045f, 0.0075f);
-	light_red = new PointLightObj(&Lighting::PointLights[1], glm::vec3(5.0f, 1.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), 0.03f, 1.0f, 1.0f, 0.045f, 0.0075f);
-	light_blue = new PointLightObj(&Lighting::PointLights[2], glm::vec3(5.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), 0.03f, 1.0f, 1.0f, 0.045f, 0.0075f);
-	light_purple = new PointLightObj(&Lighting::PointLights[3], glm::vec3(5.0f, 1.0f, 0.0f), glm::vec3(1.0f, 0.0f, 1.0f), 0.03f, 1.0f, 1.0f, 0.045f, 0.0075f);
-	
 
-	Lighting::DirectionalLights[0].Direction = glm::vec3(-1.0f, -1.0f, -1.0f);
+
+	//Setup Lights
+	light_green = new PointLightObj(&Lighting::PointLights[0], glm::vec3(-5.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.03f, 1.0f, 1.0f, 0.007f, 0.0002f);
+	light_red = new PointLightObj(&Lighting::PointLights[1], glm::vec3(5.0f, 1.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), 0.03f, 1.0f, 1.0f, 0.007f, 0.0002f);
+	light_blue = new PointLightObj(&Lighting::PointLights[2], glm::vec3(5.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), 0.03f, 1.0f, 1.0f, 0.007f, 0.0002f);
+	light_purple = new PointLightObj(&Lighting::PointLights[3], glm::vec3(5.0f, 1.0f, 0.0f), glm::vec3(1.0f, 0.0f, 1.0f), 0.03f, 1.0f, 1.0f, 0.007f, 0.0002f);
+	
+	Lighting::DirectionalLights[0].Direction = glm::vec3(1.0f, -1.0f, 0.0f);
 	Lighting::DirectionalLights[0].Color = glm::vec3(1.0f, 1.0f, 1.0f);
 	Lighting::DirectionalLights[0].AmbientStrength = 0.02f;
 	Lighting::DirectionalLights[0].SpecularStrength = 1.0f;
 }
+
+
 
 //Update all objects and run the processes
 void Update()
@@ -350,9 +373,6 @@ void Update()
 	glfwPollEvents();
 
 
-	
-	//Lighting::Global_Illumination_Color = glm::vec3(((sin(current_time) + 1.0f) * 0.5f), ((sin(current_time + 2.0f) + 0.5f) * 0.5f), ((sin(current_time + 4.0f) + 1.0f) * 0.5f));
-	//Lighting::Global_Illumination_Strength = ((sin(current_time) + 1) / 2);
 
 	//Update Username test from the Input Buffer
 	text_username->SetText("\"" + SceneManager::GetTextInputBuffer() + "\"");
@@ -362,16 +382,16 @@ void Update()
 	current_time = (float)glfwGetTime();
 	delta_time = current_time - delta_time;
 
-	//Rotate and move Cubes
-	for (int i = 0; i < 100; i++)
+	//Move spheres and lights
+	for (int i = 0; i < 300; i++)
 	{
-		Spheres[i]->Position(glm::vec3(sin(((float)i + current_time) / 4) * 10, (float)i / 4, cos(((float)i + current_time) / 4) * 10));
+		Spheres[i]->Position(glm::vec3(sin(((float)i + current_time) / 4) * ((sin((float)i / 105) * 20)), (float)i / 8, cos(((float)i + current_time) / 4) * ((sin((float)i / 105) * 20))));
 	}
 
-	light_green->SetPosition(glm::vec3(sin((current_time*2)) * 5, (sin(current_time) * 10) + 10, cos((current_time*2)) * 5));
-	light_red->SetPosition(glm::vec3(-sin((current_time*2)) * 5, (-sin(current_time) * 10) + 10, -cos((current_time*2)) * 5));
-	light_blue->SetPosition(glm::vec3(cos((current_time * 2)) * 5, (-cos(current_time) * 10) + 10, -sin((current_time * 2)) * 5));
-	light_purple->SetPosition(glm::vec3(-cos((current_time * 2)) * 5, (cos(current_time) * 10) + 10, sin((current_time * 2)) * 5));
+	light_green->SetPosition(glm::vec3(sin((current_time*2)) * (sin(current_time)*20), (sin(current_time) * 20) + 20, cos((current_time*2)) * (sin(current_time) * 20)));
+	light_red->SetPosition(glm::vec3(-sin((current_time*2)) * (sin(current_time) * 20), (-sin(current_time) * 20) + 20, -cos((current_time*2)) * (sin(current_time) * 20)));
+	light_blue->SetPosition(glm::vec3(cos((current_time * 2)) * (sin(current_time) * 20), (-cos(current_time) * 20) + 20, -sin((current_time * 2)) * (sin(current_time) * 20)));
+	light_purple->SetPosition(glm::vec3(-cos((current_time * 2)) * (sin(current_time) * 20), (cos(current_time) * 20) + 20, sin((current_time * 2)) * (sin(current_time) * 20)));
 
 	shape_cube->Rotation(glm::vec3(delta_time * 70, delta_time * 70, delta_time * 70) + shape_cube->Rotation());
 
@@ -391,24 +411,11 @@ void Render()
 	//Render the floor
 	shape_floor->Render(*freecam->GetCamera(), program_blinnphong);
 
-	//Render the cubes
-	//if (cfFLAG("Render_First_Cube"))//Check config file
-	//{
-	//	shape_firstcube->Render(*camera, program_worldspace);
-	//}
-	//if (cfFLAG("Render_Second_Cube"))//Check config file
-	//{
-	//	shape_secondcube->Render(*camera, program_worldspace);
-	//}
-
-	////Render the buttons
-	//button_SoundEffect_Airhorn->Render(*orthocamera, program_texture);
-	//button_SoundEffect_Bruh->Render(*orthocamera, program_texture);
-
+	//Render objects
 	shape_cube->Render(*freecam->GetCamera(), program_reflective);
 	shape_sphere->Render(*freecam->GetCamera(), program_reflectiverim);
 
-	for (int i = 0; i < 100; i++)
+	for (int i = 0; i < 300; i++)
 	{
 		Spheres[i]->Render(*freecam->GetCamera(), program_blinnphong);
 	}
@@ -417,15 +424,6 @@ void Render()
 	light_red->Render(freecam->GetCamera());
 	light_blue->Render(freecam->GetCamera());
 	light_purple->Render(freecam->GetCamera());
-
-	//Render the Character
-	/*char_test->Render(*camera, program_fixed_color);*/
-
-	//Render the textlabels
-	/*text_message->Render();
-	text_cursorpos->Render();
-	text_username->Render();
-	text_scalebounce->Render();*/
 
 	//Push buffer to the screen
 	glfwSwapBuffers(main_window);
