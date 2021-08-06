@@ -1,0 +1,3 @@
+D:\Users\mds000020d\scoop\apps\cmake\3.21.1\bin\cmake.exe -E rm -f CMakeFiles\Testapp.dir/objects.a
+D:\Users\mds000020d\scoop\apps\MSYS2\2021-06-04\mingw64\bin\ar.exe qc CMakeFiles\Testapp.dir/objects.a @CMakeFiles\Testapp.dir\objects1.rsp
+D:\Users\mds000020d\scoop\apps\MSYS2\2021-06-04\mingw64\bin\x86_64-w64-mingw32-g++.exe -g -Wl,--whole-archive CMakeFiles\Testapp.dir/objects.a -Wl,--no-whole-archive -o Testapp.exe -Wl,--out-implib,libTestapp.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\Testapp.dir\linklibs.rsp

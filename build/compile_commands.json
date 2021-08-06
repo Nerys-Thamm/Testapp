@@ -1,0 +1,7 @@
+[
+{
+  "directory": "D:/Users/mds000020d/Documents/Repos/Testapp/build",
+  "command": "D:\\Users\\mds000020d\\scoop\\apps\\MSYS2\\2021-06-04\\mingw64\\bin\\x86_64-w64-mingw32-g++.exe  @CMakeFiles/Testapp.dir/includes_CXX.rsp -g -o CMakeFiles\\Testapp.dir\\Testapp\\Testapp.cpp.obj -c D:\\Users\\mds000020d\\Documents\\Repos\\Testapp\\Testapp\\Testapp.cpp",
+  "file": "D:/Users/mds000020d/Documents/Repos/Testapp/Testapp/Testapp.cpp"
+}
+]

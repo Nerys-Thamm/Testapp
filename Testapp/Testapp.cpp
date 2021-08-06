@@ -177,6 +177,7 @@ void InitialSetup()
 {
 	
 	glEnable(GL_DEPTH_TEST);
+	
 	glEnable(GL_MULTISAMPLE);
 	glDepthFunc(GL_LESS);
 	CObjectController::SetMainWindow(main_window);
@@ -191,6 +192,7 @@ void InitialSetup()
 
 	// Map range of the window size to NDC (-1 -> 1)
 	glViewport(0, 0, (GLsizei)cfWINDOW_WIDTH(), (GLsizei)cfWINDOW_HEIGHT());
+	
 
 	//Create programs
 	program_texture = ShaderLoader::CreateProgram("Resources/Shaders/ClipSpace.vs",
@@ -405,8 +407,13 @@ void Render()
 	//Clear the buffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	
+
 	//Render the skybox
 	SceneManager::GetCurrentSkybox()->Render();
+
+	glEnable(GL_SCISSOR_TEST);
+	glScissor(100, 100, 600, 600);
 
 	//Render the floor
 	shape_floor->Render(*freecam->GetCamera(), program_blinnphong);
@@ -424,6 +431,8 @@ void Render()
 	light_red->Render(freecam->GetCamera());
 	light_blue->Render(freecam->GetCamera());
 	light_purple->Render(freecam->GetCamera());
+
+	glDisable(GL_SCISSOR_TEST);
 
 	//Push buffer to the screen
 	glfwSwapBuffers(main_window);

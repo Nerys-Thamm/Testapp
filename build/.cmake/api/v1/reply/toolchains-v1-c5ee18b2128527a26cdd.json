@@ -1,0 +1,139 @@
+{
+	"kind" : "toolchains",
+	"toolchains" : 
+	[
+		{
+			"compiler" : 
+			{
+				"id" : "GNU",
+				"implicit" : 
+				{
+					"includeDirectories" : 
+					[
+						"D:/Users/mds000020d/scoop/apps/MSYS2/2021-06-04/mingw64/lib/gcc/x86_64-w64-mingw32/10.3.0/include",
+						"D:/Users/mds000020d/scoop/apps/MSYS2/2021-06-04/mingw64/include",
+						"D:/Users/mds000020d/scoop/apps/MSYS2/2021-06-04/mingw64/lib/gcc/x86_64-w64-mingw32/10.3.0/include-fixed",
+						"D:/Users/mds000020d/scoop/apps/MSYS2/2021-06-04/mingw64/x86_64-w64-mingw32/include"
+					],
+					"linkDirectories" : 
+					[
+						"D:/Users/mds000020d/scoop/apps/MSYS2/2021-06-04/mingw64/lib/gcc/x86_64-w64-mingw32/10.3.0",
+						"D:/Users/mds000020d/scoop/apps/MSYS2/2021-06-04/mingw64/lib/gcc",
+						"D:/Users/mds000020d/scoop/apps/MSYS2/2021-06-04/mingw64/x86_64-w64-mingw32/lib",
+						"D:/Users/mds000020d/scoop/apps/MSYS2/2021-06-04/mingw64/lib"
+					],
+					"linkFrameworkDirectories" : [],
+					"linkLibraries" : 
+					[
+						"mingw32",
+						"gcc",
+						"moldname",
+						"mingwex",
+						"kernel32",
+						"pthread",
+						"advapi32",
+						"shell32",
+						"user32",
+						"kernel32",
+						"mingw32",
+						"gcc",
+						"moldname",
+						"mingwex",
+						"kernel32"
+					]
+				},
+				"path" : "D:/Users/mds000020d/scoop/apps/MSYS2/2021-06-04/mingw64/bin/x86_64-w64-mingw32-gcc.exe",
+				"version" : "10.3.0"
+			},
+			"language" : "C",
+			"sourceFileExtensions" : 
+			[
+				"c",
+				"m"
+			]
+		},
+		{
+			"compiler" : 
+			{
+				"id" : "GNU",
+				"implicit" : 
+				{
+					"includeDirectories" : 
+					[
+						"D:/Users/mds000020d/scoop/apps/MSYS2/2021-06-04/mingw64/include/c++/10.3.0",
+						"D:/Users/mds000020d/scoop/apps/MSYS2/2021-06-04/mingw64/include/c++/10.3.0/x86_64-w64-mingw32",
+						"D:/Users/mds000020d/scoop/apps/MSYS2/2021-06-04/mingw64/include/c++/10.3.0/backward",
+						"D:/Users/mds000020d/scoop/apps/MSYS2/2021-06-04/mingw64/lib/gcc/x86_64-w64-mingw32/10.3.0/include",
+						"D:/Users/mds000020d/scoop/apps/MSYS2/2021-06-04/mingw64/include",
+						"D:/Users/mds000020d/scoop/apps/MSYS2/2021-06-04/mingw64/lib/gcc/x86_64-w64-mingw32/10.3.0/include-fixed",
+						"D:/Users/mds000020d/scoop/apps/MSYS2/2021-06-04/mingw64/x86_64-w64-mingw32/include"
+					],
+					"linkDirectories" : 
+					[
+						"D:/Users/mds000020d/scoop/apps/MSYS2/2021-06-04/mingw64/lib/gcc/x86_64-w64-mingw32/10.3.0",
+						"D:/Users/mds000020d/scoop/apps/MSYS2/2021-06-04/mingw64/lib/gcc",
+						"D:/Users/mds000020d/scoop/apps/MSYS2/2021-06-04/mingw64/x86_64-w64-mingw32/lib",
+						"D:/Users/mds000020d/scoop/apps/MSYS2/2021-06-04/mingw64/lib"
+					],
+					"linkFrameworkDirectories" : [],
+					"linkLibraries" : 
+					[
+						"stdc++",
+						"mingw32",
+						"gcc_s",
+						"gcc",
+						"moldname",
+						"mingwex",
+						"kernel32",
+						"pthread",
+						"advapi32",
+						"shell32",
+						"user32",
+						"kernel32",
+						"mingw32",
+						"gcc_s",
+						"gcc",
+						"moldname",
+						"mingwex",
+						"kernel32"
+					]
+				},
+				"path" : "D:/Users/mds000020d/scoop/apps/MSYS2/2021-06-04/mingw64/bin/x86_64-w64-mingw32-g++.exe",
+				"version" : "10.3.0"
+			},
+			"language" : "CXX",
+			"sourceFileExtensions" : 
+			[
+				"C",
+				"M",
+				"c++",
+				"cc",
+				"cpp",
+				"cxx",
+				"mm",
+				"mpp",
+				"CPP",
+				"ixx",
+				"cppm"
+			]
+		},
+		{
+			"compiler" : 
+			{
+				"implicit" : {},
+				"path" : "D:/Users/mds000020d/scoop/apps/MSYS2/2021-06-04/mingw64/bin/windres.exe"
+			},
+			"language" : "RC",
+			"sourceFileExtensions" : 
+			[
+				"rc",
+				"RC"
+			]
+		}
+	],
+	"version" : 
+	{
+		"major" : 1,
+		"minor" : 0
+	}
+}

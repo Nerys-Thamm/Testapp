@@ -123,9 +123,12 @@ void Mesh3D::Render(Camera _camera, GLuint _program, glm::mat4 _modelmat, std::v
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, _textures[_textureindex]);
 		glUniform1i(glGetUniformLocation(_program, "ImageTexture"), 0);
-		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_2D, _textures[_fadeindex]);
-		glUniform1i(glGetUniformLocation(_program, "ReflectionMap"), 2);
+		if (_textures.size() > 1)
+		{
+			glActiveTexture(GL_TEXTURE2);
+			glBindTexture(GL_TEXTURE_2D, _textures[_fadeindex]);
+			glUniform1i(glGetUniformLocation(_program, "ReflectionMap"), 2);
+		}
 	}
 	
 	glActiveTexture(GL_TEXTURE1);
