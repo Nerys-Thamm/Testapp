@@ -267,8 +267,12 @@ void InitialSetup()
 	shape_sea = new Renderable3D(Quad3D::GetMesh(), Lighting::GetMaterial("Default"));
 
 	shape_seafloor->Position(glm::vec3(0.0f, -0.8f, 0.0f));
-	shape_seafloor->Scale(glm::vec3(14.0f, 14.0f, 0.0f));
+	shape_seafloor->Scale(glm::vec3(100.0f, 100.0f, 1.0f));
 	shape_seafloor->Rotation(glm::vec3(-90.0f, 0.0f, 0.0f));
+
+	shape_sea->Position(glm::vec3(0.0f, 0.0f, 0.0f));
+	shape_sea->Scale(glm::vec3(100.0f, 100.0f, 1.0f));
+	shape_sea->Rotation(glm::vec3(-90.0f, 0.0f, 0.0f));
 
 
 
@@ -292,7 +296,8 @@ void InitialSetup()
 	shape_cube->AddTexture(TextureLoader::LoadTexture("SciFi_Metallic.jpg"));
 	
 
-	shape_seafloor->AddTexture(TextureLoader::LoadTexture("grid.jpg"));
+	shape_seafloor->AddTexture(TextureLoader::LoadTexture("beachsand.jpg"));
+	shape_sea->AddTexture(TextureLoader::LoadTexture("WaterTransparent.png"));
 
 
 
@@ -329,7 +334,7 @@ void InitialSetup()
 	
 	Lighting::DirectionalLights[0].Direction = glm::vec3(1.0f, -1.0f, 0.0f);
 	Lighting::DirectionalLights[0].Color = glm::vec3(1.0f, 1.0f, 1.0f);
-	Lighting::DirectionalLights[0].AmbientStrength = 0.02f;
+	Lighting::DirectionalLights[0].AmbientStrength = 0.55f;
 	Lighting::DirectionalLights[0].SpecularStrength = 1.0f;
 }
 
@@ -387,22 +392,25 @@ void Render()
 	//Render the skybox
 	SceneManager::GetCurrentSkybox()->Render();
 
-	glEnable(GL_SCISSOR_TEST);
-	glScissor(100, 100, 600, 600);
+	
 
 	//Render the floor
 	
 	shape_seafloor->Render(*freecam->GetCamera(), program_blinnphong);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
+	shape_sea->Render(*freecam->GetCamera(), program_reflective);
+	glDisable(GL_BLEND);
 
 	//Render objects
-	//shape_cube->Render(*freecam->GetCamera(), program_reflective);
+	shape_cube->Render(*freecam->GetCamera(), program_reflective);
 	
 
 	
 
 	
 
-	glDisable(GL_SCISSOR_TEST);
+	
 
 	//Push buffer to the screen
 	glfwSwapBuffers(main_window);
