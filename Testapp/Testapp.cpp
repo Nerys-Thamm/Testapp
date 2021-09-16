@@ -54,6 +54,7 @@ GLuint program_blinnphong;
 GLuint program_blinnphongrim;
 GLuint program_blinnphongfog;
 GLuint program_reflective;
+GLuint program_reflectivefog;
 GLuint program_reflectiverim;
 
 //TIME
@@ -92,15 +93,11 @@ UIButton* button_cameraback = nullptr;
 
 //SHAPES
 Renderable3D* shape_cube = nullptr;
-Renderable3D* shape_sphere = nullptr;
+Renderable3D* shape_stencilcube = nullptr;
 
-std::vector<Renderable3D*> Spheres;
 
-//LIGHTS
-PointLightObj* light_green;
-PointLightObj* light_red;
-PointLightObj* light_blue;
-PointLightObj* light_purple;
+
+
 
 
 //Audio
@@ -234,6 +231,9 @@ void InitialSetup()
 	program_blinnphongfog = ShaderLoader::CreateProgram("Resources/Shaders/3D_Normals.vs",
 		"Resources/Shaders/3DLight_BlinnPhongFog.fs");
 
+	program_reflectivefog = ShaderLoader::CreateProgram("Resources/Shaders/3D_Normals.vs",
+		"Resources/Shaders/3DLight_ReflectiveFog.fs");
+
 	//Cull poly not facing viewport
 	glCullFace(GL_BACK);
 
@@ -260,16 +260,18 @@ void InitialSetup()
 	//Create objects
 	shape_floor = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Default"));
 	shape_cube = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Chrome"));
+	shape_stencilcube = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Glossy"));
 	
 
 	shape_cube->Position(glm::vec3(0.0f, 5.0f, 2.0f));
 	shape_cube->Scale(glm::vec3(2.0f, 2.0f, 2.0f));
 	
+	
 
 	shape_seafloor = new Renderable3D(Quad3D::GetMesh(), Lighting::GetMaterial("Default"));
 	shape_sea = new Renderable3D(Quad3D::GetMesh(), Lighting::GetMaterial("Glossy"));
 
-	shape_seafloor->Position(glm::vec3(0.0f, 3.0f, 0.0f));
+	shape_seafloor->Position(glm::vec3(0.0f, 3.5f, 0.0f));
 	shape_seafloor->Scale(glm::vec3(100.0f, 100.0f, 1.0f));
 	shape_seafloor->Rotation(glm::vec3(270.0f, 0.0f, 0.0f));
 
@@ -277,7 +279,7 @@ void InitialSetup()
 	shape_sea->Scale(glm::vec3(100.0f, 100.0f, 1.0f));
 	shape_sea->Rotation(glm::vec3(270.0f, 0.0f, 0.0f));
 
-
+	
 
 	
 
@@ -297,6 +299,8 @@ void InitialSetup()
 	shape_floor->AddTexture(TextureLoader::LoadTexture("grid.jpg"));
 	shape_cube->AddTexture(TextureLoader::LoadTexture("SciFi_Albedo.jpg"));
 	shape_cube->AddTexture(TextureLoader::LoadTexture("SciFi_Metallic.jpg"));
+	shape_stencilcube->AddTexture(TextureLoader::LoadTexture("Yellow.jpg"));
+	shape_stencilcube->AddTexture(TextureLoader::LoadTexture("Grey.jpg"));
 	
 
 	shape_seafloor->AddTexture(TextureLoader::LoadTexture("beachsand.jpg"));
@@ -341,9 +345,9 @@ void InitialSetup()
 
 	
 	
-	Lighting::DirectionalLights[0].Direction = glm::vec3(1.0f, -1.0f, 0.0f);
+	Lighting::DirectionalLights[0].Direction = glm::vec3(1.0f, -1.0f, 1.0f);
 	Lighting::DirectionalLights[0].Color = glm::vec3(1.0f, 1.0f, 1.0f);
-	Lighting::DirectionalLights[0].AmbientStrength = 0.05f;
+	Lighting::DirectionalLights[0].AmbientStrength = 0.15f;
 	Lighting::DirectionalLights[0].SpecularStrength = 1.0f;
 }
 
@@ -356,8 +360,7 @@ void Update()
 	CObjectController::UpdateObjects();
 
 	
-	camera->m_cameraTargetPos = shape_cube->Position();
-
+	
 	////Update Flag test text
 	//if (cfFLAG("Test_Flag"))
 	//{
@@ -382,7 +385,13 @@ void Update()
 	current_time = (float)glfwGetTime();
 	delta_time = current_time - delta_time;
 
-	
+	camera->m_cameraTargetPos = shape_cube->Position();
+
+	shape_cube->Rotation(shape_cube->Rotation() + glm::vec3(0.0f, delta_time * 2, 0.0f));
+
+	shape_stencilcube->Position(shape_cube->Position());
+	shape_stencilcube->Scale(shape_cube->Scale() + glm::vec3(0.5f, 0.5f, 0.5f));
+	shape_stencilcube->Rotation(shape_cube->Rotation());
 
 	
 	
@@ -395,7 +404,7 @@ void Update()
 void Render()
 {
 	//Clear the buffer
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	
 
@@ -409,11 +418,22 @@ void Render()
 	shape_seafloor->Render(*camera, program_blinnphongfog);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	shape_sea->Render(*camera, program_reflective);
+	shape_sea->Render(*camera, program_reflectivefog);
 	glDisable(GL_BLEND);
 
 	//Render objects
+
+	glEnable(GL_STENCIL_TEST);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	glStencilFunc(GL_ALWAYS, 1, 0xFF);
+	glStencilMask(0xFF);
 	shape_cube->Render(*camera, program_blinnphongfog);
+	glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+	glStencilMask(0x00);
+	shape_stencilcube->Render(*camera, program_reflective);
+	glStencilMask(0x00);
+	glDisable(GL_STENCIL_TEST);
+	glStencilMask(0xFF);
 	
 
 	
