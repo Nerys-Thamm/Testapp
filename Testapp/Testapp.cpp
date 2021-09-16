@@ -264,7 +264,7 @@ void InitialSetup()
 	shape_sphere->Scale(glm::vec3(6.0f, 6.0f, 6.0f));
 
 	shape_seafloor = new Renderable3D(Quad3D::GetMesh(), Lighting::GetMaterial("Default"));
-	shape_sea = new Renderable3D(Quad3D::GetMesh(), Lighting::GetMaterial("Default"));
+	shape_sea = new Renderable3D(Quad3D::GetMesh(), Lighting::GetMaterial("Glossy"));
 
 	shape_seafloor->Position(glm::vec3(0.0f, -0.8f, 0.0f));
 	shape_seafloor->Scale(glm::vec3(100.0f, 100.0f, 1.0f));
@@ -399,7 +399,7 @@ void Render()
 	shape_seafloor->Render(*freecam->GetCamera(), program_blinnphong);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
-	shape_sea->Render(*freecam->GetCamera(), program_reflective);
+	shape_sea->Render(*freecam->GetCamera(), program_blinnphong);
 	glDisable(GL_BLEND);
 
 	//Render objects
