@@ -387,3 +387,42 @@ Mesh3D* Sphere3D::GetMesh(float Radius, int Fidelity)
 Mesh3D* Cube3D::m_mesh = nullptr;
 Mesh3D* Pyramid3D::m_mesh = nullptr;
 Mesh3D* Sphere3D::m_mesh = nullptr;
+Mesh3D* Quad3D::m_mesh = nullptr;
+
+Quad3D::Quad3D()
+{
+	m_verticesCount = sizeof(m_indices) / sizeof(int32_t);
+
+
+
+	//Generate and bind vertex array to VAO
+	glGenVertexArrays(1, &m_VAO);
+	glBindVertexArray(m_VAO);
+
+	//Generate and bind EBO
+	glGenBuffers(1, &m_EBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(m_indices), m_indices, GL_STATIC_DRAW);
+
+	//Generate and bind VBO
+	glGenBuffers(1, &m_VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(m_vertices), m_vertices, GL_STATIC_DRAW);
+
+	//Set attribute pointers
+	glVertexAttribPointer(0, 3, GL_FLOAT, false, 8 * sizeof(GLfloat), (GLvoid*)0);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 2, GL_FLOAT, false, 8 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 3, GL_FLOAT, false, 8 * sizeof(GLfloat), (GLvoid*)(5 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(2);
+}
+
+Mesh3D* Quad3D::GetMesh()
+{
+	if (m_mesh == nullptr)
+	{
+		m_mesh = new Quad3D();
+	}
+	return m_mesh;
+}

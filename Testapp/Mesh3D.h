@@ -170,6 +170,38 @@ private:
 	static Mesh3D* m_mesh;
 };
 
+class Quad3D : public Mesh3D
+{
+public:
+	// ********************************************************************************
+	/// <summary>
+	/// Gets a singleton of the mesh
+	/// </summary>
+	/// <returns></returns>
+	// ********************************************************************************
+	static Mesh3D* GetMesh();
+private:
+	// ********************************************************************************
+	/// <summary>
+	/// Constructor
+	/// </summary>
+	/// <returns></returns>
+	// ********************************************************************************
+	Quad3D();
+	GLfloat m_vertices[44] = {
+		// Index   // Position          // Texture Coords    //Normals
+		/* 1 */   -0.5f, 0.5f, 0.0f,    0.0f, 1.0f,          0.0f, 0.0f, 1.0f,            // Top - Left
+		/* 2 */   -0.5f,-0.5f, 0.0f,    0.0f, 0.0f,          0.0f, 0.0f, 1.0f,            // Bot - Left
+		/* 3 */    0.5f,-0.5f, 0.0f,    1.0f, 0.0f,          0.0f, 0.0f, 1.0f,            // Bot - Right
+		/* 4 */    0.5f, 0.5f, 0.0f,    1.0f, 1.0f,          0.0f, 0.0f, 1.0f,            // Top - Right
+	};
+	GLuint m_indices[6] = {
+	0, 1, 2, // First Triangle (TL -> BL -> BR)
+	0, 2, 3, // Second Triangle (TL -> BR -> TR)
+	};
+	static Mesh3D* m_mesh;
+};
+
 class Sphere3D : public Mesh3D
 {
 public:

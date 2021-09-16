@@ -72,6 +72,9 @@ Renderable3D* shape_firstcube = nullptr;
 Renderable3D* shape_secondcube = nullptr;
 Renderable3D* shape_floor = nullptr;
 
+Renderable3D* shape_seafloor = nullptr;
+Renderable3D* shape_sea = nullptr;
+
 
 //CONTROLLABLE CHARACTERS
 Character* char_test = nullptr;
@@ -179,6 +182,8 @@ void InitialSetup()
 	glEnable(GL_DEPTH_TEST);
 	
 	glEnable(GL_MULTISAMPLE);
+	glEnable(GL_SCISSOR_TEST);
+	glScissor(0, 100, 800, 600);
 	glDepthFunc(GL_LESS);
 	CObjectController::SetMainWindow(main_window);
 	manager = new SceneManager(main_window);
@@ -258,39 +263,36 @@ void InitialSetup()
 	shape_sphere->Position(glm::vec3(0.0f, 40.0f, 0.0f));
 	shape_sphere->Scale(glm::vec3(6.0f, 6.0f, 6.0f));
 
-	//Spawn all the spheres
-	for (int i = 0; i < 300; i++)
-	{
-		Renderable3D* sphere = new Renderable3D(Sphere3D::GetMesh(1, 10), Lighting::GetMaterial("Default"));
-		sphere->AddTexture(TextureLoader::LoadTexture("Flushed.png"));
-		sphere->Position(glm::vec3(sin((float)i/4) * 10, (float)i/4 , cos((float)i/4)*10));
-		Spheres.push_back(sphere);
-	}
+	shape_seafloor = new Renderable3D(Quad3D::GetMesh(), Lighting::GetMaterial("Default"));
+	shape_sea = new Renderable3D(Quad3D::GetMesh(), Lighting::GetMaterial("Default"));
+
+	shape_seafloor->Position(glm::vec3(0.0f, -0.8f, 0.0f));
+	shape_seafloor->Scale(glm::vec3(14.0f, 14.0f, 0.0f));
+	shape_seafloor->Rotation(glm::vec3(-90.0f, 0.0f, 0.0f));
+
+
+
+	
 
 	//Create character
 	char_test = new Character(main_window);
 
 
 
-	//Create Text
-	text_message = new TextLabel("Super spicy text!", "Resources/Fonts/ARIAL.ttf", glm::ivec2(0, 40), glm::vec2(200.0f, 100.0f), TextLabel::TextEffect::MARQUEE, glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 1.0f), 200.0f, 600.0f);
-	text_cursorpos = new TextLabel("Default", "Resources/Fonts/ARIAL.ttf", glm::ivec2(0, 40), glm::vec2(0.0f, 0.0f), TextLabel::TextEffect::NONE);
-	text_username = new TextLabel("Press Enter to type!", "Resources/Fonts/ARIAL.ttf", glm::ivec2(0, 40), glm::vec2(0.0f, 650.0f), TextLabel::TextEffect::MARQUEE, glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 1.0f), 200.0f, 600.0f);
-	text_scalebounce = new TextLabel("Username:", "Resources/Fonts/ARIAL.ttf", glm::ivec2(0, 40), glm::vec2(300.0f, 750.0f), TextLabel::TextEffect::SCALE_BOUNCE);
+	
 
 
 
-	//Create Buttons
-	button_SoundEffect_Airhorn = new UIButton(glm::vec3(300, 300, 4), glm::vec3(200, 200, 1), TextureLoader::LoadTexture("Button_Default.png"), TextureLoader::LoadTexture("Button_Hover.png"), TextureLoader::LoadTexture("Button_Press.png"));
-	button_SoundEffect_Bruh = new UIButton(glm::vec3(-300, 300, 4), glm::vec3(200, 200, 1), TextureLoader::LoadTexture("Button_Default.png"), TextureLoader::LoadTexture("Button_Hover.png"), TextureLoader::LoadTexture("Button_Press.png"));
-
+	
 
 
 	//Set textures of objects
 	shape_floor->AddTexture(TextureLoader::LoadTexture("grid.jpg"));
 	shape_cube->AddTexture(TextureLoader::LoadTexture("SciFi_Albedo.jpg"));
 	shape_cube->AddTexture(TextureLoader::LoadTexture("SciFi_Metallic.jpg"));
-	shape_sphere->AddTexture(TextureLoader::LoadTexture("AwesomeFace.png"));
+	
+
+	shape_seafloor->AddTexture(TextureLoader::LoadTexture("grid.jpg"));
 
 
 
@@ -313,23 +315,17 @@ void InitialSetup()
 
 	//Download sounds if they dont already exist
 	audio_main->AddSoundFromYoutube("https://www.youtube.com/watch?v=OoDo7kMbOd8", "Track_ShowaGroove");
-	audio_main->AddSoundFromYoutube("https://www.youtube.com/watch?v=TKfS5zVfGBc", "Track_Dreamscape");
-	audio_main->AddSoundFromYoutube("https://www.youtube.com/watch?v=UaUa_0qPPgc", "SFX_Airhorn");
-	audio_main->AddSoundFromYoutube("https://www.youtube.com/watch?v=D2_r4q2imnQ", "SFX_Bruh");
-	audio_main->AddSound("Track_PolishCow.mp3", "Track_PolishCow");
+	
+	
 	
 
 
 	//Start playing background track
-	audio_main->PlaySound("Track_Dreamscape", 0.1f, true);
+	audio_main->PlaySound("Track_ShowaGroove", 0.1f, true);
 
 
 
-	//Setup Lights
-	light_green = new PointLightObj(&Lighting::PointLights[0], glm::vec3(-5.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.03f, 1.0f, 1.0f, 0.007f, 0.0002f);
-	light_red = new PointLightObj(&Lighting::PointLights[1], glm::vec3(5.0f, 1.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), 0.03f, 1.0f, 1.0f, 0.007f, 0.0002f);
-	light_blue = new PointLightObj(&Lighting::PointLights[2], glm::vec3(5.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), 0.03f, 1.0f, 1.0f, 0.007f, 0.0002f);
-	light_purple = new PointLightObj(&Lighting::PointLights[3], glm::vec3(5.0f, 1.0f, 0.0f), glm::vec3(1.0f, 0.0f, 1.0f), 0.03f, 1.0f, 1.0f, 0.007f, 0.0002f);
+	
 	
 	Lighting::DirectionalLights[0].Direction = glm::vec3(1.0f, -1.0f, 0.0f);
 	Lighting::DirectionalLights[0].Color = glm::vec3(1.0f, 1.0f, 1.0f);
@@ -345,57 +341,36 @@ void Update()
 	//Update all GameObjects
 	CObjectController::UpdateObjects();
 
-	//Update Cursor position text
-	double xpos;
-	double ypos;
-	glfwGetCursorPos(main_window, &xpos, &ypos);
-	text_cursorpos->SetText("Pos: ( " + std::to_string(xpos - cfWINDOW_WIDTH() / 2) + " , " + std::to_string(ypos - cfWINDOW_HEIGHT() / 2) + " )");
+	
 
-	//Update Flag test text
-	if (cfFLAG("Test_Flag"))
-	{
-		text_message->SetText("Test flag is enabled!");
-	}
-	else
-	{
-		text_message->SetText("Test flag is disabled!");
-	}
+	////Update Flag test text
+	//if (cfFLAG("Test_Flag"))
+	//{
+	//	text_message->SetText("Test flag is enabled!");
+	//}
+	//else
+	//{
+	//	text_message->SetText("Test flag is disabled!");
+	//}
 
-	//Play sound if button is pressed
-	if (button_SoundEffect_Airhorn->GetState() == UIButton::State::BUTTON_PRESSED)
-	{
-		audio_main->PlaySound("SFX_Airhorn");
-	}
-	if (button_SoundEffect_Bruh->GetState() == UIButton::State::BUTTON_PRESSED)
-	{
-		audio_main->PlaySound("SFX_Bruh");
-	}
+	
 
 	//Poll events for GLFW input
 	glfwPollEvents();
 
 
 
-	//Update Username test from the Input Buffer
-	text_username->SetText("\"" + SceneManager::GetTextInputBuffer() + "\"");
+	
 
 	//Get the current time
 	delta_time = current_time;
 	current_time = (float)glfwGetTime();
 	delta_time = current_time - delta_time;
 
-	//Move spheres and lights
-	for (int i = 0; i < 300; i++)
-	{
-		Spheres[i]->Position(glm::vec3(sin(((float)i + current_time) / 4) * ((sin((float)i / 105) * 20)), (float)i / 8, cos(((float)i + current_time) / 4) * ((sin((float)i / 105) * 20))));
-	}
+	
 
-	light_green->SetPosition(glm::vec3(sin((current_time*2)) * (sin(current_time)*20), (sin(current_time) * 20) + 20, cos((current_time*2)) * (sin(current_time) * 20)));
-	light_red->SetPosition(glm::vec3(-sin((current_time*2)) * (sin(current_time) * 20), (-sin(current_time) * 20) + 20, -cos((current_time*2)) * (sin(current_time) * 20)));
-	light_blue->SetPosition(glm::vec3(cos((current_time * 2)) * (sin(current_time) * 20), (-cos(current_time) * 20) + 20, -sin((current_time * 2)) * (sin(current_time) * 20)));
-	light_purple->SetPosition(glm::vec3(-cos((current_time * 2)) * (sin(current_time) * 20), (cos(current_time) * 20) + 20, sin((current_time * 2)) * (sin(current_time) * 20)));
-
-	shape_cube->Rotation(glm::vec3(delta_time * 70, delta_time * 70, delta_time * 70) + shape_cube->Rotation());
+	
+	
 
 	//Rainbow background
 	glClearColor(((sin(current_time) + 1.0f) * 0.5f), ((sin(current_time + 2.0f) + 0.5f) * 0.5f), ((sin(current_time + 4.0f) + 1.0f) * 0.5f), 1.0f);
@@ -416,21 +391,16 @@ void Render()
 	glScissor(100, 100, 600, 600);
 
 	//Render the floor
-	shape_floor->Render(*freecam->GetCamera(), program_blinnphong);
+	
+	shape_seafloor->Render(*freecam->GetCamera(), program_blinnphong);
 
 	//Render objects
-	shape_cube->Render(*freecam->GetCamera(), program_reflective);
-	shape_sphere->Render(*freecam->GetCamera(), program_reflectiverim);
+	//shape_cube->Render(*freecam->GetCamera(), program_reflective);
+	
 
-	for (int i = 0; i < 300; i++)
-	{
-		Spheres[i]->Render(*freecam->GetCamera(), program_blinnphong);
-	}
+	
 
-	light_green->Render(freecam->GetCamera());
-	light_red->Render(freecam->GetCamera());
-	light_blue->Render(freecam->GetCamera());
-	light_purple->Render(freecam->GetCamera());
+	
 
 	glDisable(GL_SCISSOR_TEST);
 
