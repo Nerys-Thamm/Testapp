@@ -263,7 +263,7 @@ void InitialSetup()
 	shape_stencilcube = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Glossy"));
 	
 
-	shape_cube->Position(glm::vec3(0.0f, 5.0f, 2.0f));
+	shape_cube->Position(glm::vec3(0.0f, 3.8f, 2.0f));
 	shape_cube->Scale(glm::vec3(2.0f, 2.0f, 2.0f));
 	
 	
@@ -281,18 +281,8 @@ void InitialSetup()
 
 	
 
-	
-
 	//Create character
 	char_test = new Character(main_window);
-
-
-
-	
-
-
-
-	
 
 
 	//Set textures of objects
@@ -351,7 +341,37 @@ void InitialSetup()
 	Lighting::DirectionalLights[0].SpecularStrength = 1.0f;
 }
 
+float mouseY, mouseX;
+glm::vec3 rayDirection;
 
+void MousePassive()
+{
+	double x, y;
+	glfwGetCursorPos(CObjectController::GetMainWindow(), &x, &y);
+	mouseX = (2.0f * x) / cfWINDOW_WIDTH() - 1.0f;
+	mouseY = 1.0f - (2.0f * y) / cfWINDOW_HEIGHT();
+}
+
+void UpdateMousePicking()
+{
+	//screen pos
+	glm::vec2 normalizedScreenPos = glm::vec2(mouseX, mouseY);
+
+	//screenpos to Proj space
+	glm::vec4 clipCoords = glm::vec4(normalizedScreenPos.x, normalizedScreenPos.y, -1.0f, 1.0f);
+
+	//Proj space to eye space
+	glm::mat4 invProjMat = glm::inverse(camera->m_projectionMat);
+	glm::vec4 eyeCoords = invProjMat * clipCoords;
+	eyeCoords = glm::vec4(eyeCoords.x, eyeCoords.y, -1.0f, 0.0f);
+
+	//Eye space to world space
+	glm::mat4 invViewMat = glm::inverse(camera->m_viewMat);
+	glm::vec4 rayWorld = invViewMat * eyeCoords;
+	rayDirection = glm::normalize(glm::vec3(rayWorld));
+
+
+}
 
 //Update all objects and run the processes
 void Update()
@@ -375,7 +395,8 @@ void Update()
 
 	//Poll events for GLFW input
 	glfwPollEvents();
-
+	MousePassive();
+	UpdateMousePicking();
 
 
 	
@@ -388,6 +409,7 @@ void Update()
 	camera->m_cameraTargetPos = shape_cube->Position();
 
 	shape_cube->Rotation(shape_cube->Rotation() + glm::vec3(0.0f, delta_time * 2, 0.0f));
+	shape_cube->Position(shape_cube->Position() + glm::vec3(0.0f, ((sin(current_time)/4) * delta_time), 0.0f));
 
 	shape_stencilcube->Position(shape_cube->Position());
 	shape_stencilcube->Scale(shape_cube->Scale() + glm::vec3(0.5f, 0.5f, 0.5f));
@@ -396,8 +418,8 @@ void Update()
 	
 	
 
-	//Rainbow background
-	glClearColor(((sin(current_time) + 1.0f) * 0.5f), ((sin(current_time + 2.0f) + 0.5f) * 0.5f), ((sin(current_time + 4.0f) + 1.0f) * 0.5f), 1.0f);
+	//Set BG color
+	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 }
 
 //Render all objects
@@ -413,13 +435,7 @@ void Render()
 
 	
 
-	//Render the floor
 	
-	shape_seafloor->Render(*camera, program_blinnphongfog);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	shape_sea->Render(*camera, program_reflectivefog);
-	glDisable(GL_BLEND);
 
 	//Render objects
 
@@ -435,7 +451,13 @@ void Render()
 	glDisable(GL_STENCIL_TEST);
 	glStencilMask(0xFF);
 	
+	//Render the floor
 
+	shape_seafloor->Render(*camera, program_blinnphongfog);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	shape_sea->Render(*camera, program_reflectivefog);
+	glDisable(GL_BLEND);
 	
 
 	
