@@ -87,8 +87,8 @@ TextLabel* text_username = nullptr;
 TextLabel* text_scalebounce = nullptr;
 
 //BUTTONS
-UIButton* button_SoundEffect_Airhorn = nullptr;
-UIButton* button_SoundEffect_Bruh = nullptr;
+UIButton* button_cameraforward = nullptr;
+UIButton* button_cameraback = nullptr;
 
 //SHAPES
 Renderable3D* shape_cube = nullptr;
@@ -253,7 +253,7 @@ void InitialSetup()
 	//Create Skybox
 	std::string SkyboxFilepaths[] = {"MountainOutpost/Right.jpg","MountainOutpost/Left.jpg","MountainOutpost/Up.jpg","MountainOutpost/Down.jpg","MountainOutpost/Back.jpg","MountainOutpost/Front.jpg"};
 	
-	SceneManager::SetCurrentSkybox(new Skybox(freecam->GetCamera(), SkyboxFilepaths));
+	SceneManager::SetCurrentSkybox(new Skybox(camera, SkyboxFilepaths));
 
 
 
@@ -269,7 +269,7 @@ void InitialSetup()
 	shape_seafloor = new Renderable3D(Quad3D::GetMesh(), Lighting::GetMaterial("Default"));
 	shape_sea = new Renderable3D(Quad3D::GetMesh(), Lighting::GetMaterial("Glossy"));
 
-	shape_seafloor->Position(glm::vec3(0.0f, 2.0f, 0.0f));
+	shape_seafloor->Position(glm::vec3(0.0f, 3.0f, 0.0f));
 	shape_seafloor->Scale(glm::vec3(100.0f, 100.0f, 1.0f));
 	shape_seafloor->Rotation(glm::vec3(270.0f, 0.0f, 0.0f));
 
@@ -312,7 +312,9 @@ void InitialSetup()
 
 
 	//Set position of Cameras
-	camera->m_cameraPos = glm::vec3(0.0f, 0.0f, 0.0f);
+	camera->m_cameraPos = glm::vec3(0.0f, 7.0f, 35.0f);
+	camera->m_cameraTargetPos = shape_cube->Position();
+	camera->m_lookAtTarget = true;
 	orthocamera->m_cameraPos = glm::vec3(0.0f, 0.0f, 8.0f);
 
 	freecam->GetCamera()->m_cameraPos.y = 5.0f;
@@ -354,6 +356,7 @@ void Update()
 	CObjectController::UpdateObjects();
 
 	
+	camera->m_cameraTargetPos = shape_cube->Position();
 
 	////Update Flag test text
 	//if (cfFLAG("Test_Flag"))
@@ -403,14 +406,14 @@ void Render()
 
 	//Render the floor
 	
-	shape_seafloor->Render(*freecam->GetCamera(), program_blinnphongfog);
+	shape_seafloor->Render(*camera, program_blinnphongfog);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	shape_sea->Render(*freecam->GetCamera(), program_reflective);
+	shape_sea->Render(*camera, program_reflective);
 	glDisable(GL_BLEND);
 
 	//Render objects
-	shape_cube->Render(*freecam->GetCamera(), program_blinnphongfog);
+	shape_cube->Render(*camera, program_blinnphongfog);
 	
 
 	
