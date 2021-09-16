@@ -6,6 +6,7 @@
 in vec2 FragTexCoords;
 in vec3 FragNormal;
 in vec3 FragPos;
+in vec4 mWorldPos;
 
 struct PointLight
 {
@@ -35,10 +36,14 @@ struct Material
 
 //Uniform inputs
 uniform sampler2D ImageTexture;
-uniform sampler2D ReflectionMap;
-uniform samplerCube CubeMap;
 uniform vec3 CameraPos;
 uniform Material Mat[1];
+uniform float AmbientStrength;
+uniform vec3 AmbientColor;
+uniform vec3 LightColor               = vec3(1.0f, 1.0f, 1.0f);
+uniform vec3 LightPos                 = vec3(0.0f, 6.0f, 6.0f);
+uniform float LightSpecularStrength   = 1.0f;
+uniform float Shininess;
 uniform PointLight PointLights[MAX_POINT_LIGHTS];
 uniform DirectionalLight DirectionalLights[MAX_DIRECTIONAL_LIGHTS];
 
@@ -63,7 +68,7 @@ vec3 CalculateLight_Point(PointLight _light)
     //Specular component
     vec3 ReverseViewDir = normalize(CameraPos - FragPos);
     vec3 HalfwayVector = normalize(-LightDir + ReverseViewDir);
-    float SpecularReflectivity = pow(max(dot(Normal, HalfwayVector), 0.0f), Mat[0].Smoothness * texture(ReflectionMap, FragTexCoords).r);
+    float SpecularReflectivity = pow(max(dot(Normal, HalfwayVector), 0.0f), Mat[0].Smoothness);
     vec3 Specular = _light.SpecularStrength * SpecularReflectivity * _light.Color;
 
     //Combine the lighting components
@@ -94,7 +99,7 @@ vec3 CalculateLight_Directional(DirectionalLight _light)
     //Specular component
     vec3 ReverseViewDir = normalize(CameraPos - FragPos);
     vec3 HalfwayVector = normalize(-LightDir + ReverseViewDir);
-    float SpecularReflectivity = pow(max(dot(Normal, HalfwayVector), 0.0f), Mat[0].Smoothness * texture(ReflectionMap, FragTexCoords).r);
+    float SpecularReflectivity = pow(max(dot(Normal, HalfwayVector), 0.0f), Mat[0].Smoothness);
     vec3 Specular = _light.SpecularStrength * SpecularReflectivity * _light.Color;
 
     //Combine the lighting components
@@ -104,19 +109,11 @@ vec3 CalculateLight_Directional(DirectionalLight _light)
     return CombinedLight;
 }
 
-vec4 CalculateReflection()
-{
-    vec3 Normal = normalize(FragNormal);
-    vec3 ViewDir = normalize(FragPos - CameraPos);
-    vec3 ReflectDir = reflect(ViewDir, Normal);
-    vec4 ReflectColor = texture(CubeMap, ReflectDir);
-    return ReflectColor;
-}
+
 
 void main()
 {
     vec3 LightOutput = vec3(0.0f, 0.0f, 0.0f);
-    //Calculate lights
     for(int i = 0; i < MAX_POINT_LIGHTS; i++)
     {
         LightOutput += CalculateLight_Point(PointLights[i]);
@@ -126,11 +123,15 @@ void main()
         LightOutput += CalculateLight_Directional(DirectionalLights[i]);
     }
 
-    //Calculate final colour
-    vec4 TexColor = vec4(LightOutput, 1.0f) * texture(ImageTexture, FragTexCoords);
-    vec4 ReflectColor = CalculateReflection();
-    float ReflectionAmount = texture(ReflectionMap, FragTexCoords).r;
-    
-	FinalColor = mix(TexColor, ReflectColor, Mat[0].Reflectivity * ReflectionAmount);
+    //Calculate colour before fog
+    vec4 prefog = vec4(LightOutput, 1.0f) * texture(ImageTexture, FragTexCoords);
+
+    //Add fog effect
+    vec4 vFogColor = vec4(0.5f, 0.5f, 0.5f, 1.0f);
+    float d = distance(mWorldPos.xyz, CameraPos);
+    float lerp = (d - 10.0f)/10.0f;
+    lerp = clamp(lerp, 0.0f, 1.0f);
+
+	FinalColor = mix(prefog, vFogColor, lerp);
 }
 

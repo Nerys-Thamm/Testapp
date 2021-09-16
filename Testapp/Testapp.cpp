@@ -52,6 +52,7 @@ GLuint program_texture_wave;
 GLuint program_normals;
 GLuint program_blinnphong;
 GLuint program_blinnphongrim;
+GLuint program_blinnphongfog;
 GLuint program_reflective;
 GLuint program_reflectiverim;
 
@@ -230,6 +231,9 @@ void InitialSetup()
 	program_reflectiverim = ShaderLoader::CreateProgram("Resources/Shaders/3D_Normals.vs",
 		"Resources/Shaders/3DLight_ReflectiveRim.fs");
 
+	program_blinnphongfog = ShaderLoader::CreateProgram("Resources/Shaders/3D_Normals.vs",
+		"Resources/Shaders/3DLight_BlinnPhongFog.fs");
+
 	//Cull poly not facing viewport
 	glCullFace(GL_BACK);
 
@@ -256,23 +260,22 @@ void InitialSetup()
 	//Create objects
 	shape_floor = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Default"));
 	shape_cube = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Chrome"));
-	shape_sphere = new Renderable3D(Sphere3D::GetMesh(1, 10), Lighting::GetMaterial("Glossy"));
+	
 
-	shape_cube->Position(glm::vec3(0.0f, 20.0f, 0.0f));
-	shape_cube->Scale(glm::vec3(20.0f, 20.0f, 20.0f));
-	shape_sphere->Position(glm::vec3(0.0f, 40.0f, 0.0f));
-	shape_sphere->Scale(glm::vec3(6.0f, 6.0f, 6.0f));
+	shape_cube->Position(glm::vec3(0.0f, 5.0f, 2.0f));
+	shape_cube->Scale(glm::vec3(2.0f, 2.0f, 2.0f));
+	
 
 	shape_seafloor = new Renderable3D(Quad3D::GetMesh(), Lighting::GetMaterial("Default"));
 	shape_sea = new Renderable3D(Quad3D::GetMesh(), Lighting::GetMaterial("Glossy"));
 
-	shape_seafloor->Position(glm::vec3(0.0f, -0.8f, 0.0f));
+	shape_seafloor->Position(glm::vec3(0.0f, 2.0f, 0.0f));
 	shape_seafloor->Scale(glm::vec3(100.0f, 100.0f, 1.0f));
-	shape_seafloor->Rotation(glm::vec3(-90.0f, 0.0f, 0.0f));
+	shape_seafloor->Rotation(glm::vec3(270.0f, 0.0f, 0.0f));
 
-	shape_sea->Position(glm::vec3(0.0f, 0.0f, 0.0f));
+	shape_sea->Position(glm::vec3(0.0f, 4.0f, 0.0f));
 	shape_sea->Scale(glm::vec3(100.0f, 100.0f, 1.0f));
-	shape_sea->Rotation(glm::vec3(-90.0f, 0.0f, 0.0f));
+	shape_sea->Rotation(glm::vec3(270.0f, 0.0f, 0.0f));
 
 
 
@@ -297,7 +300,8 @@ void InitialSetup()
 	
 
 	shape_seafloor->AddTexture(TextureLoader::LoadTexture("beachsand.jpg"));
-	shape_sea->AddTexture(TextureLoader::LoadTexture("WaterTransparent.png"));
+	shape_sea->AddTexture(TextureLoader::LoadTexture("WaterTransparent2.png"));
+	shape_sea->AddTexture(TextureLoader::LoadTexture("WaterSpecular.png"));
 
 
 
@@ -308,8 +312,11 @@ void InitialSetup()
 
 
 	//Set position of Cameras
-	camera->m_cameraPos = glm::vec3(0.0f, 0.0f, 8.0f);
+	camera->m_cameraPos = glm::vec3(0.0f, 0.0f, 0.0f);
 	orthocamera->m_cameraPos = glm::vec3(0.0f, 0.0f, 8.0f);
+
+	freecam->GetCamera()->m_cameraPos.y = 5.0f;
+	
 
 
 
@@ -334,7 +341,7 @@ void InitialSetup()
 	
 	Lighting::DirectionalLights[0].Direction = glm::vec3(1.0f, -1.0f, 0.0f);
 	Lighting::DirectionalLights[0].Color = glm::vec3(1.0f, 1.0f, 1.0f);
-	Lighting::DirectionalLights[0].AmbientStrength = 0.55f;
+	Lighting::DirectionalLights[0].AmbientStrength = 0.05f;
 	Lighting::DirectionalLights[0].SpecularStrength = 1.0f;
 }
 
@@ -396,14 +403,14 @@ void Render()
 
 	//Render the floor
 	
-	shape_seafloor->Render(*freecam->GetCamera(), program_blinnphong);
+	shape_seafloor->Render(*freecam->GetCamera(), program_blinnphongfog);
 	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
-	shape_sea->Render(*freecam->GetCamera(), program_blinnphong);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	shape_sea->Render(*freecam->GetCamera(), program_reflective);
 	glDisable(GL_BLEND);
 
 	//Render objects
-	shape_cube->Render(*freecam->GetCamera(), program_reflective);
+	shape_cube->Render(*freecam->GetCamera(), program_blinnphongfog);
 	
 
 	
