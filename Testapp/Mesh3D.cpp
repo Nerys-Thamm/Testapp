@@ -489,14 +489,34 @@ Terrain3D::Terrain3D(std::string _name, int _size)
 			Vertices[Element++] = z;
 
 			// Set the texture coordinates of the current vertex point
-			Vertices[Element++] = (float)i / (_size - 1);
-			Vertices[Element++] = 1 - ((float)j / (_size - 1)); // 1 minus in order to flip the direction of 0-1 (0 at the bottom)
+			Vertices[Element++] = (float)j / (_size - 1);
+			Vertices[Element++] = 1 - ((float)i / (_size - 1)); // 1 minus in order to flip the direction of 0-1 (0 at the bottom)
 
 			// Set the normal direction of the current vertex point
-			Vertices[Element++] = x;
-			Vertices[Element++] = y;
-			Vertices[Element++] = z;
+			if (j <= 1 || i <= 1 || j == (_size - 1) || i == (_size - 1))
+			{
+				Vertices[Element++] = x;
+				Vertices[Element++] = y;
+				Vertices[Element++] = z;
+			}
+			else
+			{
+				float t = (float)data[(i - 1) * _size + j];
+				float b = (float)data[(i + 1) * _size + j];
+				float l = (float)data[i * _size + j - 1];
+				float r = (float)data[i * _size + j + 1];
 
+				glm::vec3 tanZ(0.0f, (t - b) * 0.5f, 1.0f);
+				glm::vec3 tanX(1.0f, (r - l) * 0.5f, 0.0f);
+
+				glm::vec3 N = glm::cross(tanZ, tanX);
+				N = glm::normalize(N);
+				
+
+				Vertices[Element++] = N.x;
+				Vertices[Element++] = N.y;
+				Vertices[Element++] = N.z;
+			}
 			
 		}
 

@@ -253,9 +253,9 @@ void InitialSetup()
 	shape_3Dbutton_fwd = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Default"));;
 	shape_3Dbutton_bck = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Default"));;
 
-	Terrain3D::LoadFromRaw("heightmap2.raw", 1081);
+	Terrain3D::LoadFromRaw("AucklandHarbor2.raw", 1081);
 
-	terrain_auckland = new Renderable3D(Terrain3D::GetTerrainMesh("heightmap2.raw"), Lighting::GetMaterial("Default"));
+	terrain_auckland = new Renderable3D(Terrain3D::GetTerrainMesh("AucklandHarbor2.raw"), Lighting::GetMaterial("Default"));
 	
 
 	shape_cube->Position(glm::vec3(0.0f, 3.8f, 2.0f));
@@ -275,13 +275,13 @@ void InitialSetup()
 	shape_seafloor->Scale(glm::vec3(100.0f, 100.0f, 1.0f));
 	shape_seafloor->Rotation(glm::vec3(271.0f, 0.0f, 0.0f));
 
-	shape_sea->Position(glm::vec3(0.0f, 4.0f, 0.0f));
-	shape_sea->Scale(glm::vec3(100.0f, 100.0f, 1.0f));
+	shape_sea->Position(glm::vec3(0.0f, 0.01f, 0.0f));
+	shape_sea->Scale(glm::vec3(500.0f, 500.0f, 1.0f));
 	shape_sea->Rotation(glm::vec3(270.0f, 0.0f, 0.0f));
 
 	
-	terrain_auckland->Position(glm::vec3(0.0f, -50.0f, 0.0f));
-	terrain_auckland->Scale(glm::vec3(1.0f, 0.01f, 1.0f));
+	terrain_auckland->Position(glm::vec3(0.0f,0.0f, 0.0f));
+	terrain_auckland->Scale(glm::vec3(0.2f, 0.05f, 0.2f));
 	terrain_auckland->Rotation(glm::vec3(0.0f, 180.0f, 0.0f));
 	
 	
@@ -296,7 +296,7 @@ void InitialSetup()
 	shape_stencilcube->AddTexture(TextureLoader::LoadTexture("Grey.jpg"));
 	shape_3Dbutton_fwd->AddTexture(TextureLoader::LoadTexture("Yellow.jpg"));
 	shape_3Dbutton_bck->AddTexture(TextureLoader::LoadTexture("Grey.jpg"));
-	terrain_auckland->AddTexture(TextureLoader::LoadTexture("beachsand.jpg"));
+	terrain_auckland->AddTexture(TextureLoader::LoadTexture("map.png"));
 	
 
 	shape_seafloor->AddTexture(TextureLoader::LoadTexture("beachsand.jpg"));
@@ -579,13 +579,14 @@ void Render()
 	shape_3Dbutton_fwd->Render(*freecam->GetCamera(), program_blinnphong);
 	//Render the floor
 
-	shape_seafloor->Render(*freecam->GetCamera(), program_blinnphongfog);
+	//shape_seafloor->Render(*freecam->GetCamera(), program_blinnphongfog);
+	terrain_auckland->Render(*freecam->GetCamera(), program_blinnphong);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	shape_sea->Render(*freecam->GetCamera(), program_reflectivefog);
+	shape_sea->Render(*freecam->GetCamera(), program_reflective);
 	glDisable(GL_BLEND);
 
-	terrain_auckland->Render(*freecam->GetCamera(), program_blinnphong);
+	
 	
 
 	
