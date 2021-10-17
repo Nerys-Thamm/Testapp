@@ -426,3 +426,130 @@ Mesh3D* Quad3D::GetMesh()
 	}
 	return m_mesh;
 }
+
+std::map<std::string, Terrain3D*> Terrain3D::m_terrains;
+
+void Terrain3D::LoadFromRaw(std::string _name, int _size)
+{
+	Terrain3D* newTerr = new Terrain3D(_name, _size);
+	Terrain3D::m_terrains.emplace(_name, newTerr);
+}
+
+Mesh3D* Terrain3D::GetTerrainMesh(std::string _name)
+{
+	return Terrain3D::m_terrains.find(_name)->second;
+}
+
+Terrain3D::Terrain3D(std::string _name, int _size)
+{
+	int VertexAttrib = 8;	// Float components are needed for each vertex point
+	int IndexPerQuad = 6;	// Indices needed to create a quad
+	std::string Path = "Resources/Terrain/";
+	
+	std::vector<unsigned char> data(_size * _size);
+	
+	std::ifstream rawFile;
+	rawFile.open((Path + _name).c_str(), std::ios_base::binary);
+
+
+	
+
+	
+
+	// Create the vertex array to hold the correct number of elements based on the fidelity of the sphere
+	int VertexCount = _size * _size * VertexAttrib;
+	int TerrainPointCount = _size * _size;
+	float* Heights = new float[TerrainPointCount];
+
+
+	rawFile.read((char*)&data[0],(std::streamsize)data.size());
+	rawFile.close();
+
+
+
+	GLfloat* Vertices = new GLfloat[VertexCount];
+	int Element = 0;
+	int terrainPoint = 0;
+	// Each cycle moves down on the vertical (Y axis) to start the next ring
+	for (int i = 0; i < _size; i++)
+	{
+		
+
+		// Creates a horizontal ring and adds each new vertex point to the vertex array
+		for (int j = 0; j < _size; j++)
+		{
+			// Calculate the new vertex position point with the new angles
+			float x = (float)j - (_size/2);
+			float y = (float)data[terrainPoint++];
+			float z = (float)i - (_size / 2);
+
+			// Set the position of the current vertex point
+			Vertices[Element++] = x;
+			Vertices[Element++] = y;
+			Vertices[Element++] = z;
+
+			// Set the texture coordinates of the current vertex point
+			Vertices[Element++] = (float)i / (_size - 1);
+			Vertices[Element++] = 1 - ((float)j / (_size - 1)); // 1 minus in order to flip the direction of 0-1 (0 at the bottom)
+
+			// Set the normal direction of the current vertex point
+			Vertices[Element++] = x;
+			Vertices[Element++] = y;
+			Vertices[Element++] = z;
+
+			
+		}
+
+	}
+
+	// Create the index array to hold the correct number of elements based on the fidelity of the sphere
+	int IndexCount = (TerrainPointCount-1) * IndexPerQuad;
+	GLuint* Indices = new GLuint[IndexCount];
+
+	Element = 0;	// Reset the element offset for the new array
+	for (int gridY = 0; gridY < (_size-1); ++gridY)
+	{
+		for (int gridX = 0; gridX < (_size - 1); ++gridX)
+		{
+			int start = gridY * _size + gridX;
+			// First triangle of the quad
+			Indices[Element++] = (GLuint)start;
+			Indices[Element++] = (GLuint)(start + _size);
+			Indices[Element++] = (GLuint)(start + 1);
+			
+
+			// Second triangle of the quad
+			Indices[Element++] = (GLuint)(start + 1);
+			Indices[Element++] = (GLuint)(start + _size);
+			Indices[Element++] = (GLuint)(start + 1 + _size);
+			
+		}
+	}
+
+	// Create the Vertex Array and associated buffers
+
+	glGenVertexArrays(1, &m_VAO);
+	glBindVertexArray(m_VAO);
+	glGenBuffers(1, &m_VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+	glBufferData(GL_ARRAY_BUFFER, VertexCount * sizeof(GLfloat), Vertices, GL_STATIC_DRAW);
+	glGenBuffers(1, &m_EBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, IndexCount * sizeof(GLuint), Indices, GL_STATIC_DRAW);
+
+	// Vertex Information (Position, Texture Coords and Normals)
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)0);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (void*)(5 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(2);
+
+	DrawType = GL_TRIANGLES;
+
+	// Clean up the used memory
+	delete[] Vertices;
+	delete[] Indices;
+
+	m_verticesCount = IndexCount;
+}

@@ -25,6 +25,7 @@
 #include <iostream>
 #include <string>
 #include "SceneManager.h"
+#include <fstream>
 
 class Mesh3D
 {
@@ -217,4 +218,16 @@ private:
 	int IndexCount;
 	int DrawType;
 	static Mesh3D* m_mesh;
+};
+
+class Terrain3D : public Mesh3D
+{
+public:
+	static void LoadFromRaw(std::string _name, int _size);
+	static Mesh3D* GetTerrainMesh(std::string _name);
+private:
+	static std::map<std::string, Terrain3D*> m_terrains;
+	Terrain3D(std::string _name, int _size);
+	int DrawType;
+
 };

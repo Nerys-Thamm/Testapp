@@ -77,28 +77,17 @@ Renderable3D* shape_floor = nullptr;
 Renderable3D* shape_seafloor = nullptr;
 Renderable3D* shape_sea = nullptr;
 
+Renderable3D* terrain_auckland = nullptr;
 
-//CONTROLLABLE CHARACTERS
-Character* char_test = nullptr;
 
-//TEXTLABELS
-TextLabel* text_message = nullptr;
-TextLabel* text_cursorpos = nullptr;
-TextLabel* text_username = nullptr;
-TextLabel* text_scalebounce = nullptr;
 
 //BUTTONS
-UIButton* button_cameraforward = nullptr;
-UIButton* button_cameraback = nullptr;
+Renderable3D* shape_3Dbutton_fwd = nullptr;
+Renderable3D* shape_3Dbutton_bck = nullptr;
 
 //SHAPES
 Renderable3D* shape_cube = nullptr;
 Renderable3D* shape_stencilcube = nullptr;
-
-
-
-
-
 
 //Audio
 Audiosystem* audio_main = nullptr;
@@ -258,13 +247,24 @@ void InitialSetup()
 
 
 	//Create objects
-	shape_floor = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Default"));
+	
 	shape_cube = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Chrome"));
 	shape_stencilcube = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Glossy"));
+	shape_3Dbutton_fwd = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Default"));;
+	shape_3Dbutton_bck = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Default"));;
+
+	Terrain3D::LoadFromRaw("heightmap2.raw", 1081);
+
+	terrain_auckland = new Renderable3D(Terrain3D::GetTerrainMesh("heightmap2.raw"), Lighting::GetMaterial("Default"));
 	
 
 	shape_cube->Position(glm::vec3(0.0f, 3.8f, 2.0f));
 	shape_cube->Scale(glm::vec3(2.0f, 2.0f, 2.0f));
+
+	shape_3Dbutton_fwd->Position(glm::vec3(-4.0f, 5.0f, 2.0f));
+	shape_3Dbutton_fwd->Scale(glm::vec3(2.0f, 2.0f, 2.0f));
+	shape_3Dbutton_bck->Position(glm::vec3(4.0f, 5.0f, 2.0f));
+	shape_3Dbutton_bck->Scale(glm::vec3(2.0f, 2.0f, 2.0f));
 	
 	
 
@@ -273,24 +273,30 @@ void InitialSetup()
 
 	shape_seafloor->Position(glm::vec3(0.0f, 3.5f, 0.0f));
 	shape_seafloor->Scale(glm::vec3(100.0f, 100.0f, 1.0f));
-	shape_seafloor->Rotation(glm::vec3(270.0f, 0.0f, 0.0f));
+	shape_seafloor->Rotation(glm::vec3(271.0f, 0.0f, 0.0f));
 
 	shape_sea->Position(glm::vec3(0.0f, 4.0f, 0.0f));
 	shape_sea->Scale(glm::vec3(100.0f, 100.0f, 1.0f));
 	shape_sea->Rotation(glm::vec3(270.0f, 0.0f, 0.0f));
 
 	
+	terrain_auckland->Position(glm::vec3(0.0f, -50.0f, 0.0f));
+	terrain_auckland->Scale(glm::vec3(1.0f, 0.01f, 1.0f));
+	terrain_auckland->Rotation(glm::vec3(0.0f, 180.0f, 0.0f));
+	
+	
 
-	//Create character
-	char_test = new Character(main_window);
+	
 
 
 	//Set textures of objects
-	shape_floor->AddTexture(TextureLoader::LoadTexture("grid.jpg"));
 	shape_cube->AddTexture(TextureLoader::LoadTexture("SciFi_Albedo.jpg"));
 	shape_cube->AddTexture(TextureLoader::LoadTexture("SciFi_Metallic.jpg"));
 	shape_stencilcube->AddTexture(TextureLoader::LoadTexture("Yellow.jpg"));
 	shape_stencilcube->AddTexture(TextureLoader::LoadTexture("Grey.jpg"));
+	shape_3Dbutton_fwd->AddTexture(TextureLoader::LoadTexture("Yellow.jpg"));
+	shape_3Dbutton_bck->AddTexture(TextureLoader::LoadTexture("Grey.jpg"));
+	terrain_auckland->AddTexture(TextureLoader::LoadTexture("beachsand.jpg"));
 	
 
 	shape_seafloor->AddTexture(TextureLoader::LoadTexture("beachsand.jpg"));
@@ -299,14 +305,9 @@ void InitialSetup()
 
 
 
-	//Set position and scale of Environment
-	shape_floor->Position(glm::vec3(0.0f, -0.8f, 0.0f));
-	shape_floor->Scale(glm::vec3(14.0f, 0.1f, 14.0f));
-
-
 
 	//Set position of Cameras
-	camera->m_cameraPos = glm::vec3(0.0f, 7.0f, 35.0f);
+	camera->m_cameraPos = glm::vec3(0.0f, 7.0f, 20.0f);
 	camera->m_cameraTargetPos = shape_cube->Position();
 	camera->m_lookAtTarget = true;
 	orthocamera->m_cameraPos = glm::vec3(0.0f, 0.0f, 8.0f);
@@ -322,20 +323,80 @@ void InitialSetup()
 
 
 	//Download sounds if they dont already exist
-	audio_main->AddSoundFromYoutube("https://www.youtube.com/watch?v=OoDo7kMbOd8", "Track_ShowaGroove");
+	audio_main->AddSound("Track_BeachAmbience.mp3", "Track_BeachAmbience");
 	
 	
 	
 
 
 	//Start playing background track
-	audio_main->PlaySound("Track_ShowaGroove", 0.1f, true);
-
+	audio_main->PlaySound("Track_BeachAmbience", 0.5f, true);
 
 
 	
+	Lighting::DirectionalLights[0].Direction = glm::vec3(-1.0f, -1.0f, -1.0f);
+	Lighting::DirectionalLights[0].Color = glm::vec3(1.0f, 1.0f, 1.0f);
+	Lighting::DirectionalLights[0].AmbientStrength = 0.15f;
+	Lighting::DirectionalLights[0].SpecularStrength = 1.0f;
+}
+
+//Resets the scene
+void ResetScene()
+{
+	//Delete objects
+	delete shape_cube;
+	delete shape_stencilcube;
+	delete shape_3Dbutton_fwd;
+	delete shape_3Dbutton_bck;
+	delete shape_seafloor;
+	delete shape_sea;
 	
-	Lighting::DirectionalLights[0].Direction = glm::vec3(1.0f, -1.0f, 1.0f);
+
+	//Create new objects and set position + orientation
+
+	shape_cube = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Chrome"));
+	shape_stencilcube = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Glossy"));
+	shape_3Dbutton_fwd = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Default"));;
+	shape_3Dbutton_bck = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Default"));;
+	shape_cube->Position(glm::vec3(0.0f, 3.8f, 2.0f));
+	shape_cube->Scale(glm::vec3(2.0f, 2.0f, 2.0f));
+	shape_3Dbutton_fwd->Position(glm::vec3(-4.0f, 5.0f, 2.0f));
+	shape_3Dbutton_fwd->Scale(glm::vec3(2.0f, 2.0f, 2.0f));
+	shape_3Dbutton_bck->Position(glm::vec3(4.0f, 5.0f, 2.0f));
+	shape_3Dbutton_bck->Scale(glm::vec3(2.0f, 2.0f, 2.0f));
+	shape_seafloor = new Renderable3D(Quad3D::GetMesh(), Lighting::GetMaterial("Default"));
+	shape_sea = new Renderable3D(Quad3D::GetMesh(), Lighting::GetMaterial("Glossy"));
+	shape_seafloor->Position(glm::vec3(0.0f, 3.5f, 0.0f));
+	shape_seafloor->Scale(glm::vec3(100.0f, 100.0f, 1.0f));
+	shape_seafloor->Rotation(glm::vec3(271.0f, 0.0f, 0.0f));
+	shape_sea->Position(glm::vec3(0.0f, 4.0f, 0.0f));
+	shape_sea->Scale(glm::vec3(100.0f, 100.0f, 1.0f));
+	shape_sea->Rotation(glm::vec3(270.0f, 0.0f, 0.0f));
+
+
+	//Set textures of objects
+	shape_cube->AddTexture(TextureLoader::LoadTexture("SciFi_Albedo.jpg"));
+	shape_cube->AddTexture(TextureLoader::LoadTexture("SciFi_Metallic.jpg"));
+	shape_stencilcube->AddTexture(TextureLoader::LoadTexture("Yellow.jpg"));
+	shape_stencilcube->AddTexture(TextureLoader::LoadTexture("Grey.jpg"));
+	shape_3Dbutton_fwd->AddTexture(TextureLoader::LoadTexture("Yellow.jpg"));
+	shape_3Dbutton_bck->AddTexture(TextureLoader::LoadTexture("Grey.jpg"));
+	shape_seafloor->AddTexture(TextureLoader::LoadTexture("beachsand.jpg"));
+	shape_sea->AddTexture(TextureLoader::LoadTexture("WaterTransparent2.png"));
+	shape_sea->AddTexture(TextureLoader::LoadTexture("WaterSpecular.png"));
+
+	//Set position of Cameras
+	camera->m_cameraPos = glm::vec3(0.0f, 7.0f, 20.0f);
+	camera->m_cameraTargetPos = shape_cube->Position();
+	camera->m_lookAtTarget = true;
+
+	//Reset Audio
+	audio_main = Audiosystem::GetInstance();
+	//Start playing background track
+	audio_main->PlaySound("Track_BeachAmbience", 0.5f, true);
+
+	//Setup Lighting
+	Lighting::DirectionalLights[0].Direction = glm::vec3(-1.0f, -1.0f, -1.0f);
 	Lighting::DirectionalLights[0].Color = glm::vec3(1.0f, 1.0f, 1.0f);
 	Lighting::DirectionalLights[0].AmbientStrength = 0.15f;
 	Lighting::DirectionalLights[0].SpecularStrength = 1.0f;
@@ -344,6 +405,7 @@ void InitialSetup()
 float mouseY, mouseX;
 glm::vec3 rayDirection;
 
+//Get cursor position relative to window
 void MousePassive()
 {
 	double x, y;
@@ -352,6 +414,7 @@ void MousePassive()
 	mouseY = 1.0f - (2.0f * y) / cfWINDOW_HEIGHT();
 }
 
+//Update mouse picking ray
 void UpdateMousePicking()
 {
 	//screen pos
@@ -373,25 +436,29 @@ void UpdateMousePicking()
 
 }
 
+//Check if ray intersects with Axis Aligned Bounding Box
+bool CheckAABBIntersect(glm::vec3 _origin, glm::vec3 _direction, glm::vec3 _boxPosition, glm::vec3 _boxExtents)
+{
+	glm::vec3 boxMin = _boxPosition - (_boxExtents/2.0f);
+	glm::vec3 boxMax = _boxPosition + (_boxExtents / 2.0f);
+	glm::vec3 min = (boxMin - _origin) / _direction;
+	glm::vec3 max = (boxMax - _origin) / _direction;
+	glm::vec3 high = glm::min(min, max);
+	glm::vec3 low = glm::max(min, max);
+	float near = std::max(std::max(high.x, high.y), high.z);
+	float far = std::min(std::min(low.x, low.y), low.z);
+	return near > far;
+}
+
+bool stencilEnabled = true, scissorEnabled = true, cullingEnabled = true, pressedLastFrame = false;;
+
+
 //Update all objects and run the processes
 void Update()
 {
 	//Update all GameObjects
 	CObjectController::UpdateObjects();
 
-	
-	
-	////Update Flag test text
-	//if (cfFLAG("Test_Flag"))
-	//{
-	//	text_message->SetText("Test flag is enabled!");
-	//}
-	//else
-	//{
-	//	text_message->SetText("Test flag is disabled!");
-	//}
-
-	
 
 	//Poll events for GLFW input
 	glfwPollEvents();
@@ -399,20 +466,67 @@ void Update()
 	UpdateMousePicking();
 
 
-	
-
 	//Get the current time
 	delta_time = current_time;
 	current_time = (float)glfwGetTime();
 	delta_time = current_time - delta_time;
 
+	//Process mouse input and Mouse picking
+	if (glfwGetMouseButton(CObjectController::GetMainWindow(), GLFW_MOUSE_BUTTON_1) == GLFW_PRESS)
+	{
+		if (CheckAABBIntersect(camera->m_cameraPos, rayDirection, shape_3Dbutton_fwd->Position(), shape_3Dbutton_fwd->Scale()))
+		{
+			camera->m_cameraPos.z += delta_time * 2.0f;
+		}
+		if (CheckAABBIntersect(camera->m_cameraPos, rayDirection, shape_3Dbutton_bck->Position(), shape_3Dbutton_bck->Scale()))
+		{
+			camera->m_cameraPos.z -= delta_time * 2.0f;
+		}
+	}
+	//Perform actions on key press
+	if (glfwGetKey(CObjectController::GetMainWindow(), GLFW_KEY_R) && !pressedLastFrame) ResetScene();
+	if (glfwGetKey(CObjectController::GetMainWindow(), GLFW_KEY_T) && !pressedLastFrame)
+	{
+		stencilEnabled = !stencilEnabled;
+	}
+	if (glfwGetKey(CObjectController::GetMainWindow(), GLFW_KEY_Y) && !pressedLastFrame)
+	{
+		scissorEnabled = !scissorEnabled;
+		if (scissorEnabled)
+		{
+			glClear(GL_COLOR_BUFFER_BIT);
+			glEnable(GL_SCISSOR_TEST);
+			glScissor(0, 100, 800, 600);
+		}
+		else
+		{
+			glDisable(GL_SCISSOR_TEST);
+		}
+	}
+	if (glfwGetKey(CObjectController::GetMainWindow(), GLFW_KEY_U) && !pressedLastFrame)
+	{
+		cullingEnabled = !cullingEnabled;
+		if (cullingEnabled)
+		{
+			glEnable(GL_CULL_FACE);
+		}
+		else
+		{
+			glDisable(GL_CULL_FACE);
+		}
+	}
+	pressedLastFrame = (glfwGetKey(CObjectController::GetMainWindow(), GLFW_KEY_R) || glfwGetKey(CObjectController::GetMainWindow(), GLFW_KEY_T) || glfwGetKey(CObjectController::GetMainWindow(), GLFW_KEY_Y) || glfwGetKey(CObjectController::GetMainWindow(), GLFW_KEY_U));
+
+	//Make camera follow cube
 	camera->m_cameraTargetPos = shape_cube->Position();
 
 	shape_cube->Rotation(shape_cube->Rotation() + glm::vec3(0.0f, delta_time * 2, 0.0f));
 	shape_cube->Position(shape_cube->Position() + glm::vec3(0.0f, ((sin(current_time)/4) * delta_time), 0.0f));
 
+	shape_sea->Rotation(shape_sea->Rotation() + glm::vec3(0.0f, 0.0f, delta_time));
+
 	shape_stencilcube->Position(shape_cube->Position());
-	shape_stencilcube->Scale(shape_cube->Scale() + glm::vec3(0.5f, 0.5f, 0.5f));
+	shape_stencilcube->Scale(shape_cube->Scale() + glm::vec3(0.2f, 0.2f, 0.2f));
 	shape_stencilcube->Rotation(shape_cube->Rotation());
 
 	
@@ -439,25 +553,39 @@ void Render()
 
 	//Render objects
 
-	glEnable(GL_STENCIL_TEST);
-	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-	glStencilFunc(GL_ALWAYS, 1, 0xFF);
-	glStencilMask(0xFF);
-	shape_cube->Render(*camera, program_blinnphongfog);
-	glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-	glStencilMask(0x00);
-	shape_stencilcube->Render(*camera, program_reflective);
-	glStencilMask(0x00);
-	glDisable(GL_STENCIL_TEST);
-	glStencilMask(0xFF);
 	
+
+	if (stencilEnabled)
+	{
+		glEnable(GL_STENCIL_TEST);
+		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+		glStencilFunc(GL_ALWAYS, 1, 0xFF);
+		glStencilMask(0xFF);
+		shape_cube->Render(*freecam->GetCamera(), program_blinnphongfog);
+		glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+		glStencilMask(0x00);
+		shape_stencilcube->Render(*freecam->GetCamera(), program_reflective);
+		glStencilMask(0x00);
+		glDisable(GL_STENCIL_TEST);
+		glStencilMask(0xFF);
+	}
+	else
+	{
+		shape_cube->Render(*freecam->GetCamera(), program_blinnphongfog);
+	}
+	
+
+	shape_3Dbutton_bck->Render(*freecam->GetCamera(), program_blinnphong);
+	shape_3Dbutton_fwd->Render(*freecam->GetCamera(), program_blinnphong);
 	//Render the floor
 
-	shape_seafloor->Render(*camera, program_blinnphongfog);
+	shape_seafloor->Render(*freecam->GetCamera(), program_blinnphongfog);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	shape_sea->Render(*camera, program_reflectivefog);
+	shape_sea->Render(*freecam->GetCamera(), program_reflectivefog);
 	glDisable(GL_BLEND);
+
+	terrain_auckland->Render(*freecam->GetCamera(), program_blinnphong);
 	
 
 	
