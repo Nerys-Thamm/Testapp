@@ -31,6 +31,9 @@
 #include "TextureLoader.h"
 #include "FreeCam.h"
 #include "PointLightObj.h"
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
 
 
 //Pointer to window
@@ -92,6 +95,36 @@ Renderable3D* shape_stencilcube = nullptr;
 //Audio
 Audiosystem* audio_main = nullptr;
 
+//---------------------------------------------------------------
+//GUI variables
+bool bWireFrameMode = false;
+float clothLength = 60.0f;
+float clothWidth = 60.0f;
+
+int numberOfHooks = 3;
+float hookDistance = 20.0f;
+float clothStiffness = 0.5f;
+
+const char* mouseModeItems[]{ "Pull", "Push", "Tear", "Fire", "Pin" };
+int selectedMouseMode = 0;
+
+const char* collisionItems[]{ "No Object", "Sphere", "Capsule", "Pyramid" };
+int selectedCollision = 0;
+
+float windDirection = 0.0f;
+float windStrength = 10.0f;
+
+float timeOfDay = 0.0f;
+
+//----------------------------------------------------
+
+void ShutDown()
+{
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
+}
+
 int main()
 {
 	std::cout << "Program compiled " << __DATE__ << " | " << __TIME__ << std::endl;
@@ -109,7 +142,7 @@ int main()
 	{
 		std::cout << "GLFW failed to initialize properly. Terminating program." << std::endl;
 		system("pause");
-
+		ShutDown();
 		glfwTerminate();
 		return -1;
 	}
@@ -120,7 +153,7 @@ int main()
 	{
 		std::cout << "GLEW failed to initialize properly. Terminating program." << std::endl;
 		system("pause");
-
+		ShutDown();
 		glfwTerminate();
 		return -1;
 	}
@@ -140,6 +173,7 @@ int main()
 
 	// Ensuring correct shutdown of GLFW
 	glfwTerminate();
+	ShutDown();
 	return 0;
 }
 
@@ -170,7 +204,7 @@ void InitialSetup()
 	
 	glEnable(GL_MULTISAMPLE);
 	glEnable(GL_SCISSOR_TEST);
-	glScissor(0, 100, 800, 600);
+	glScissor(0, 100, (GLsizei)cfWINDOW_WIDTH(), (GLsizei)cfWINDOW_HEIGHT()-200);
 	glDepthFunc(GL_LESS);
 	CObjectController::SetMainWindow(main_window);
 	manager = new SceneManager(main_window);
@@ -281,7 +315,7 @@ void InitialSetup()
 
 	
 	terrain_auckland->Position(glm::vec3(0.0f,0.0f, 0.0f));
-	terrain_auckland->Scale(glm::vec3(0.2f, 0.05f, 0.2f));
+	terrain_auckland->Scale(glm::vec3(0.1f, 0.025f, 0.1f));
 	terrain_auckland->Rotation(glm::vec3(0.0f, 180.0f, 0.0f));
 	
 	
@@ -335,9 +369,17 @@ void InitialSetup()
 
 	
 	Lighting::DirectionalLights[0].Direction = glm::vec3(-1.0f, -1.0f, -1.0f);
-	Lighting::DirectionalLights[0].Color = glm::vec3(1.0f, 1.0f, 1.0f);
+	Lighting::DirectionalLights[0].Color = glm::vec3(1.0f, 0.8f, 0.8f);
 	Lighting::DirectionalLights[0].AmbientStrength = 0.15f;
 	Lighting::DirectionalLights[0].SpecularStrength = 1.0f;
+
+
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	ImGui::StyleColorsDark();
+	ImGui_ImplGlfw_InitForOpenGL(main_window, true);
+	ImGui_ImplOpenGL3_Init("#version 330");
 }
 
 //Resets the scene
@@ -398,7 +440,7 @@ void ResetScene()
 	//Setup Lighting
 	Lighting::DirectionalLights[0].Direction = glm::vec3(-1.0f, -1.0f, -1.0f);
 	Lighting::DirectionalLights[0].Color = glm::vec3(1.0f, 1.0f, 1.0f);
-	Lighting::DirectionalLights[0].AmbientStrength = 0.15f;
+	Lighting::DirectionalLights[0].AmbientStrength = 0.1f;
 	Lighting::DirectionalLights[0].SpecularStrength = 1.0f;
 }
 
@@ -496,7 +538,7 @@ void Update()
 		{
 			glClear(GL_COLOR_BUFFER_BIT);
 			glEnable(GL_SCISSOR_TEST);
-			glScissor(0, 100, 800, 600);
+			glScissor(0, 100, (GLsizei)cfWINDOW_WIDTH(), (GLsizei)cfWINDOW_HEIGHT() - 200);
 		}
 		else
 		{
@@ -529,11 +571,97 @@ void Update()
 	shape_stencilcube->Scale(shape_cube->Scale() + glm::vec3(0.2f, 0.2f, 0.2f));
 	shape_stencilcube->Rotation(shape_cube->Rotation());
 
-	
+	Lighting::DirectionalLights[0].Direction = glm::vec3(sin(timeOfDay), cos(timeOfDay), 0.0f);
+	Lighting::DirectionalLights[0].Color = glm::vec3(1.0f, 0.5f + (((sin(timeOfDay)+1.0f)/2.0f)*0.5f), 0.5f + (((sin(timeOfDay) + 1.0f) / 2.0f) * 0.5f));
 	
 
 	//Set BG color
 	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+}
+
+void RenderGUI()
+{
+	// ImGUI window creation
+
+	ImGui::Begin("Physics Framework");
+
+	ImGui::Text("General Controls:");
+
+	ImGui::Checkbox("Wireframe Mode", &bWireFrameMode);
+
+	ImGui::Combo("Mouse Mode", &selectedMouseMode, mouseModeItems, IM_ARRAYSIZE(mouseModeItems));
+
+	ImGui::Text("Environment");
+
+	ImGui::SliderAngle("Time of Day", &timeOfDay);
+
+	ImGui::Text("Cloth Shape:");
+
+	ImGui::SliderFloat("Cloth Length", &clothLength, 1.0f, 200.0f);
+
+	ImGui::SliderFloat("Cloth Width", &clothWidth, 1.0f, 200.0f);
+
+	ImGui::SliderInt("Number Of Hooks", &numberOfHooks, 0, 20);
+
+	ImGui::SliderFloat("Hook Distance", &hookDistance, 1.0f, 100.0f);
+
+	ImGui::SliderFloat("Cloth Stiffness", &clothStiffness, 0.0f, 1.0f);
+
+	
+		if (ImGui::Button("Reset Cloth"))
+
+		{
+
+			clothLength = 60.0f;
+
+			clothWidth = 60.0f;
+
+			numberOfHooks = 3;
+
+			hookDistance = 20.0f;
+
+			clothStiffness = 0.5f;
+
+		}
+
+
+
+	ImGui::Text("Object Interation:");
+
+	ImGui::Combo("Selected Object: ", &selectedCollision, collisionItems, IM_ARRAYSIZE(collisionItems));
+
+
+
+	ImGui::Text("Wind:");
+
+	ImGui::SliderFloat("Wind Direction (Degrees):", &windDirection, 0.0f, 360.0f);
+
+	ImGui::SliderFloat("Wind Strength:", &windStrength, 0.0f, 100.0f);
+
+		if (ImGui::Button("Reset Wind"))
+
+		{
+
+			windDirection = 0.0f;
+
+			windStrength = 10.0f;
+
+		}
+
+
+
+	// Closes the window
+
+	ImGui::End();
+
+
+
+	// Render the ImGUI elements
+
+	ImGui::Render();
+
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
 }
 
 //Render all objects
@@ -542,6 +670,9 @@ void Render()
 	//Clear the buffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
 	
 
 	//Render the skybox
@@ -580,16 +711,16 @@ void Render()
 	//Render the floor
 
 	//shape_seafloor->Render(*freecam->GetCamera(), program_blinnphongfog);
-	terrain_auckland->Render(*freecam->GetCamera(), program_blinnphong);
+	terrain_auckland->Render(*freecam->GetCamera(), program_blinnphongfog);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	shape_sea->Render(*freecam->GetCamera(), program_reflective);
+	shape_sea->Render(*freecam->GetCamera(), program_reflectivefog);
 	glDisable(GL_BLEND);
 
 	
 	
 
-	
+	RenderGUI();
 
 	
 

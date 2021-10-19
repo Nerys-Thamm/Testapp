@@ -451,34 +451,24 @@ Terrain3D::Terrain3D(std::string _name, int _size)
 	std::ifstream rawFile;
 	rawFile.open((Path + _name).c_str(), std::ios_base::binary);
 
-
-	
-
-	
-
 	// Create the vertex array to hold the correct number of elements based on the fidelity of the sphere
 	int VertexCount = _size * _size * VertexAttrib;
 	int TerrainPointCount = _size * _size;
 	float* Heights = new float[TerrainPointCount];
 
-
 	rawFile.read((char*)&data[0],(std::streamsize)data.size());
 	rawFile.close();
-
-
 
 	GLfloat* Vertices = new GLfloat[VertexCount];
 	int Element = 0;
 	int terrainPoint = 0;
-	// Each cycle moves down on the vertical (Y axis) to start the next ring
+	
 	for (int i = 0; i < _size; i++)
 	{
 		
-
-		// Creates a horizontal ring and adds each new vertex point to the vertex array
 		for (int j = 0; j < _size; j++)
 		{
-			// Calculate the new vertex position point with the new angles
+			
 			float x = (float)j - (_size/2);
 			float y = (float)data[terrainPoint++];
 			float z = (float)i - (_size / 2);

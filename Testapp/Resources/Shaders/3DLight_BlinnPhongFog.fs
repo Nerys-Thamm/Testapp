@@ -129,7 +129,7 @@ void main()
     //Add fog effect
     vec4 vFogColor = vec4(0.5f, 0.5f, 0.5f, 1.0f);
     float d = distance(mWorldPos.xyz, CameraPos);
-    float lerp = (d - 10.0f)/10.0f;
+    float lerp = (d - 10.0f)/120.0f;
     lerp = clamp(lerp, 0.0f, 1.0f);
 
 	FinalColor = mix(prefog, vFogColor, lerp);
