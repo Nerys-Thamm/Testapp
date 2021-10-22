@@ -92,6 +92,7 @@ Renderable3D* shape_3Dbutton_bck = nullptr;
 //SHAPES
 Renderable3D* shape_cube = nullptr;
 Renderable3D* shape_stencilcube = nullptr;
+Renderable3D* shape_rendercube = nullptr;
 
 Shape2D* ppQuad = nullptr;
 
@@ -294,8 +295,9 @@ void InitialSetup()
 	
 	shape_cube = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Chrome"));
 	shape_stencilcube = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Glossy"));
-	shape_3Dbutton_fwd = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Default"));;
-	shape_3Dbutton_bck = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Default"));;
+	shape_3Dbutton_fwd = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Default"));
+	shape_3Dbutton_bck = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Default"));
+	shape_rendercube = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Default"));
 
 	Terrain3D::LoadFromRaw("AucklandHarbor2.raw", 1081);
 
@@ -342,6 +344,7 @@ void InitialSetup()
 	shape_3Dbutton_bck->AddTexture(TextureLoader::LoadTexture("Grey.jpg"));
 	terrain_auckland->AddTexture(TextureLoader::LoadTexture("map.png"));
 	
+	
 
 	shape_seafloor->AddTexture(TextureLoader::LoadTexture("beachsand.jpg"));
 	shape_sea->AddTexture(TextureLoader::LoadTexture("WaterTransparent2.png"));
@@ -351,11 +354,10 @@ void InitialSetup()
 
 
 	//Set position of Cameras
-	camera->m_cameraPos = glm::vec3(0.0f, 7.0f, 20.0f);
-	camera->m_cameraTargetPos = shape_cube->Position();
+	camera->m_cameraPos = glm::vec3(0.0f, 0.0f, 2.0f);
+	camera->m_cameraTargetPos = shape_rendercube->Position();
 	camera->m_lookAtTarget = true;
-	orthocamera->m_cameraPos = glm::vec3(0.0f, 0.0f, 0.0f);
-
+	orthocamera->m_cameraPos = glm::vec3(0.0f, 0.0f, 2.0f);
 	freecam->GetCamera()->m_cameraPos.y = 5.0f;
 	
 
@@ -383,11 +385,12 @@ void InitialSetup()
 	//Post Processing
 	TextureLoader::CreateFrameBuffer(cfWINDOW_WIDTH(), cfWINDOW_HEIGHT(), renderTexture, frameBuffer);
 	ppQuad = new Quad2D();
-	ppQuad->AddTexture(renderTexture);
-	ppQuad->Position(glm::vec3{ 0.0f,0.0f,0.0f });
-	ppQuad->Scale(glm::vec3{ 1.0f,1.0f,0.0f });
+	ppQuad->AddTexture(TextureLoader::LoadTexture("Yellow.jpg"));
+	ppQuad->Position(glm::vec3{ 0.0f,0.0f,-1.0f });
+	ppQuad->Scale(glm::vec3{ 1000.0f,1000.0f,0.0f });
 	ppQuad->Rotation(glm::vec3{ 0.0f,0.0f,0.0f });
-	
+	shape_rendercube->AddTexture(renderTexture);
+	shape_rendercube->Scale(glm::vec3{ 100, 100, 0 });
 
 
 	IMGUI_CHECKVERSION();
@@ -444,7 +447,7 @@ void ResetScene()
 	shape_sea->AddTexture(TextureLoader::LoadTexture("WaterSpecular.png"));
 
 	//Set position of Cameras
-	camera->m_cameraPos = glm::vec3(0.0f, 7.0f, 20.0f);
+	camera->m_cameraPos = glm::vec3(0.0f, 0.0f, 0.0f);
 	camera->m_cameraTargetPos = shape_cube->Position();
 	camera->m_lookAtTarget = true;
 
@@ -576,7 +579,7 @@ void Update()
 	pressedLastFrame = (glfwGetKey(CObjectController::GetMainWindow(), GLFW_KEY_R) || glfwGetKey(CObjectController::GetMainWindow(), GLFW_KEY_T) || glfwGetKey(CObjectController::GetMainWindow(), GLFW_KEY_Y) || glfwGetKey(CObjectController::GetMainWindow(), GLFW_KEY_U));
 
 	//Make camera follow cube
-	camera->m_cameraTargetPos = shape_cube->Position();
+	camera->m_cameraTargetPos = ppQuad->Position();
 
 	shape_cube->Rotation(shape_cube->Rotation() + glm::vec3(0.0f, delta_time * 2, 0.0f));
 	shape_cube->Position(shape_cube->Position() + glm::vec3(0.0f, ((sin(current_time)/4) * delta_time), 0.0f));
@@ -741,8 +744,8 @@ void Render()
 	glDisable(GL_DEPTH_TEST);
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
-	ppQuad->Render(*camera, program_postprocess);
-
+	ppQuad->Render(*camera, program_texture);
+	//shape_rendercube->Render(*orthocamera, program_normals);
 	
 
 	RenderGUI();
