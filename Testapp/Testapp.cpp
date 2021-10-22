@@ -354,7 +354,7 @@ void InitialSetup()
 
 
 	//Set position of Cameras
-	camera->m_cameraPos = glm::vec3(0.0f, 0.0f, 2.0f);
+	camera->m_cameraPos = glm::vec3(0.0f, 0.0f, 10.0f);
 	camera->m_cameraTargetPos = shape_rendercube->Position();
 	camera->m_lookAtTarget = true;
 	orthocamera->m_cameraPos = glm::vec3(0.0f, 0.0f, 2.0f);
@@ -386,11 +386,11 @@ void InitialSetup()
 	TextureLoader::CreateFrameBuffer(cfWINDOW_WIDTH(), cfWINDOW_HEIGHT(), renderTexture, frameBuffer);
 	ppQuad = new Quad2D();
 	ppQuad->AddTexture(TextureLoader::LoadTexture("Yellow.jpg"));
-	ppQuad->Position(glm::vec3{ 0.0f,0.0f,-1.0f });
+	ppQuad->Position(glm::vec3{ 0.0f,0.0f,0.0f });
 	ppQuad->Scale(glm::vec3{ 1000.0f,1000.0f,0.0f });
 	ppQuad->Rotation(glm::vec3{ 0.0f,0.0f,0.0f });
 	shape_rendercube->AddTexture(renderTexture);
-	shape_rendercube->Scale(glm::vec3{ 100, 100, 0 });
+	shape_rendercube->Scale(glm::vec3{ 20, 10, 1 });
 
 
 	IMGUI_CHECKVERSION();
@@ -448,7 +448,7 @@ void ResetScene()
 
 	//Set position of Cameras
 	camera->m_cameraPos = glm::vec3(0.0f, 0.0f, 0.0f);
-	camera->m_cameraTargetPos = shape_cube->Position();
+	camera->m_cameraTargetPos = shape_rendercube->Position();
 	camera->m_lookAtTarget = true;
 
 	//Reset Audio
@@ -745,7 +745,7 @@ void Render()
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 	ppQuad->Render(*camera, program_texture);
-	//shape_rendercube->Render(*orthocamera, program_normals);
+	//shape_rendercube->Render(*camera, program_normals);
 	
 
 	RenderGUI();
