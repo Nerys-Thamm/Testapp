@@ -59,6 +59,7 @@ GLuint program_blinnphongfog;
 GLuint program_reflective;
 GLuint program_reflectivefog;
 GLuint program_reflectiverim;
+GLuint program_postprocess;
 
 //TIME
 float current_time;
@@ -92,8 +93,14 @@ Renderable3D* shape_3Dbutton_bck = nullptr;
 Renderable3D* shape_cube = nullptr;
 Renderable3D* shape_stencilcube = nullptr;
 
+Shape2D* ppQuad = nullptr;
+
 //Audio
 Audiosystem* audio_main = nullptr;
+
+//PostProcessing
+GLuint renderTexture;
+GLuint frameBuffer;
 
 //---------------------------------------------------------------
 //GUI variables
@@ -256,6 +263,9 @@ void InitialSetup()
 
 	program_reflectivefog = ShaderLoader::CreateProgram("Resources/Shaders/3D_Normals.vs",
 		"Resources/Shaders/3DLight_ReflectiveFog.fs");
+	
+	program_postprocess = ShaderLoader::CreateProgram("Resources/Shaders/NDC_Texture.vs",
+		"Resources/Shaders/Texture.fs");
 
 	//Cull poly not facing viewport
 	glCullFace(GL_BACK);
@@ -344,7 +354,7 @@ void InitialSetup()
 	camera->m_cameraPos = glm::vec3(0.0f, 7.0f, 20.0f);
 	camera->m_cameraTargetPos = shape_cube->Position();
 	camera->m_lookAtTarget = true;
-	orthocamera->m_cameraPos = glm::vec3(0.0f, 0.0f, 8.0f);
+	orthocamera->m_cameraPos = glm::vec3(0.0f, 0.0f, 0.0f);
 
 	freecam->GetCamera()->m_cameraPos.y = 5.0f;
 	
@@ -360,9 +370,6 @@ void InitialSetup()
 	audio_main->AddSound("Track_BeachAmbience.mp3", "Track_BeachAmbience");
 	
 	
-	
-
-
 	//Start playing background track
 	audio_main->PlaySound("Track_BeachAmbience", 0.5f, true);
 
@@ -372,6 +379,15 @@ void InitialSetup()
 	Lighting::DirectionalLights[0].Color = glm::vec3(1.0f, 0.8f, 0.8f);
 	Lighting::DirectionalLights[0].AmbientStrength = 0.15f;
 	Lighting::DirectionalLights[0].SpecularStrength = 1.0f;
+
+	//Post Processing
+	TextureLoader::CreateFrameBuffer(cfWINDOW_WIDTH(), cfWINDOW_HEIGHT(), renderTexture, frameBuffer);
+	ppQuad = new Quad2D();
+	ppQuad->AddTexture(renderTexture);
+	ppQuad->Position(glm::vec3{ 0.0f,0.0f,0.0f });
+	ppQuad->Scale(glm::vec3{ 1.0f,1.0f,0.0f });
+	ppQuad->Rotation(glm::vec3{ 0.0f,0.0f,0.0f });
+	
 
 
 	IMGUI_CHECKVERSION();
@@ -674,6 +690,10 @@ void Render()
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
 	
+	glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+	glEnable(GL_DEPTH_TEST);
+	glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	//Render the skybox
 	SceneManager::GetCurrentSkybox()->Render();
@@ -717,7 +737,12 @@ void Render()
 	shape_sea->Render(*freecam->GetCamera(), program_reflectivefog);
 	glDisable(GL_BLEND);
 
-	
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glDisable(GL_DEPTH_TEST);
+	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
+	ppQuad->Render(*camera, program_postprocess);
+
 	
 
 	RenderGUI();

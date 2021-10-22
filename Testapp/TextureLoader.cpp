@@ -108,3 +108,27 @@ GLuint TextureLoader::LoadCubeMap(std::string _filepaths[6])
 
 	return out;
 }
+
+void TextureLoader::CreateFrameBuffer(int _xResolution, int _yResolution, GLuint& out_renderTexture, GLuint& out_frameBuffer)
+{
+	
+	glGenTextures(1, &out_renderTexture);
+	glBindTexture(GL_TEXTURE_2D, out_renderTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _xResolution, _yResolution, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	
+	glGenFramebuffers(1, &out_frameBuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, out_frameBuffer);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, out_renderTexture, 0);
+
+	GLuint rbo;
+	glGenRenderbuffers(1, &rbo);
+	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, _xResolution, _yResolution);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) std::cout << "ERROR::FRAMEBUFFER::Framebuffer is not complete!" << std::endl;
+	
+}

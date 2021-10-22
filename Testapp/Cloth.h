@@ -10,6 +10,7 @@
 #include <cmath>
 #include <math.h>
 #include <iostream>
+#include <algorithm>
 #include <string>
 
 class ClothParticle
@@ -18,6 +19,7 @@ public: //Public Vars
 
 private: //Private Vars
     glm::vec3 m_pos;
+    glm::vec3 m_localPos;
     glm::vec3 m_lastPos;
     glm::vec3 m_accel;
     float m_particleMass;
@@ -32,6 +34,8 @@ public: //Public Methods
     //Getters and Setters
     glm::vec3& Pos() { return m_pos; }
     void Pos(glm::vec3 _newPos) { m_pos = _newPos; }
+    glm::vec3& LocalPos() { return m_localPos; }
+    void LocalPos(glm::vec3 _newPos) { m_localPos = _newPos; }
     glm::vec3& Accel() { return m_accel; }
     void Accel(glm::vec3 _newAccel) { m_accel = _newAccel; }
     void Dynamic(bool _isDynamic) { m_dynamic = _isDynamic; }
