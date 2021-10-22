@@ -92,7 +92,7 @@ Renderable3D* shape_3Dbutton_bck = nullptr;
 //SHAPES
 Renderable3D* shape_cube = nullptr;
 Renderable3D* shape_stencilcube = nullptr;
-Renderable3D* shape_rendercube = nullptr;
+Renderable3D* shape_renderquad = nullptr;
 
 Shape2D* ppQuad = nullptr;
 
@@ -297,7 +297,7 @@ void InitialSetup()
 	shape_stencilcube = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Glossy"));
 	shape_3Dbutton_fwd = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Default"));
 	shape_3Dbutton_bck = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Default"));
-	shape_rendercube = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Default"));
+	shape_renderquad = new Renderable3D(Quad3D::GetMesh(), Lighting::GetMaterial("Default"));
 
 	Terrain3D::LoadFromRaw("AucklandHarbor2.raw", 1081);
 
@@ -354,10 +354,10 @@ void InitialSetup()
 
 
 	//Set position of Cameras
-	camera->m_cameraPos = glm::vec3(0.0f, 0.0f, 10.0f);
-	camera->m_cameraTargetPos = shape_rendercube->Position();
-	camera->m_lookAtTarget = true;
-	orthocamera->m_cameraPos = glm::vec3(0.0f, 0.0f, 2.0f);
+	camera->m_cameraPos = glm::vec3(0.0f, 0.0f, 1.0f);
+	camera->m_cameraTargetPos = shape_renderquad->Position();
+	//camera->m_lookAtTarget = true;
+	orthocamera->m_cameraPos = glm::vec3(0.0f, 0.0f, 1.0f);
 	freecam->GetCamera()->m_cameraPos.y = 5.0f;
 	
 
@@ -386,11 +386,12 @@ void InitialSetup()
 	TextureLoader::CreateFrameBuffer(cfWINDOW_WIDTH(), cfWINDOW_HEIGHT(), renderTexture, frameBuffer);
 	ppQuad = new Quad2D();
 	ppQuad->AddTexture(TextureLoader::LoadTexture("Yellow.jpg"));
-	ppQuad->Position(glm::vec3{ 0.0f,0.0f,0.0f });
-	ppQuad->Scale(glm::vec3{ 1000.0f,1000.0f,0.0f });
+	ppQuad->Position(glm::vec3{ 300.0f,300.0f,4.0f });
+	ppQuad->Scale(glm::vec3{ 200.0f,200.0f,1.0f });
 	ppQuad->Rotation(glm::vec3{ 0.0f,0.0f,0.0f });
-	shape_rendercube->AddTexture(renderTexture);
-	shape_rendercube->Scale(glm::vec3{ 20, 10, 1 });
+	shape_renderquad->AddTexture(renderTexture);
+	shape_renderquad->Scale(glm::vec3{ 2.0f, 1.0f, 1.0f });
+	//shape_renderquad->Position(glm::vec3{ 0.0f, 0.0f, -1.0f });
 
 
 	IMGUI_CHECKVERSION();
@@ -448,7 +449,7 @@ void ResetScene()
 
 	//Set position of Cameras
 	camera->m_cameraPos = glm::vec3(0.0f, 0.0f, 0.0f);
-	camera->m_cameraTargetPos = shape_rendercube->Position();
+	camera->m_cameraTargetPos = shape_renderquad->Position();
 	camera->m_lookAtTarget = true;
 
 	//Reset Audio
@@ -744,8 +745,8 @@ void Render()
 	glDisable(GL_DEPTH_TEST);
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
-	ppQuad->Render(*camera, program_texture);
-	//shape_rendercube->Render(*camera, program_normals);
+	//ppQuad->Render(*freecam->GetCamera(), program_texture);
+	shape_renderquad->Render(*camera, program_normals);
 	
 
 	RenderGUI();
