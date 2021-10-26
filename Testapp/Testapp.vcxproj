@@ -153,6 +153,7 @@
     <ClCompile Include="Cloth.cpp" />
     <ClCompile Include="Collider2D.cpp" />
     <ClCompile Include="Config.cpp" />
+    <ClCompile Include="Entity.cpp" />
     <ClCompile Include="FreeCam.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
@@ -162,6 +163,7 @@
     <ClCompile Include="imgui\imgui_tables.cpp" />
     <ClCompile Include="imgui\imgui_widgets.cpp" />
     <ClCompile Include="Lighting.cpp" />
+    <ClCompile Include="MeshRenderer.cpp" />
     <ClCompile Include="PointLightObj.cpp" />
     <ClCompile Include="Renderable3D.cpp" />
     <ClCompile Include="Skybox.cpp" />
@@ -182,6 +184,7 @@
     <ClInclude Include="Cloth.h" />
     <ClInclude Include="Collider2D.h" />
     <ClInclude Include="Config.h" />
+    <ClInclude Include="Entity.h" />
     <ClInclude Include="FreeCam.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
@@ -193,6 +196,7 @@
     <ClInclude Include="imgui\imstb_textedit.h" />
     <ClInclude Include="imgui\imstb_truetype.h" />
     <ClInclude Include="Lighting.h" />
+    <ClInclude Include="MeshRenderer.h" />
     <ClInclude Include="PointLightObj.h" />
     <ClInclude Include="Renderable3D.h" />
     <ClInclude Include="Skybox.h" />
