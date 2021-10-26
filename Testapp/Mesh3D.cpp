@@ -429,9 +429,9 @@ Mesh3D* Quad3D::GetMesh()
 
 std::map<std::string, Terrain3D*> Terrain3D::m_terrains;
 
-void Terrain3D::LoadFromRaw(std::string _name, int _size)
+void Terrain3D::LoadFromRaw(std::string _name, int _size, float _xScale, float _yScale)
 {
-	Terrain3D* newTerr = new Terrain3D(_name, _size);
+	Terrain3D* newTerr = new Terrain3D(_name, _size, _xScale, _yScale);
 	Terrain3D::m_terrains.emplace(_name, newTerr);
 }
 
@@ -440,8 +440,51 @@ Mesh3D* Terrain3D::GetTerrainMesh(std::string _name)
 	return Terrain3D::m_terrains.find(_name)->second;
 }
 
-Terrain3D::Terrain3D(std::string _name, int _size)
+Terrain3D* Terrain3D::GetTerrain(std::string _name)
 {
+	return Terrain3D::m_terrains.find(_name)->second;
+}
+
+float Terrain3D::GetHeightAt(int _x, int _y)
+{
+	if (_x < 0 || _y < 0 || _x > (m_size-1) || _y > (m_size-1))
+	{
+		return -5.0f;
+	}
+	else
+	{
+		return m_heightMap[_y * m_size + _x];
+	}
+}
+
+float Terrain3D::GetHeightFromWorldPos(glm::vec3 _terrainPos, glm::vec3 _terrainRotation, glm::vec3 _queryPos)
+{
+	glm::vec3 localQueryPos = (_queryPos - (_terrainPos - glm::vec3(((m_size*m_xScale)/2.0f), 0.0f, ((m_size * m_xScale) /2.0f))));
+	localQueryPos = localQueryPos * (1.0f / m_xScale);
+	glm::quat rotateToLocal = glm::quat(-_terrainRotation);
+	localQueryPos = rotateToLocal * localQueryPos;
+
+	float xCeil = std::ceilf(localQueryPos.x);
+	float xFloor = std::floorf(localQueryPos.x);
+	float zCeil = std::ceilf(localQueryPos.z);
+	float zFloor = std::floorf(localQueryPos.z);
+
+	float xLerpAmount = localQueryPos.x - xFloor;
+	float zLerpAmount = localQueryPos.z - zFloor;
+
+	float a = GetHeightAt(xFloor, zFloor), b = GetHeightAt(xFloor, zCeil), c = GetHeightAt(xCeil, zCeil), d = GetHeightAt(xCeil, zFloor);
+
+	float ab = (a * (1.0f - zLerpAmount)) + (b * zLerpAmount);
+	float dc = (d * (1.0f - zLerpAmount)) + (c * zLerpAmount);
+	return ((ab * (1.0f - xLerpAmount)) + (dc * xLerpAmount));
+
+}
+
+Terrain3D::Terrain3D(std::string _name, int _size, float _xScale, float _yScale)
+{
+	m_xScale = _xScale;
+	m_yScale = _yScale;
+	m_size = _size;
 	int VertexAttrib = 8;	// Float components are needed for each vertex point
 	int IndexPerQuad = 6;	// Indices needed to create a quad
 	std::string Path = "Resources/Terrain/";
@@ -455,6 +498,7 @@ Terrain3D::Terrain3D(std::string _name, int _size)
 	int VertexCount = _size * _size * VertexAttrib;
 	int TerrainPointCount = _size * _size;
 	float* Heights = new float[TerrainPointCount];
+	m_heightMap = new float[TerrainPointCount];
 
 	rawFile.read((char*)&data[0],(std::streamsize)data.size());
 	rawFile.close();
@@ -469,9 +513,11 @@ Terrain3D::Terrain3D(std::string _name, int _size)
 		for (int j = 0; j < _size; j++)
 		{
 			
-			float x = (float)j - (_size/2);
-			float y = (float)data[terrainPoint++];
-			float z = (float)i - (_size / 2);
+			float x = ((float)j - (_size/2))*m_xScale;
+			float y = m_heightMap[terrainPoint] = ((float)data[terrainPoint++]*m_yScale);
+			float z = ((float)i - (_size / 2))*m_xScale;
+
+
 
 			// Set the position of the current vertex point
 			Vertices[Element++] = x;

@@ -103,6 +103,8 @@ Audiosystem* audio_main = nullptr;
 GLuint renderTexture;
 GLuint frameBuffer;
 
+std::vector<Renderable3D> testcubes;
+
 //---------------------------------------------------------------
 //GUI variables
 bool bWireFrameMode = false;
@@ -299,7 +301,7 @@ void InitialSetup()
 	shape_3Dbutton_bck = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Default"));
 	shape_renderquad = new Renderable3D(Quad3D::GetMesh(), Lighting::GetMaterial("Default"));
 
-	Terrain3D::LoadFromRaw("AucklandHarbor2.raw", 1081);
+	Terrain3D::LoadFromRaw("AucklandHarbor2.raw", 1081, 0.1f, 0.025f);
 
 	terrain_auckland = new Renderable3D(Terrain3D::GetTerrainMesh("AucklandHarbor2.raw"), Lighting::GetMaterial("Default"));
 	
@@ -327,10 +329,19 @@ void InitialSetup()
 
 	
 	terrain_auckland->Position(glm::vec3(0.0f,0.0f, 0.0f));
-	terrain_auckland->Scale(glm::vec3(0.1f, 0.025f, 0.1f));
-	terrain_auckland->Rotation(glm::vec3(0.0f, 180.0f, 0.0f));
+	terrain_auckland->Scale(glm::vec3(1.0f, 1.0f, 1.0f));
+	terrain_auckland->Rotation(glm::vec3(0.0f, 0.0f, 0.0f));
 	
-	
+	/*for (int i = 0; i < 100; i++)
+	{
+		for (int j = 0; j < 100; j++)
+		{
+			Renderable3D cube(Cube3D::GetMesh(), Lighting::GetMaterial("Default"));
+			float groundHeight = Terrain3D::GetTerrain("AucklandHarbor2.raw")->GetHeightFromWorldPos(terrain_auckland->Position(), terrain_auckland->Rotation(), glm::vec3(i, 0.0f, j));
+			cube.Position(glm::vec3(i, groundHeight, j));
+			testcubes.push_back(cube);
+		}
+	}*/
 
 	
 
@@ -591,6 +602,9 @@ void Update()
 	shape_stencilcube->Scale(shape_cube->Scale() + glm::vec3(0.2f, 0.2f, 0.2f));
 	shape_stencilcube->Rotation(shape_cube->Rotation());
 
+	float groundHeight = Terrain3D::GetTerrain("AucklandHarbor2.raw")->GetHeightFromWorldPos(terrain_auckland->Position(), terrain_auckland->Rotation(), freecam->GetCamera()->m_cameraPos);
+	freecam->GetCamera()->m_cameraPos.y = groundHeight + 1.0f;
+
 	Lighting::DirectionalLights[0].Direction = glm::vec3(sin(timeOfDay), cos(timeOfDay), 0.0f);
 	Lighting::DirectionalLights[0].Color = glm::vec3(1.0f, 0.5f + (((sin(timeOfDay)+1.0f)/2.0f)*0.5f), 0.5f + (((sin(timeOfDay) + 1.0f) / 2.0f) * 0.5f));
 	
@@ -604,6 +618,8 @@ void RenderGUI()
 	// ImGUI window creation
 
 	ImGui::Begin("Physics Framework");
+
+	ImGui::Text(std::to_string(freecam->GetCamera()->m_cameraPos.y).c_str());
 
 	ImGui::Text("General Controls:");
 
@@ -736,6 +752,7 @@ void Render()
 
 	//shape_seafloor->Render(*freecam->GetCamera(), program_blinnphongfog);
 	terrain_auckland->Render(*freecam->GetCamera(), program_blinnphongfog);
+	//std::for_each(testcubes.begin(), testcubes.end(), [](Renderable3D r) {r.Render(*freecam->GetCamera(), program_blinnphong); });
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	shape_sea->Render(*freecam->GetCamera(), program_reflectivefog);
