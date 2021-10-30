@@ -28,13 +28,13 @@ public:
 	GLFWwindow* GetWindow();
 	void SetMainCamera(Camera* _camera);
 	Camera* GetMainCamera();
-
+	static bool m_isWireframe;
 private:
 	GLFWwindow* m_window = nullptr;
 	Camera* m_mainCamera;
 	virtual void Update(float _fDeltaTime);
 	static Skybox* m_skybox;
-	static bool m_isWireframe;
+	
 	static bool m_isReadingTextInput;
 	static bool m_isCursorVisible;
 	static std::string m_textinputbuffer;

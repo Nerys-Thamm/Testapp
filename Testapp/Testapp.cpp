@@ -37,6 +37,8 @@
 #include "Entity.h"
 #include "MeshRenderer.h"
 #include "TestBehaviour.h"
+#include "Cloth.h"
+#include "ClothRenderer.h"
 
 
 //Pointer to window
@@ -108,12 +110,14 @@ GLuint frameBuffer;
 
 std::vector<Renderable3D> testcubes;
 
-CEntity* entityTest = nullptr;
-CEntity* childEntityTest = nullptr;
-CEntity* otherEntityTest = nullptr;
-CEntity* rootBone = nullptr;
-CEntity* secondBone = nullptr;
-CEntity* thirdBone = nullptr;
+//CEntity* entityTest = nullptr;
+//CEntity* childEntityTest = nullptr;
+//CEntity* otherEntityTest = nullptr;
+//CEntity* rootBone = nullptr;
+//CEntity* secondBone = nullptr;
+//CEntity* thirdBone = nullptr;
+
+CEntity* clothEntity = nullptr;
 
 //---------------------------------------------------------------
 //GUI variables
@@ -309,7 +313,7 @@ void InitialSetup()
 
 
 	//Create objects
-	
+	/*
 	rootBone = new CEntity();
 	secondBone = new CEntity(rootBone);
 	thirdBone = new CEntity(secondBone);
@@ -340,6 +344,15 @@ void InitialSetup()
 	rootBone->AddBehaviour<TestBehaviour>();
 	secondBone->AddBehaviour<TestBehaviour>();
 	thirdBone->AddBehaviour<TestBehaviour>();
+	*/
+
+	clothEntity = new CEntity();
+	std::shared_ptr<ClothRenderer> clothrenderer = clothEntity->AddBehaviour<ClothRenderer>();
+	clothrenderer->SetCloth(new Cloth(glm::vec2(5.0f, 5.0f), glm::ivec2(4, 4)));
+	clothrenderer->SetMaterial(Lighting::GetMaterial("EntityTest"));
+	clothrenderer->SetShader(program_blinnphong);
+	clothrenderer->SetTexture(TextureLoader::LoadTexture("Yellow.jpg"));
+	clothEntity->m_transform.position = glm::vec3(6.0f, 10.0f, 8.0f);
 
 	shape_cube = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Chrome"));
 	shape_stencilcube = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Glossy"));
@@ -360,6 +373,7 @@ void InitialSetup()
 	shape_3Dbutton_bck->Position(glm::vec3(4.0f, 5.0f, 2.0f));
 	shape_3Dbutton_bck->Scale(glm::vec3(2.0f, 2.0f, 2.0f));
 	
+	/*
 	entityTest->m_transform.position = glm::vec3(0.0f, 0.0f, 0.0f);
 	entityTest->m_transform.scale = glm::vec3(5.0f, 2.0f, 2.0f);
 	childEntityTest->m_transform.scale = glm::vec3(5.0f, 1.5f, 1.5f);
@@ -369,6 +383,7 @@ void InitialSetup()
 	secondBone->m_transform.position = glm::vec3(2.5f, 0.0f, 0.0f);
 	thirdBone->m_transform.position = glm::vec3(5.0f, 0.0f, 0.0f);
 	rootBone->m_transform.position = glm::vec3(6.0f, 4.0f, 8.0f);
+	*/
 
 	shape_seafloor = new Renderable3D(Quad3D::GetMesh(), Lighting::GetMaterial("Default"));
 	shape_sea = new Renderable3D(Quad3D::GetMesh(), Lighting::GetMaterial("Glossy"));
@@ -586,8 +601,8 @@ void Update()
 	//Update all GameObjects
 	CObjectController::UpdateObjects();
 	CEntityManager::UpdateEntities();
-
-
+	clothEntity->GetBehaviour<ClothRenderer>()->GetCloth()->AddForce(glm::vec3(0.0f, -0.2f, 0.0f));
+	clothEntity->GetBehaviour<ClothRenderer>()->GetCloth()->AddWind(glm::vec3(0.2f, 0.0f, 0.2f));
 	//Poll events for GLFW input
 	glfwPollEvents();
 	MousePassive();
@@ -659,6 +674,8 @@ void Update()
 
 	float groundHeight = Terrain3D::GetTerrain("AucklandHarbor2.raw")->GetHeightFromWorldPos(terrain_auckland->Position(), terrain_auckland->Rotation(), freecam->GetCamera()->m_cameraPos);
 	freecam->GetCamera()->m_cameraPos.y = groundHeight + 1.0f;
+
+	
 
 	Lighting::DirectionalLights[0].Direction = glm::vec3(sin(timeOfDay), cos(timeOfDay), 0.0f);
 	Lighting::DirectionalLights[0].Color = glm::vec3(1.0f, 0.5f + (((sin(timeOfDay)+1.0f)/2.0f)*0.5f), 0.5f + (((sin(timeOfDay) + 1.0f) / 2.0f) * 0.5f));
@@ -804,9 +821,12 @@ void Render()
 	shape_3Dbutton_bck->Render(*freecam->GetCamera(), program_blinnphong);
 	shape_3Dbutton_fwd->Render(*freecam->GetCamera(), program_blinnphong);
 
+	/*
 	entityTest->GetBehaviour<MeshRenderer>()->Render(freecam->GetCamera());
 	childEntityTest->GetBehaviour<MeshRenderer>()->Render(freecam->GetCamera());
 	otherEntityTest->GetBehaviour<MeshRenderer>()->Render(freecam->GetCamera());
+	*/
+	clothEntity->GetBehaviour<ClothRenderer>()->Render(freecam->GetCamera());
 	//Render the floor
 
 	//shape_seafloor->Render(*freecam->GetCamera(), program_blinnphongfog);
@@ -822,8 +842,16 @@ void Render()
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 	//ppQuad->Render(*freecam->GetCamera(), program_texture);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	shape_renderquad->Render(*camera, program_normals);
-	
+	if (SceneManager::m_isWireframe)
+	{
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	}
+	else
+	{
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	}
 
 	RenderGUI();
 

@@ -61,17 +61,20 @@ private: //Private Methods
 };
 
 
-class Cloth :
-    public CGameObject
+class Cloth 
 {
 public: //Public Vars
-private: //Private Vars
+    int GetSize() { return m_particles.size(); }
     glm::ivec2 m_particleDensity;
+    glm::vec3 GetParticlePositionAtIndex(int _index) { return m_particles[_index].LocalPos(); }
+private: //Private Vars
+    
     std::vector<ClothParticle> m_particles;
     std::vector<ClothParticleConstraint> m_constraints;
 public: //Public Methods
     Cloth(glm::vec2 _scale, glm::ivec2 _density);
     void Update(float _fDeltaTime);
+    void FixedUpdate();
     void AddForce(glm::vec3 _force);
     void AddWind(glm::vec3 _force);
 private: //Private Methods

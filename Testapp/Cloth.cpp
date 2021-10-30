@@ -9,7 +9,7 @@ void ClothParticle::Update(float _fDeltaTime)
 {
     if (!m_dynamic) return;
     glm::vec3 currPos = m_pos;
-    m_pos = m_pos + (m_pos - m_lastPos) * (1.0f - 0.5f) + m_accel * _fDeltaTime;
+    m_pos = m_pos + (m_pos - m_lastPos) * (1.0f - 0.5f) + (m_accel * _fDeltaTime);
     m_lastPos = currPos;
     Accel({ 0.0f,0.0f,0.0f });
 }
@@ -65,7 +65,12 @@ void Cloth::Update(float _fDeltaTime)
         std::for_each(m_constraints.begin(), m_constraints.end(), [&](ClothParticleConstraint _c) { _c.Constrain(); });
     }
     //Update the Particles
-    std::for_each(m_particles.begin(), m_particles.end(), [&](ClothParticle _p) { _p.Update(_fDeltaTime); _p.LocalPos(_p.Pos() - m_particles[0].Pos()); });
+    std::for_each(m_particles.begin(), m_particles.end(), [&](ClothParticle& _p) { _p.Update(_fDeltaTime); _p.LocalPos(_p.Pos() - m_particles[0].Pos()); });
+}
+
+void Cloth::FixedUpdate()
+{
+   
 }
 
 void Cloth::AddForce(glm::vec3 _force)
@@ -75,6 +80,14 @@ void Cloth::AddForce(glm::vec3 _force)
 
 void Cloth::AddWind(glm::vec3 _force)
 {
+    for (int x = 0; x < m_particleDensity.x - 1; x++)
+    {
+        for (int y = 0; y < m_particleDensity.y - 1; y++)
+        {
+            ApplyWindForce(GetParticleAtIndex(x + 1, y), GetParticleAtIndex(x, y), GetParticleAtIndex(x, y + 1), _force);
+            ApplyWindForce(GetParticleAtIndex(x + 1, y + 1), GetParticleAtIndex(x + 1, y), GetParticleAtIndex(x, y + 1), _force);
+        }
+    }
 }
 
 glm::vec3 Cloth::GetTriNormal(ClothParticle* _a, ClothParticle* _b, ClothParticle* _c)
@@ -84,4 +97,11 @@ glm::vec3 Cloth::GetTriNormal(ClothParticle* _a, ClothParticle* _b, ClothParticl
 
 void Cloth::ApplyWindForce(ClothParticle* _a, ClothParticle* _b, ClothParticle* _c, glm::vec3 _force)
 {
+    glm::vec3 norm = GetTriNormal(_a, _b, _c);
+    glm::vec3 d = glm::normalize(norm);
+    glm::vec3 force = norm * (glm::dot(d, _force));
+    _a->ApplyForce(force);
+    _b->ApplyForce(force);
+    _c->ApplyForce(force);
+
 }

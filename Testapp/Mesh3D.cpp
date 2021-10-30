@@ -609,3 +609,59 @@ Terrain3D::Terrain3D(std::string _name, int _size, float _xScale, float _yScale)
 
 	m_verticesCount = IndexCount;
 }
+
+Tri3D::Tri3D()
+{
+	m_verticesCount = sizeof(m_indices) / sizeof(int32_t);
+
+
+
+	//Generate and bind vertex array to VAO
+	glGenVertexArrays(1, &m_VAO);
+	glBindVertexArray(m_VAO);
+
+	//Generate and bind EBO
+	glGenBuffers(1, &m_EBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(m_indices), m_indices, GL_DYNAMIC_DRAW);
+
+	//Generate and bind VBO
+	glGenBuffers(1, &m_VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(m_vertices), m_vertices, GL_DYNAMIC_DRAW);
+
+	//Set attribute pointers
+	glVertexAttribPointer(0, 3, GL_FLOAT, false, 8 * sizeof(GLfloat), (GLvoid*)0);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 2, GL_FLOAT, false, 8 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 3, GL_FLOAT, false, 8 * sizeof(GLfloat), (GLvoid*)(5 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(2);
+}
+
+void Tri3D::UpdateVertices(glm::vec3 _first, glm::vec3 _second, glm::vec3 _third)
+{
+	
+	//m_vertices = {
+	//	// Index   // Position                     // Texture Coords    //Normals
+	//	/* 1 */   _first.x, _first.y, _first.z,     0.0f, 0.0f,          0.0f, 0.0f, 1.0f,            // Top - Left
+	//	/* 2 */   _second.x, _second.y, _second.z,  0.0f, 1.0f,          0.0f, 0.0f, 1.0f,            // Bot - Left
+	//	/* 3 */   _third.x, _third.y, _third.z,     1.0f, 0.0f,          0.0f, 0.0f, 1.0f,            // Bot - Right
+
+	//};
+	
+	m_vertices[0] = _first.x;
+	m_vertices[1] = _first.y;
+	m_vertices[2] = _first.z;
+
+	m_vertices[8] = _second.x;
+	m_vertices[9] = _second.y;
+	m_vertices[10] = _second.z;
+
+	m_vertices[16] = _third.x;
+	m_vertices[17] = _third.y;
+	m_vertices[18] = _third.z;
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+	glInvalidateBufferData(GL_ARRAY_BUFFER);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(m_vertices), m_vertices, GL_DYNAMIC_DRAW);
+}
