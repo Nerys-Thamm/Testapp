@@ -494,7 +494,7 @@ Terrain3D::Terrain3D(std::string _name, int _size, float _xScale, float _yScale)
 	std::ifstream rawFile;
 	rawFile.open((Path + _name).c_str(), std::ios_base::binary);
 
-	// Create the vertex array to hold the correct number of elements based on the fidelity of the sphere
+	// Create the vertex array to hold the correct number of elements
 	int VertexCount = _size * _size * VertexAttrib;
 	int TerrainPointCount = _size * _size;
 	float* Heights = new float[TerrainPointCount];

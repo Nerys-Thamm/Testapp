@@ -29,6 +29,9 @@ struct Material
 {
 	float Smoothness;
 	float Reflectivity;
+	GLuint AlbedoMap;
+	GLuint ReflectionMap;
+	GLuint SpecularMap;
 };
 
 //Struct defining properties of a Point light with Attenuation

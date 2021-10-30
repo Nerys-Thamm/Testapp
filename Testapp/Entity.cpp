@@ -42,7 +42,7 @@ CEntity::CEntity() : m_pNext(nullptr), m_pPrev(nullptr), m_isEnabled(true)
 	CEntityManager::AddUpdater(this);
 }
 
-CEntity::CEntity(CEntity* _parent) : m_parent(_parent)
+CEntity::CEntity(CEntity* _parent) : m_parent(_parent), m_pNext(nullptr), m_pPrev(nullptr)
 {
 	m_parent->m_children.push_back(std::shared_ptr<CEntity>(this));
 }
@@ -55,7 +55,7 @@ CEntity::~CEntity()
 	}
 	else
 	{
-		//m_parent->m_children.erase(std::remove_if(m_parent->m_children.begin(), m_parent->m_children.end(), [](CE))
+		m_parent->m_children.erase(std::remove_if(m_parent->m_children.begin(), m_parent->m_children.end(), [&](std::shared_ptr<CEntity> e) {return e == std::shared_ptr<CEntity>(this); }));
 	}
 }
 
@@ -100,7 +100,7 @@ void CEntity::LateUpdate(float _fDeltaTime)
 	}
 }
 
-IBehaviour::IBehaviour(CEntity& _entity) : m_entity(_entity)
+IBehaviour::IBehaviour(CEntity* _entity) : m_entity(_entity)
 {
 	
 }

@@ -32,9 +32,9 @@ class IBehaviour
 	friend class CEntity;
 public:
 	bool m_isEnabled = true;
-	const CEntity& m_entity;
+	const CEntity* m_entity;
 protected:
-	IBehaviour(CEntity& _entity);
+	IBehaviour(CEntity* _entity);
 	virtual ~IBehaviour();
 private:
 	void OnAwake();
@@ -117,14 +117,13 @@ public:
 	{
 		for (int i = 0; i < m_behaviours.size(); i++)
 		{
-			if (dynamic_cast<B*>(m_behaviours[i]))
+			if (static_cast<B*>(m_behaviours[i].get()))
 			{
-				return dynamic_cast<B*>(m_behaviours[i]);
+				return static_cast<B*>(m_behaviours[i].get());
 			}
 		}
 		return nullptr;
 	}
-
 	template <typename B, typename std::enable_if<std::is_base_of<IBehaviour, B>::value>::type* = nullptr>
 	std::shared_ptr<B> GetBehaviourInChildren(int _maxDepth = 1)
 	{
@@ -143,13 +142,14 @@ public:
 	{
 		if (!GetBehaviour<B>())
 		{
-			std::shared_ptr<B> newBehaviour(new B(*this));
+			std::shared_ptr<B> newBehaviour(new B(this));
 			m_behaviours.push_back(newBehaviour);
 			return newBehaviour;
 		}
 		else
 		{
-			std::cout << "ERROR! Entity already has Behaviour of Type: " << typeid(B) << std::endl;
+			std::cout << "ERROR! Entity already has Behaviour of Type: " << typeid(B).name() << std::endl;
+			return nullptr;
 		}
 	}
 
@@ -178,6 +178,8 @@ public:
 	/// <returns></returns>
 	// ********************************************************************************
 	~CEntity();
+
+	Transform m_globalTransform;
 	
 protected:
 
@@ -205,7 +207,7 @@ private:
 	// ********************************************************************************
 	void LateUpdate(float _fDeltaTime);
 
-	Transform m_globalTransform;
+	
 
 	/// <summary>Pointer to the next CGameObject in the linked list of updatable objects</summary>
 	CEntity* m_pNext;

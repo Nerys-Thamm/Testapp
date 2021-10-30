@@ -26,9 +26,12 @@ public:
 	static void SetCurrentSkybox(Skybox* _skybox);
 	static Skybox* GetCurrentSkybox();
 	GLFWwindow* GetWindow();
+	static void SetMainCamera(Camera* _camera);
+	static Camera* GetMainCamera();
 
 private:
 	GLFWwindow* m_window = nullptr;
+	static Camera* m_mainCamera;
 	virtual void Update(float _fDeltaTime);
 	static Skybox* m_skybox;
 	static bool m_isWireframe;

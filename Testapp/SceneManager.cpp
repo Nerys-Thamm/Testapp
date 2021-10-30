@@ -65,9 +65,20 @@ GLFWwindow* SceneManager::GetWindow()
 	return m_window;
 }
 
+void SceneManager::SetMainCamera(Camera* _camera)
+{
+	m_mainCamera = _camera;
+}
+
+Camera* SceneManager::GetMainCamera()
+{
+	return m_mainCamera;
+}
+
 bool SceneManager::m_isWireframe = false;
 bool SceneManager::m_isCursorVisible = true;
 bool SceneManager::m_isReadingTextInput = false;
+Camera* SceneManager::m_mainCamera = nullptr;
 std::string SceneManager::m_textinputbuffer = "";
 
 // ********************************************************************************
