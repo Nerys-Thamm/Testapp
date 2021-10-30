@@ -32,15 +32,15 @@ class IBehaviour
 	friend class CEntity;
 public:
 	bool m_isEnabled = true;
-	const CEntity* m_entity;
+	CEntity& m_entity;
 protected:
-	IBehaviour(CEntity* _entity);
+	IBehaviour(CEntity& _entity);
 	virtual ~IBehaviour();
 private:
-	void OnAwake();
-	void OnUpdate(float _fDeltaTime);
-	void OnFixedUpdate();
-	void OnLateUpdate(float _fDeltaTime);
+	virtual void OnAwake();
+	virtual void OnUpdate(float _fDeltaTime);
+	virtual void OnFixedUpdate();
+	virtual void OnLateUpdate(float _fDeltaTime);
 };
 
 class CEntity
@@ -142,7 +142,7 @@ public:
 	{
 		if (!GetBehaviour<B>())
 		{
-			std::shared_ptr<B> newBehaviour(new B(this));
+			std::shared_ptr<B> newBehaviour(new B(*this));
 			m_behaviours.push_back(newBehaviour);
 			return newBehaviour;
 		}

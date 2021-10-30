@@ -167,6 +167,7 @@
     <ClCompile Include="PointLightObj.cpp" />
     <ClCompile Include="Renderable3D.cpp" />
     <ClCompile Include="Skybox.cpp" />
+    <ClCompile Include="TestBehaviour.cpp" />
     <ClCompile Include="TextureLoader.cpp" />
     <ClCompile Include="UIButton.cpp" />
     <ClCompile Include="GameObject.cpp" />
@@ -200,6 +201,7 @@
     <ClInclude Include="PointLightObj.h" />
     <ClInclude Include="Renderable3D.h" />
     <ClInclude Include="Skybox.h" />
+    <ClInclude Include="TestBehaviour.h" />
     <ClInclude Include="TextureLoader.h" />
     <ClInclude Include="UIButton.h" />
     <ClInclude Include="GameObject.h" />

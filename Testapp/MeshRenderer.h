@@ -11,7 +11,7 @@ class MeshRenderer :
     public IBehaviour
 {
 public :
-    MeshRenderer(CEntity* _parent);
+    MeshRenderer(CEntity& _parent);
     void Render(Camera* _camera);
     void SetMesh(Mesh3D* _mesh) { m_mesh = _mesh; }
     void SetMaterial(Material* _material) { m_material = _material; }

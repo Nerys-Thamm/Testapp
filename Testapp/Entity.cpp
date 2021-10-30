@@ -100,7 +100,7 @@ void CEntity::LateUpdate(float _fDeltaTime)
 	}
 }
 
-IBehaviour::IBehaviour(CEntity* _entity) : m_entity(_entity)
+IBehaviour::IBehaviour(CEntity& _entity) : m_entity(_entity)
 {
 	
 }

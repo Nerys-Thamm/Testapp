@@ -1,6 +1,6 @@
 #include "MeshRenderer.h"
 
-MeshRenderer::MeshRenderer(CEntity* _parent) : IBehaviour(_parent)
+MeshRenderer::MeshRenderer(CEntity& _parent) : IBehaviour(_parent)
 {
 	m_material = nullptr;
 	m_shader = NULL;
@@ -15,9 +15,9 @@ void MeshRenderer::Render(Camera* _camera)
 		return;
 	}
 	//Calculate model matrix
-	glm::mat4 translationMat = glm::translate(glm::mat4(), m_entity->m_globalTransform.position);
-	glm::mat4 rotationMat = glm::rotate(glm::mat4(), glm::radians(m_entity->m_globalTransform.rotation.x), glm::vec3(1.0f, 0.0f, 0.0f)) * glm::rotate(glm::mat4(), glm::radians(m_entity->m_globalTransform.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f)) * glm::rotate(glm::mat4(), glm::radians(m_entity->m_globalTransform.rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-	glm::mat4 scaleMat = glm::scale(glm::mat4(), m_entity->m_globalTransform.scale);
+	glm::mat4 translationMat = glm::translate(glm::mat4(), m_entity.m_globalTransform.position);
+	glm::mat4 rotationMat = glm::rotate(glm::mat4(), glm::radians(m_entity.m_globalTransform.rotation.x), glm::vec3(1.0f, 0.0f, 0.0f)) * glm::rotate(glm::mat4(), glm::radians(m_entity.m_globalTransform.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f)) * glm::rotate(glm::mat4(), glm::radians(m_entity.m_globalTransform.rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+	glm::mat4 scaleMat = glm::scale(glm::mat4(), m_entity.m_globalTransform.scale);
 	glm::mat4 modelmat = translationMat * rotationMat * scaleMat;
 	//Calculate the PVM matrix
 	glm::mat4 PVMMat = _camera->GetPVM(modelmat);

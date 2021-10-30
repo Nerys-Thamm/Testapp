@@ -36,6 +36,7 @@
 #include "imgui_impl_opengl3.h"
 #include "Entity.h"
 #include "MeshRenderer.h"
+#include "TestBehaviour.h"
 
 
 //Pointer to window
@@ -310,6 +311,8 @@ void InitialSetup()
 	entityTest->GetBehaviour<MeshRenderer>()->SetMaterial(Lighting::GetMaterial("EntityTest"));
 	entityTest->GetBehaviour<MeshRenderer>()->SetShader(program_blinnphong);
 	entityTest->GetBehaviour<MeshRenderer>()->SetTexture(TextureLoader::LoadTexture("Yellow.jpg"));
+
+	entityTest->AddBehaviour<TestBehaviour>();
 
 
 	shape_cube = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Chrome"));
