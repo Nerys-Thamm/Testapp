@@ -11,10 +11,10 @@ void TestBehaviour::OnAwake()
 
 void TestBehaviour::OnUpdate(float _fDeltaTime)
 {
-	m_entity.m_transform.rotation.x += _fDeltaTime * 2;
-	if (m_entity.m_transform.rotation.x > 360.0f)
+	m_entity.m_transform.rotation.y = ((sin(glfwGetTime()) * 30.0f));
+	if (m_entity.m_transform.rotation.y > 360.0f)
 	{
-		m_entity.m_transform.rotation.x = 0.0f;
+		m_entity.m_transform.rotation.y = 0.0f;
 	}
 
 }

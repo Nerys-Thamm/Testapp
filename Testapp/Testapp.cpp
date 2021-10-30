@@ -110,7 +110,10 @@ std::vector<Renderable3D> testcubes;
 
 CEntity* entityTest = nullptr;
 CEntity* childEntityTest = nullptr;
-CEntity* parentEntityTest = nullptr;
+CEntity* otherEntityTest = nullptr;
+CEntity* rootBone = nullptr;
+CEntity* secondBone = nullptr;
+CEntity* thirdBone = nullptr;
 
 //---------------------------------------------------------------
 //GUI variables
@@ -307,25 +310,36 @@ void InitialSetup()
 
 	//Create objects
 	
-	parentEntityTest = new CEntity();
+	rootBone = new CEntity();
+	secondBone = new CEntity(rootBone);
+	thirdBone = new CEntity(secondBone);
 
-	entityTest = new CEntity(parentEntityTest);
+	entityTest = new CEntity(rootBone);
 	entityTest->AddBehaviour<MeshRenderer>();
 	entityTest->GetBehaviour<MeshRenderer>()->SetMesh(Cube3D::GetMesh());
 	entityTest->GetBehaviour<MeshRenderer>()->SetMaterial(Lighting::GetMaterial("EntityTest"));
 	entityTest->GetBehaviour<MeshRenderer>()->SetShader(program_blinnphong);
 	entityTest->GetBehaviour<MeshRenderer>()->SetTexture(TextureLoader::LoadTexture("Yellow.jpg"));
 
-	parentEntityTest->AddBehaviour<TestBehaviour>();
+	
 
-	childEntityTest = new CEntity(parentEntityTest);
+	childEntityTest = new CEntity(secondBone);
 	childEntityTest->AddBehaviour<MeshRenderer>();
 	childEntityTest->GetBehaviour<MeshRenderer>()->SetMesh(Cube3D::GetMesh());
 	childEntityTest->GetBehaviour<MeshRenderer>()->SetMaterial(Lighting::GetMaterial("EntityTest"));
 	childEntityTest->GetBehaviour<MeshRenderer>()->SetShader(program_blinnphong);
 	childEntityTest->GetBehaviour<MeshRenderer>()->SetTexture(TextureLoader::LoadTexture("Yellow.jpg"));
 
+	otherEntityTest = new CEntity(thirdBone);
+	otherEntityTest->AddBehaviour<MeshRenderer>();
+	otherEntityTest->GetBehaviour<MeshRenderer>()->SetMesh(Cube3D::GetMesh());
+	otherEntityTest->GetBehaviour<MeshRenderer>()->SetMaterial(Lighting::GetMaterial("EntityTest"));
+	otherEntityTest->GetBehaviour<MeshRenderer>()->SetShader(program_blinnphong);
+	otherEntityTest->GetBehaviour<MeshRenderer>()->SetTexture(TextureLoader::LoadTexture("Yellow.jpg"));
 
+	rootBone->AddBehaviour<TestBehaviour>();
+	secondBone->AddBehaviour<TestBehaviour>();
+	thirdBone->AddBehaviour<TestBehaviour>();
 
 	shape_cube = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Chrome"));
 	shape_stencilcube = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Glossy"));
@@ -346,9 +360,15 @@ void InitialSetup()
 	shape_3Dbutton_bck->Position(glm::vec3(4.0f, 5.0f, 2.0f));
 	shape_3Dbutton_bck->Scale(glm::vec3(2.0f, 2.0f, 2.0f));
 	
-	entityTest->m_transform.position = glm::vec3(0.0f, 5.0f, 0.0f);
-	entityTest->m_transform.scale = glm::vec3(5.0f, 10.0f, 3.0f);
-	childEntityTest->m_transform.scale = glm::vec3(0.5f, 1.5f, 2.0f);
+	entityTest->m_transform.position = glm::vec3(0.0f, 0.0f, 0.0f);
+	entityTest->m_transform.scale = glm::vec3(5.0f, 2.0f, 2.0f);
+	childEntityTest->m_transform.scale = glm::vec3(5.0f, 1.5f, 1.5f);
+	childEntityTest->m_transform.position = glm::vec3(2.5f, 0.0f, 0.0f);
+	otherEntityTest->m_transform.scale = glm::vec3(5.0f, 1.0f, 1.0f);
+	otherEntityTest->m_transform.position = glm::vec3(2.5f, 0.0f, 0.0f);
+	secondBone->m_transform.position = glm::vec3(2.5f, 0.0f, 0.0f);
+	thirdBone->m_transform.position = glm::vec3(5.0f, 0.0f, 0.0f);
+	rootBone->m_transform.position = glm::vec3(6.0f, 4.0f, 8.0f);
 
 	shape_seafloor = new Renderable3D(Quad3D::GetMesh(), Lighting::GetMaterial("Default"));
 	shape_sea = new Renderable3D(Quad3D::GetMesh(), Lighting::GetMaterial("Glossy"));
@@ -786,6 +806,7 @@ void Render()
 
 	entityTest->GetBehaviour<MeshRenderer>()->Render(freecam->GetCamera());
 	childEntityTest->GetBehaviour<MeshRenderer>()->Render(freecam->GetCamera());
+	otherEntityTest->GetBehaviour<MeshRenderer>()->Render(freecam->GetCamera());
 	//Render the floor
 
 	//shape_seafloor->Render(*freecam->GetCamera(), program_blinnphongfog);

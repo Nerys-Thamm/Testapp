@@ -56,7 +56,7 @@ public:
 		Transform& operator+=(const Transform& rhs)
 		{
 			rotation += rhs.rotation;
-			position = (rhs.position + (glm::quat(rhs.rotation * (3.141592f / 180.0f)) * position));
+			position = (rhs.position + ((glm::quat(rhs.rotation * (3.141592f / 180.0f)) * position) * rhs.scale));
 			if (rotation.x > 360.0f) rotation.x -= 360.0f;
 			if (rotation.y > 360.0f) rotation.y -= 360.0f;
 			if (rotation.z > 360.0f) rotation.z -= 360.0f;
@@ -80,7 +80,7 @@ public:
 		friend Transform operator+(Transform lhs, const Transform& rhs)
 		{
 			lhs.rotation += rhs.rotation;
-			lhs.position = (rhs.position + (glm::quat(rhs.rotation * (3.141592f/180.0f)) * lhs.position));
+			lhs.position = (rhs.position + ((glm::quat(rhs.rotation * (3.141592f/180.0f)) * lhs.position)*rhs.scale));
 			if (lhs.rotation.x > 360.0f) lhs.rotation.x -= 360.0f;
 			if (lhs.rotation.y > 360.0f) lhs.rotation.y -= 360.0f;
 			if (lhs.rotation.z > 360.0f) lhs.rotation.z -= 360.0f;
