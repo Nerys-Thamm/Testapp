@@ -55,8 +55,8 @@ public:
 		glm::vec3 scale = glm::vec3(1, 1, 1);
 		Transform& operator+=(const Transform& rhs)
 		{
-			position += rhs.position;
 			rotation += rhs.rotation;
+			position = (rhs.position + (glm::quat(rhs.rotation * (3.141592f / 180.0f)) * position));
 			if (rotation.x > 360.0f) rotation.x -= 360.0f;
 			if (rotation.y > 360.0f) rotation.y -= 360.0f;
 			if (rotation.z > 360.0f) rotation.z -= 360.0f;
@@ -79,8 +79,8 @@ public:
 		}
 		friend Transform operator+(Transform lhs, const Transform& rhs)
 		{
-			lhs.position += rhs.position;
 			lhs.rotation += rhs.rotation;
+			lhs.position = (rhs.position + (glm::quat(rhs.rotation * (3.141592f/180.0f)) * lhs.position));
 			if (lhs.rotation.x > 360.0f) lhs.rotation.x -= 360.0f;
 			if (lhs.rotation.y > 360.0f) lhs.rotation.y -= 360.0f;
 			if (lhs.rotation.z > 360.0f) lhs.rotation.z -= 360.0f;
@@ -125,10 +125,10 @@ public:
 		return nullptr;
 	}
 	template <typename B, typename std::enable_if<std::is_base_of<IBehaviour, B>::value>::type* = nullptr>
-	std::shared_ptr<B> GetBehaviourInChildren(int _maxDepth = 1)
+	B* GetBehaviourInChildren(int _maxDepth = 1)
 	{
 		if (_maxDepth == 0) return nullptr;
-		std::shared_ptr<B> val = GetBehaviour<B>();
+		B* val = GetBehaviour<B>();
 		if (val) return val;
 		for (int i = 0; i < m_children.size(); i++)
 		{

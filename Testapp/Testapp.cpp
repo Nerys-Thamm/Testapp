@@ -109,6 +109,8 @@ GLuint frameBuffer;
 std::vector<Renderable3D> testcubes;
 
 CEntity* entityTest = nullptr;
+CEntity* childEntityTest = nullptr;
+CEntity* parentEntityTest = nullptr;
 
 //---------------------------------------------------------------
 //GUI variables
@@ -305,14 +307,24 @@ void InitialSetup()
 
 	//Create objects
 	
-	entityTest = new CEntity();
+	parentEntityTest = new CEntity();
+
+	entityTest = new CEntity(parentEntityTest);
 	entityTest->AddBehaviour<MeshRenderer>();
 	entityTest->GetBehaviour<MeshRenderer>()->SetMesh(Cube3D::GetMesh());
 	entityTest->GetBehaviour<MeshRenderer>()->SetMaterial(Lighting::GetMaterial("EntityTest"));
 	entityTest->GetBehaviour<MeshRenderer>()->SetShader(program_blinnphong);
 	entityTest->GetBehaviour<MeshRenderer>()->SetTexture(TextureLoader::LoadTexture("Yellow.jpg"));
 
-	entityTest->AddBehaviour<TestBehaviour>();
+	parentEntityTest->AddBehaviour<TestBehaviour>();
+
+	childEntityTest = new CEntity(parentEntityTest);
+	childEntityTest->AddBehaviour<MeshRenderer>();
+	childEntityTest->GetBehaviour<MeshRenderer>()->SetMesh(Cube3D::GetMesh());
+	childEntityTest->GetBehaviour<MeshRenderer>()->SetMaterial(Lighting::GetMaterial("EntityTest"));
+	childEntityTest->GetBehaviour<MeshRenderer>()->SetShader(program_blinnphong);
+	childEntityTest->GetBehaviour<MeshRenderer>()->SetTexture(TextureLoader::LoadTexture("Yellow.jpg"));
+
 
 
 	shape_cube = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Chrome"));
@@ -336,7 +348,7 @@ void InitialSetup()
 	
 	entityTest->m_transform.position = glm::vec3(0.0f, 5.0f, 0.0f);
 	entityTest->m_transform.scale = glm::vec3(5.0f, 10.0f, 3.0f);
-	
+	childEntityTest->m_transform.scale = glm::vec3(0.5f, 1.5f, 2.0f);
 
 	shape_seafloor = new Renderable3D(Quad3D::GetMesh(), Lighting::GetMaterial("Default"));
 	shape_sea = new Renderable3D(Quad3D::GetMesh(), Lighting::GetMaterial("Glossy"));
@@ -773,6 +785,7 @@ void Render()
 	shape_3Dbutton_fwd->Render(*freecam->GetCamera(), program_blinnphong);
 
 	entityTest->GetBehaviour<MeshRenderer>()->Render(freecam->GetCamera());
+	childEntityTest->GetBehaviour<MeshRenderer>()->Render(freecam->GetCamera());
 	//Render the floor
 
 	//shape_seafloor->Render(*freecam->GetCamera(), program_blinnphongfog);
