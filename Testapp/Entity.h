@@ -50,9 +50,9 @@ public:
 
 	struct Transform
 	{
-		glm::vec3 position;
-		glm::vec3 rotation;
-		glm::vec3 scale;
+		glm::vec3 position = glm::vec3(0,0,0);
+		glm::vec3 rotation = glm::vec3(0, 0, 0);
+		glm::vec3 scale = glm::vec3(1, 1, 1);
 		Transform& operator+=(const Transform& rhs)
 		{
 			position += rhs.position;
@@ -117,9 +117,9 @@ public:
 	{
 		for (int i = 0; i < m_behaviours.size(); i++)
 		{
-			if (static_cast<B*>(m_behaviours[i].get()))
+			if (dynamic_cast<B*>(m_behaviours[i].get()))
 			{
-				return static_cast<B*>(m_behaviours[i].get());
+				return dynamic_cast<B*>(m_behaviours[i].get());
 			}
 		}
 		return nullptr;

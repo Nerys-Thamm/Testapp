@@ -4,10 +4,11 @@ MeshRenderer::MeshRenderer(CEntity* _parent) : IBehaviour(_parent)
 {
 	m_material = nullptr;
 	m_shader = NULL;
+	m_texture = NULL;
 	m_mesh = nullptr;
 }
 
-void MeshRenderer::Render()
+void MeshRenderer::Render(Camera* _camera)
 {
 	if (m_mesh == nullptr || m_shader == NULL)
 	{
@@ -19,7 +20,7 @@ void MeshRenderer::Render()
 	glm::mat4 scaleMat = glm::scale(glm::mat4(), m_entity->m_globalTransform.scale);
 	glm::mat4 modelmat = translationMat * rotationMat * scaleMat;
 	//Calculate the PVM matrix
-	glm::mat4 PVMMat = SceneManager::GetMainCamera()->GetPVM(modelmat);
+	glm::mat4 PVMMat = _camera->GetPVM(modelmat);
 	glm::mat4 ModelMat = modelmat;
 	//Bind program and VAO
 	glUseProgram(m_shader);
@@ -39,7 +40,7 @@ void MeshRenderer::Render()
 
 	//Camera
 	GLint CamLoc = glGetUniformLocation(m_shader, "CameraPos");
-	glUniform3fv(CamLoc, 1, glm::value_ptr(SceneManager::GetMainCamera()->m_cameraPos));
+	glUniform3fv(CamLoc, 1, glm::value_ptr(_camera->m_cameraPos));
 
 	//Material
 	glUniform1f(glGetUniformLocation(m_shader, "Mat[0].Smoothness"), m_material->Smoothness);
@@ -69,8 +70,13 @@ void MeshRenderer::Render()
 	}
 
 
-
-	if (m_material->AlbedoMap != NULL)
+	if (m_texture != NULL)
+	{
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, m_texture);
+		glUniform1i(glGetUniformLocation(m_shader, "ImageTexture"), 0);
+	}
+	/*if (m_material->AlbedoMap != NULL)
 	{
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, m_material->AlbedoMap);
@@ -82,7 +88,7 @@ void MeshRenderer::Render()
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, m_material->ReflectionMap);
 		glUniform1i(glGetUniformLocation(m_shader, "ReflectionMap"), 2);
-	}
+	}*/
 
 	
 	glActiveTexture(GL_TEXTURE1);

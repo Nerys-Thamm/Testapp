@@ -78,7 +78,6 @@ Camera* SceneManager::GetMainCamera()
 bool SceneManager::m_isWireframe = false;
 bool SceneManager::m_isCursorVisible = true;
 bool SceneManager::m_isReadingTextInput = false;
-Camera* SceneManager::m_mainCamera = nullptr;
 std::string SceneManager::m_textinputbuffer = "";
 
 // ********************************************************************************

@@ -210,7 +210,7 @@ void CreateMaterials()
 	Lighting::AddMaterial("EntityTest");
 	Lighting::GetMaterial("EntityTest")->Smoothness = 60;
 	Lighting::GetMaterial("EntityTest")->Reflectivity = 0.0f;
-	Lighting::GetMaterial("EntityTest")->AlbedoMap = TextureLoader::LoadTexture("SciFi_Albedo.jpg");
+	//Lighting::GetMaterial("EntityTest")->AlbedoMap = TextureLoader::LoadTexture("SciFi_Albedo.jpg");
 
 	
 }
@@ -293,12 +293,12 @@ void InitialSetup()
 	freecam = new FreeCam(main_window, cfWINDOW_WIDTH(), cfWINDOW_HEIGHT(), current_time, true);
 	orthocamera = new Camera(cfWINDOW_WIDTH(), cfWINDOW_HEIGHT(), current_time, false);
 
-	SceneManager::SetMainCamera(freecam->GetCamera());
+	manager->SetMainCamera(freecam->GetCamera());
 
 	//Create Skybox
 	std::string SkyboxFilepaths[] = {"MountainOutpost/Right.jpg","MountainOutpost/Left.jpg","MountainOutpost/Up.jpg","MountainOutpost/Down.jpg","MountainOutpost/Back.jpg","MountainOutpost/Front.jpg"};
 	
-	SceneManager::SetCurrentSkybox(new Skybox(camera, SkyboxFilepaths));
+	SceneManager::SetCurrentSkybox(new Skybox(freecam->GetCamera(), SkyboxFilepaths));
 
 
 
@@ -309,6 +309,7 @@ void InitialSetup()
 	entityTest->GetBehaviour<MeshRenderer>()->SetMesh(Cube3D::GetMesh());
 	entityTest->GetBehaviour<MeshRenderer>()->SetMaterial(Lighting::GetMaterial("EntityTest"));
 	entityTest->GetBehaviour<MeshRenderer>()->SetShader(program_blinnphong);
+	entityTest->GetBehaviour<MeshRenderer>()->SetTexture(TextureLoader::LoadTexture("Yellow.jpg"));
 
 
 	shape_cube = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Chrome"));
@@ -330,8 +331,8 @@ void InitialSetup()
 	shape_3Dbutton_bck->Position(glm::vec3(4.0f, 5.0f, 2.0f));
 	shape_3Dbutton_bck->Scale(glm::vec3(2.0f, 2.0f, 2.0f));
 	
-	entityTest->m_globalTransform.position = glm::vec3(0.0f, 5.0f, 0.0f);
-	entityTest->m_globalTransform.scale = glm::vec3(1.0f, 1.0f, 1.0f);
+	entityTest->m_transform.position = glm::vec3(0.0f, 5.0f, 0.0f);
+	entityTest->m_transform.scale = glm::vec3(5.0f, 10.0f, 3.0f);
 	
 
 	shape_seafloor = new Renderable3D(Quad3D::GetMesh(), Lighting::GetMaterial("Default"));
@@ -768,7 +769,7 @@ void Render()
 	shape_3Dbutton_bck->Render(*freecam->GetCamera(), program_blinnphong);
 	shape_3Dbutton_fwd->Render(*freecam->GetCamera(), program_blinnphong);
 
-	entityTest->GetBehaviour<MeshRenderer>()->Render();
+	entityTest->GetBehaviour<MeshRenderer>()->Render(freecam->GetCamera());
 	//Render the floor
 
 	//shape_seafloor->Render(*freecam->GetCamera(), program_blinnphongfog);
