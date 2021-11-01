@@ -39,6 +39,7 @@
 #include "TestBehaviour.h"
 #include "Cloth.h"
 #include "ClothRenderer.h"
+#include "GeometryRenderer.h"
 
 
 //Pointer to window
@@ -65,6 +66,7 @@ GLuint program_reflective;
 GLuint program_reflectivefog;
 GLuint program_reflectiverim;
 GLuint program_postprocess;
+GLuint program_geostar;
 
 //TIME
 float current_time;
@@ -110,12 +112,12 @@ GLuint frameBuffer;
 
 std::vector<Renderable3D> testcubes;
 
-//CEntity* entityTest = nullptr;
-//CEntity* childEntityTest = nullptr;
-//CEntity* otherEntityTest = nullptr;
-//CEntity* rootBone = nullptr;
-//CEntity* secondBone = nullptr;
-//CEntity* thirdBone = nullptr;
+CEntity* entityTest = nullptr;
+CEntity* childEntityTest = nullptr;
+CEntity* otherEntityTest = nullptr;
+CEntity* rootBone = nullptr;
+CEntity* secondBone = nullptr;
+CEntity* thirdBone = nullptr;
 
 CEntity* clothEntity = nullptr;
 
@@ -289,6 +291,9 @@ void InitialSetup()
 	program_postprocess = ShaderLoader::CreateProgram("Resources/Shaders/NDC_Texture.vs",
 		"Resources/Shaders/Texture.fs");
 
+	program_geostar = ShaderLoader::CreateProgram("Resources/Shaders/GeoShader.vs",
+		"Resources/Shaders/GeoShader.fs", "Resources/Shaders/StarGeoShader.gs");
+
 	//Cull poly not facing viewport
 	glCullFace(GL_BACK);
 
@@ -313,8 +318,8 @@ void InitialSetup()
 
 
 	//Create objects
-	/*
-	rootBone = new CEntity();
+	
+	/*rootBone = new CEntity();
 	secondBone = new CEntity(rootBone);
 	thirdBone = new CEntity(secondBone);
 
@@ -343,8 +348,13 @@ void InitialSetup()
 
 	rootBone->AddBehaviour<TestBehaviour>();
 	secondBone->AddBehaviour<TestBehaviour>();
-	thirdBone->AddBehaviour<TestBehaviour>();
-	*/
+	thirdBone->AddBehaviour<TestBehaviour>();*/
+
+	entityTest = new CEntity();
+	entityTest->AddBehaviour<GeometryRenderer>();
+	entityTest->GetBehaviour<GeometryRenderer>()->SetShader(program_geostar);
+	entityTest->m_transform.position = glm::vec3(0.0f, 3.0f, 0.0f);
+	
 
 	clothEntity = new CEntity();
 	std::shared_ptr<ClothRenderer> clothrenderer = clothEntity->AddBehaviour<ClothRenderer>();
@@ -374,7 +384,7 @@ void InitialSetup()
 	shape_3Dbutton_bck->Scale(glm::vec3(2.0f, 2.0f, 2.0f));
 	
 	/*
-	entityTest->m_transform.position = glm::vec3(0.0f, 0.0f, 0.0f);
+	
 	entityTest->m_transform.scale = glm::vec3(5.0f, 2.0f, 2.0f);
 	childEntityTest->m_transform.scale = glm::vec3(5.0f, 1.5f, 1.5f);
 	childEntityTest->m_transform.position = glm::vec3(2.5f, 0.0f, 0.0f);
@@ -790,9 +800,6 @@ void Render()
 	//Render the skybox
 	SceneManager::GetCurrentSkybox()->Render();
 
-	
-
-	
 
 	//Render objects
 
@@ -821,12 +828,14 @@ void Render()
 	shape_3Dbutton_bck->Render(*freecam->GetCamera(), program_blinnphong);
 	shape_3Dbutton_fwd->Render(*freecam->GetCamera(), program_blinnphong);
 
-	/*
-	entityTest->GetBehaviour<MeshRenderer>()->Render(freecam->GetCamera());
+	
+	/*entityTest->GetBehaviour<MeshRenderer>()->Render(freecam->GetCamera());
 	childEntityTest->GetBehaviour<MeshRenderer>()->Render(freecam->GetCamera());
-	otherEntityTest->GetBehaviour<MeshRenderer>()->Render(freecam->GetCamera());
-	*/
+	otherEntityTest->GetBehaviour<MeshRenderer>()->Render(freecam->GetCamera());*/
+	
 	clothEntity->GetBehaviour<ClothRenderer>()->Render(freecam->GetCamera());
+	entityTest->GetBehaviour<GeometryRenderer>()->Render(freecam->GetCamera());
+	
 	//Render the floor
 
 	//shape_seafloor->Render(*freecam->GetCamera(), program_blinnphongfog);

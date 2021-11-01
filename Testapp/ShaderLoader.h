@@ -9,6 +9,7 @@ class ShaderLoader
 {
 public:
 	static GLuint CreateProgram(const char* VertexShaderFilename, const char* FragmentShaderFilename);
+	static GLuint CreateProgram(const char* VertexShaderFilename, const char* FragmentShaderFilename, const char* GeometryShaderFilename);
 
 private:
 	ShaderLoader(void);

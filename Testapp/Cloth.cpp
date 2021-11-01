@@ -26,9 +26,9 @@ Cloth::Cloth(glm::vec2 _scale, glm::ivec2 _density) : m_particleDensity(_density
 {
     
     //Create a Grid of cloth particles to turn into a cloth
-    for (int x = 0; x < m_particleDensity.x; x++)
+    for (int y = 0; y < m_particleDensity.y; y++)
     {
-        for (int y = 0; y < m_particleDensity.y; y++)
+        for (int x = 0; x < m_particleDensity.y; x++)
         {
             m_particles.push_back(ClothParticle({ _scale.x * (x / (float)m_particleDensity.x), -_scale.y * (y / (float)m_particleDensity.y), 0.0f }));
         }
@@ -62,7 +62,7 @@ void Cloth::Update(float _fDeltaTime)
     //Apply the constraints
     for (int i = 0; i < 5; i++)
     {
-        std::for_each(m_constraints.begin(), m_constraints.end(), [&](ClothParticleConstraint _c) { _c.Constrain(); });
+        std::for_each(m_constraints.begin(), m_constraints.end(), [&](ClothParticleConstraint& _c) { _c.Constrain(); });
     }
     //Update the Particles
     std::for_each(m_particles.begin(), m_particles.end(), [&](ClothParticle& _p) { _p.Update(_fDeltaTime); _p.LocalPos(_p.Pos() - m_particles[0].Pos()); });
@@ -75,7 +75,7 @@ void Cloth::FixedUpdate()
 
 void Cloth::AddForce(glm::vec3 _force)
 {
-    std::for_each(m_particles.begin(), m_particles.end(), [&](ClothParticle _p) { _p.ApplyForce(_force); });
+    std::for_each(m_particles.begin(), m_particles.end(), [&](ClothParticle& _p) { _p.ApplyForce(_force); });
 }
 
 void Cloth::AddWind(glm::vec3 _force)

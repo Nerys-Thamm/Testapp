@@ -43,6 +43,32 @@ GLuint ShaderLoader::CreateProgram(const char* vertexShaderFilename, const char*
 	return program;
 }
 
+GLuint ShaderLoader::CreateProgram(const char* VertexShaderFilename, const char* FragmentShaderFilename, const char* GeometryShaderFilename)
+{
+	// Create the shaders from the filepath
+	GLuint vertexShaderID, fragmentShaderID;
+
+	// Create the program handle, attach the shaders and link it
+	GLuint program = 0;
+	// ...
+	program = glCreateProgram();
+	glAttachShader(program, CreateShader(GL_VERTEX_SHADER, VertexShaderFilename));
+	glAttachShader(program, CreateShader(GL_FRAGMENT_SHADER, FragmentShaderFilename));
+	glAttachShader(program, CreateShader(GL_GEOMETRY_SHADER, GeometryShaderFilename));
+	glLinkProgram(program);
+
+	// Check for link errors
+	int link_result = 0;
+	glGetProgramiv(program, GL_LINK_STATUS, &link_result);
+	if (link_result == GL_FALSE)
+	{
+		std::string programName = VertexShaderFilename + *FragmentShaderFilename + *GeometryShaderFilename;
+		PrintErrorDetails(false, program, programName.c_str());
+		return 0;
+	}
+	return program;
+}
+
 GLuint ShaderLoader::CreateShader(GLenum shaderType, const char* shaderName)
 {
 	// Read the shader files and save the source code as strings
