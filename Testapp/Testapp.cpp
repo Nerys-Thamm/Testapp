@@ -354,7 +354,7 @@ void InitialSetup()
 	entityTest->AddBehaviour<GeometryRenderer>();
 	entityTest->GetBehaviour<GeometryRenderer>()->SetShader(program_geostar);
 	entityTest->m_transform.position = glm::vec3(0.0f, 3.0f, 0.0f);
-	
+	entityTest->AddBehaviour<TestBehaviour>();
 
 	clothEntity = new CEntity();
 	std::shared_ptr<ClothRenderer> clothrenderer = clothEntity->AddBehaviour<ClothRenderer>();
