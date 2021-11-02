@@ -23,12 +23,34 @@ void ClothRenderer::Render(Camera* _camera)
 	//Calculate the PVM matrix
 	glm::mat4 PVMMat = _camera->GetPVM(modelmat);
 	glm::mat4 ModelMat = modelmat;
+	glUseProgram(m_shader);
+	//Lighting
+		//PointLights
+	for (size_t i = 0; i < Lighting::MAX_POINT_LIGHTS; i++)
+	{
+		glUniform3fv(glGetUniformLocation(m_shader, ("PointLights[" + std::to_string(i) + "].Position").c_str()), 1, glm::value_ptr(Lighting::PointLights[i].Position));
+		glUniform3fv(glGetUniformLocation(m_shader, ("PointLights[" + std::to_string(i) + "].Color").c_str()), 1, glm::value_ptr(Lighting::PointLights[i].Color));
+		glUniform1f(glGetUniformLocation(m_shader, ("PointLights[" + std::to_string(i) + "].AmbientStrength").c_str()), Lighting::PointLights[i].AmbientStrength);
+		glUniform1f(glGetUniformLocation(m_shader, ("PointLights[" + std::to_string(i) + "].SpecularStrength").c_str()), Lighting::PointLights[i].SpecularStrength);
+		glUniform1f(glGetUniformLocation(m_shader, ("PointLights[" + std::to_string(i) + "].AttenuationConstant").c_str()), Lighting::PointLights[i].AttenuationConstant);
+		glUniform1f(glGetUniformLocation(m_shader, ("PointLights[" + std::to_string(i) + "].AttenuationExponent").c_str()), Lighting::PointLights[i].AttenuationExponent);
+		glUniform1f(glGetUniformLocation(m_shader, ("PointLights[" + std::to_string(i) + "].AttenuationLinear").c_str()), Lighting::PointLights[i].AttenuationLinear);
+	}
+
+	//DirectionalLights
+	for (size_t i = 0; i < Lighting::MAX_DIRECTIONAL_LIGHTS; i++)
+	{
+		glUniform3fv(glGetUniformLocation(m_shader, ("DirectionalLights[" + std::to_string(i) + "].Direction").c_str()), 1, glm::value_ptr(Lighting::DirectionalLights[i].Direction));
+		glUniform3fv(glGetUniformLocation(m_shader, ("DirectionalLights[" + std::to_string(i) + "].Color").c_str()), 1, glm::value_ptr(Lighting::DirectionalLights[i].Color));
+		glUniform1f(glGetUniformLocation(m_shader, ("DirectionalLights[" + std::to_string(i) + "].AmbientStrength").c_str()), Lighting::DirectionalLights[i].AmbientStrength);
+		glUniform1f(glGetUniformLocation(m_shader, ("DirectionalLights[" + std::to_string(i) + "].SpecularStrength").c_str()), Lighting::DirectionalLights[i].SpecularStrength);
+	}
 	for (int i = 0; i < m_tris.size(); i++)
 	{
 
 
 		//Bind program and VAO
-		glUseProgram(m_shader);
+		
 		glBindVertexArray(m_tris[i]->GetVAO());
 
 		//Send Vars to shaders via Uniform
@@ -52,27 +74,7 @@ void ClothRenderer::Render(Camera* _camera)
 		glUniform1f(glGetUniformLocation(m_shader, "Mat[0].Reflectivity"), m_material->Reflectivity);
 
 
-		////Lighting
-		////PointLights
-		//for (size_t i = 0; i < Lighting::MAX_POINT_LIGHTS; i++)
-		//{
-		//	glUniform3fv(glGetUniformLocation(m_shader, ("PointLights[" + std::to_string(i) + "].Position").c_str()), 1, glm::value_ptr(Lighting::PointLights[i].Position));
-		//	glUniform3fv(glGetUniformLocation(m_shader, ("PointLights[" + std::to_string(i) + "].Color").c_str()), 1, glm::value_ptr(Lighting::PointLights[i].Color));
-		//	glUniform1f(glGetUniformLocation(m_shader, ("PointLights[" + std::to_string(i) + "].AmbientStrength").c_str()), Lighting::PointLights[i].AmbientStrength);
-		//	glUniform1f(glGetUniformLocation(m_shader, ("PointLights[" + std::to_string(i) + "].SpecularStrength").c_str()), Lighting::PointLights[i].SpecularStrength);
-		//	glUniform1f(glGetUniformLocation(m_shader, ("PointLights[" + std::to_string(i) + "].AttenuationConstant").c_str()), Lighting::PointLights[i].AttenuationConstant);
-		//	glUniform1f(glGetUniformLocation(m_shader, ("PointLights[" + std::to_string(i) + "].AttenuationExponent").c_str()), Lighting::PointLights[i].AttenuationExponent);
-		//	glUniform1f(glGetUniformLocation(m_shader, ("PointLights[" + std::to_string(i) + "].AttenuationLinear").c_str()), Lighting::PointLights[i].AttenuationLinear);
-		//}
-
-		////DirectionalLights
-		//for (size_t i = 0; i < Lighting::MAX_DIRECTIONAL_LIGHTS; i++)
-		//{
-		//	glUniform3fv(glGetUniformLocation(m_shader, ("DirectionalLights[" + std::to_string(i) + "].Direction").c_str()), 1, glm::value_ptr(Lighting::DirectionalLights[i].Direction));
-		//	glUniform3fv(glGetUniformLocation(m_shader, ("DirectionalLights[" + std::to_string(i) + "].Color").c_str()), 1, glm::value_ptr(Lighting::DirectionalLights[i].Color));
-		//	glUniform1f(glGetUniformLocation(m_shader, ("DirectionalLights[" + std::to_string(i) + "].AmbientStrength").c_str()), Lighting::DirectionalLights[i].AmbientStrength);
-		//	glUniform1f(glGetUniformLocation(m_shader, ("DirectionalLights[" + std::to_string(i) + "].SpecularStrength").c_str()), Lighting::DirectionalLights[i].SpecularStrength);
-		//}
+		
 
 
 		if (m_texture != NULL)
@@ -95,9 +97,18 @@ void ClothRenderer::Render(Camera* _camera)
 		//Unbind assets
 		glBindVertexArray(0);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-		glUseProgram(0);
+		
 	}
+	glUseProgram(0);
 	glEnable(GL_CULL_FACE);
+}
+
+void ClothRenderer::SetCloth(Cloth* _cloth)
+{
+	if (m_cloth != nullptr) delete m_cloth;
+	m_tris.clear();
+	m_indices.clear();
+	m_cloth = _cloth;
 }
 
 void ClothRenderer::OnUpdate(float _fDeltaTime)
@@ -121,41 +132,52 @@ void ClothRenderer::OnUpdate(float _fDeltaTime)
 
 				}
 			}
-
-		}
-		else
-		{
 			int Element = 0;
-			int IndexCount = (m_cloth->GetSize()) * 6;
-			int* Indices = new int[IndexCount];
+			int IndexCount = (m_tris.size()) * 3;
+			m_indices.resize(IndexCount);
 			for (int gridY = 0; gridY < (m_cloth->m_particleDensity.y - 1); ++gridY)
 			{
 				for (int gridX = 0; gridX < (m_cloth->m_particleDensity.x - 1); ++gridX)
 				{
 					int start = gridY * (m_cloth->m_particleDensity.x) + gridX;
 					// First triangle of the quad
-					Indices[Element++] = (int)start;
-					Indices[Element++] = (int)(start + (m_cloth->m_particleDensity.x));
-					Indices[Element++] = (int)(start + 1);
+					m_indices[Element++] = (int)start;
+					m_indices[Element++] = (int)(start + (m_cloth->m_particleDensity.x));
+					m_indices[Element++] = (int)(start + 1);
 
 					// Second triangle of the quad
-					Indices[Element++] = (int)(start + 1);
-					Indices[Element++] = (int)(start + m_cloth->m_particleDensity.x);
-					Indices[Element++] = (int)(start + 1 + m_cloth->m_particleDensity.x);
+					m_indices[Element++] = (int)(start + 1);
+					m_indices[Element++] = (int)(start + m_cloth->m_particleDensity.x);
+					m_indices[Element++] = (int)(start + 1 + m_cloth->m_particleDensity.x);
 
 				}
 			}
+		}
+		else
+		{
 			
-			Element = 0;
+			
+			int Element = 0;
 			for (int i = 0; i < m_tris.size(); i++)
 			{
+
+				int indexA = m_indices[Element++];
+				int indexB = m_indices[Element++];
+				int indexC = m_indices[Element++];
+				glm::vec3 a = m_cloth->GetParticlePositionAtIndex(indexA);
+				glm::vec3 b = m_cloth->GetParticlePositionAtIndex(indexB);
+				glm::vec3 c = m_cloth->GetParticlePositionAtIndex(indexC);
 				m_tris[i]->UpdateVertices(
-					m_cloth->GetParticlePositionAtIndex(Indices[Element++]),
-					m_cloth->GetParticlePositionAtIndex(Indices[Element++]),
-					m_cloth->GetParticlePositionAtIndex(Indices[Element++])
+					a,
+					b,
+					c,
+					m_cloth->GetTriNormal(indexA, indexB, indexC),
+					glm::vec2((float)(indexA % m_cloth->m_particleDensity.x)/ m_cloth->m_particleDensity.x, 1.0f-(floor(indexA / m_cloth->m_particleDensity.x))/ m_cloth->m_particleDensity.y),
+					glm::vec2((float)(indexB % m_cloth->m_particleDensity.x)/ m_cloth->m_particleDensity.x, 1.0f-(floor(indexB / m_cloth->m_particleDensity.x))/ m_cloth->m_particleDensity.y),
+					glm::vec2((float)(indexC % m_cloth->m_particleDensity.x)/ m_cloth->m_particleDensity.x, 1.0f-(floor(indexC / m_cloth->m_particleDensity.x))/ m_cloth->m_particleDensity.y)
 				);
 			}
-			delete[] Indices;
+			
 		}
 	}
 }

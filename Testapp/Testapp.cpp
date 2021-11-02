@@ -81,24 +81,13 @@ Camera* orthocamera = nullptr;
 
 
 //MESHES
-Renderable3D* shape_firstcube = nullptr;
-Renderable3D* shape_secondcube = nullptr;
-Renderable3D* shape_floor = nullptr;
-
-Renderable3D* shape_seafloor = nullptr;
-Renderable3D* shape_sea = nullptr;
-
-Renderable3D* terrain_auckland = nullptr;
 
 
 
 //BUTTONS
-Renderable3D* shape_3Dbutton_fwd = nullptr;
-Renderable3D* shape_3Dbutton_bck = nullptr;
+
 
 //SHAPES
-Renderable3D* shape_cube = nullptr;
-Renderable3D* shape_stencilcube = nullptr;
 Renderable3D* shape_renderquad = nullptr;
 
 Shape2D* ppQuad = nullptr;
@@ -110,16 +99,9 @@ Audiosystem* audio_main = nullptr;
 GLuint renderTexture;
 GLuint frameBuffer;
 
-std::vector<Renderable3D> testcubes;
-
-CEntity* entityTest = nullptr;
-CEntity* childEntityTest = nullptr;
-CEntity* otherEntityTest = nullptr;
-CEntity* rootBone = nullptr;
-CEntity* secondBone = nullptr;
-CEntity* thirdBone = nullptr;
 
 CEntity* clothEntity = nullptr;
+CEntity* ballEntity = nullptr;
 
 //---------------------------------------------------------------
 //GUI variables
@@ -149,6 +131,8 @@ void ShutDown()
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
+
+	delete clothEntity;
 }
 
 int main()
@@ -318,127 +302,26 @@ void InitialSetup()
 
 
 	//Create objects
-	
-	/*rootBone = new CEntity();
-	secondBone = new CEntity(rootBone);
-	thirdBone = new CEntity(secondBone);
-
-	entityTest = new CEntity(rootBone);
-	entityTest->AddBehaviour<MeshRenderer>();
-	entityTest->GetBehaviour<MeshRenderer>()->SetMesh(Cube3D::GetMesh());
-	entityTest->GetBehaviour<MeshRenderer>()->SetMaterial(Lighting::GetMaterial("EntityTest"));
-	entityTest->GetBehaviour<MeshRenderer>()->SetShader(program_blinnphong);
-	entityTest->GetBehaviour<MeshRenderer>()->SetTexture(TextureLoader::LoadTexture("Yellow.jpg"));
-
-	
-
-	childEntityTest = new CEntity(secondBone);
-	childEntityTest->AddBehaviour<MeshRenderer>();
-	childEntityTest->GetBehaviour<MeshRenderer>()->SetMesh(Cube3D::GetMesh());
-	childEntityTest->GetBehaviour<MeshRenderer>()->SetMaterial(Lighting::GetMaterial("EntityTest"));
-	childEntityTest->GetBehaviour<MeshRenderer>()->SetShader(program_blinnphong);
-	childEntityTest->GetBehaviour<MeshRenderer>()->SetTexture(TextureLoader::LoadTexture("Yellow.jpg"));
-
-	otherEntityTest = new CEntity(thirdBone);
-	otherEntityTest->AddBehaviour<MeshRenderer>();
-	otherEntityTest->GetBehaviour<MeshRenderer>()->SetMesh(Cube3D::GetMesh());
-	otherEntityTest->GetBehaviour<MeshRenderer>()->SetMaterial(Lighting::GetMaterial("EntityTest"));
-	otherEntityTest->GetBehaviour<MeshRenderer>()->SetShader(program_blinnphong);
-	otherEntityTest->GetBehaviour<MeshRenderer>()->SetTexture(TextureLoader::LoadTexture("Yellow.jpg"));
-
-	rootBone->AddBehaviour<TestBehaviour>();
-	secondBone->AddBehaviour<TestBehaviour>();
-	thirdBone->AddBehaviour<TestBehaviour>();*/
-
-	entityTest = new CEntity();
-	entityTest->AddBehaviour<GeometryRenderer>();
-	entityTest->GetBehaviour<GeometryRenderer>()->SetShader(program_geostar);
-	entityTest->m_transform.position = glm::vec3(0.0f, 3.0f, 0.0f);
-	entityTest->AddBehaviour<TestBehaviour>();
-
 	clothEntity = new CEntity();
 	std::shared_ptr<ClothRenderer> clothrenderer = clothEntity->AddBehaviour<ClothRenderer>();
-	clothrenderer->SetCloth(new Cloth(glm::vec2(5.0f, 5.0f), glm::ivec2(10, 5)));
+	clothrenderer->SetCloth(new Cloth(glm::vec2(clothWidth, clothLength), glm::ivec2(30, 30), 1000, numberOfHooks, clothStiffness));
 	clothrenderer->SetMaterial(Lighting::GetMaterial("EntityTest"));
-	clothrenderer->SetShader(program_texture);
-	clothrenderer->SetTexture(TextureLoader::LoadTexture("Yellow.jpg"));
-	clothEntity->m_transform.position = glm::vec3(6.0f, 10.0f, 8.0f);
+	clothrenderer->SetShader(program_blinnphong);
+	clothrenderer->SetTexture(TextureLoader::LoadTexture("Rayman.jpg"));
+	clothEntity->m_transform.position = glm::vec3(-30.0f, 20.0f, -100.0f);
+	clothEntity->m_transform.rotation = glm::vec3(0.0f, 0.0f, 0.0f);
 
-	shape_cube = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Chrome"));
-	shape_stencilcube = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Glossy"));
-	shape_3Dbutton_fwd = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Default"));
-	shape_3Dbutton_bck = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Default"));
 	shape_renderquad = new Renderable3D(Quad3D::GetMesh(), Lighting::GetMaterial("Default"));
 
-	Terrain3D::LoadFromRaw("AucklandHarbor2.raw", 1081, 0.1f, 0.025f);
-
-	terrain_auckland = new Renderable3D(Terrain3D::GetTerrainMesh("AucklandHarbor2.raw"), Lighting::GetMaterial("Default"));
-	
-
-	shape_cube->Position(glm::vec3(0.0f, 3.8f, 2.0f));
-	shape_cube->Scale(glm::vec3(2.0f, 2.0f, 2.0f));
-
-	shape_3Dbutton_fwd->Position(glm::vec3(-4.0f, 5.0f, 2.0f));
-	shape_3Dbutton_fwd->Scale(glm::vec3(2.0f, 2.0f, 2.0f));
-	shape_3Dbutton_bck->Position(glm::vec3(4.0f, 5.0f, 2.0f));
-	shape_3Dbutton_bck->Scale(glm::vec3(2.0f, 2.0f, 2.0f));
-	
-	/*
-	
-	entityTest->m_transform.scale = glm::vec3(5.0f, 2.0f, 2.0f);
-	childEntityTest->m_transform.scale = glm::vec3(5.0f, 1.5f, 1.5f);
-	childEntityTest->m_transform.position = glm::vec3(2.5f, 0.0f, 0.0f);
-	otherEntityTest->m_transform.scale = glm::vec3(5.0f, 1.0f, 1.0f);
-	otherEntityTest->m_transform.position = glm::vec3(2.5f, 0.0f, 0.0f);
-	secondBone->m_transform.position = glm::vec3(2.5f, 0.0f, 0.0f);
-	thirdBone->m_transform.position = glm::vec3(5.0f, 0.0f, 0.0f);
-	rootBone->m_transform.position = glm::vec3(6.0f, 4.0f, 8.0f);
-	*/
-
-	shape_seafloor = new Renderable3D(Quad3D::GetMesh(), Lighting::GetMaterial("Default"));
-	shape_sea = new Renderable3D(Quad3D::GetMesh(), Lighting::GetMaterial("Glossy"));
-
-	shape_seafloor->Position(glm::vec3(0.0f, 3.5f, 0.0f));
-	shape_seafloor->Scale(glm::vec3(100.0f, 100.0f, 1.0f));
-	shape_seafloor->Rotation(glm::vec3(271.0f, 0.0f, 0.0f));
-
-	shape_sea->Position(glm::vec3(0.0f, 0.01f, 0.0f));
-	shape_sea->Scale(glm::vec3(500.0f, 500.0f, 1.0f));
-	shape_sea->Rotation(glm::vec3(270.0f, 0.0f, 0.0f));
+	ballEntity = new CEntity();
+	std::shared_ptr<MeshRenderer> meshrenderer = ballEntity->AddBehaviour<MeshRenderer>();
+	meshrenderer->SetMaterial(Lighting::GetMaterial("EntityTest"));
+	meshrenderer->SetShader(program_blinnphong);
+	meshrenderer->SetTexture(TextureLoader::LoadTexture("Rayman.jpg"));
+	meshrenderer->SetMesh(Sphere3D::GetMesh(10.0f, 10));
+	ballEntity->m_transform.position = glm::vec3(0.0f, 0.0f, -120.0f);
 
 	
-	terrain_auckland->Position(glm::vec3(0.0f,0.0f, 0.0f));
-	terrain_auckland->Scale(glm::vec3(1.0f, 1.0f, 1.0f));
-	terrain_auckland->Rotation(glm::vec3(0.0f, 0.0f, 0.0f));
-	
-	/*for (int i = 0; i < 100; i++)
-	{
-		for (int j = 0; j < 100; j++)
-		{
-			Renderable3D cube(Cube3D::GetMesh(), Lighting::GetMaterial("Default"));
-			float groundHeight = Terrain3D::GetTerrain("AucklandHarbor2.raw")->GetHeightFromWorldPos(terrain_auckland->Position(), terrain_auckland->Rotation(), glm::vec3(i, 0.0f, j));
-			cube.Position(glm::vec3(i, groundHeight, j));
-			testcubes.push_back(cube);
-		}
-	}*/
-
-	
-
-
-	//Set textures of objects
-	shape_cube->AddTexture(TextureLoader::LoadTexture("SciFi_Albedo.jpg"));
-	shape_cube->AddTexture(TextureLoader::LoadTexture("SciFi_Metallic.jpg"));
-	shape_stencilcube->AddTexture(TextureLoader::LoadTexture("Yellow.jpg"));
-	shape_stencilcube->AddTexture(TextureLoader::LoadTexture("Grey.jpg"));
-	shape_3Dbutton_fwd->AddTexture(TextureLoader::LoadTexture("Yellow.jpg"));
-	shape_3Dbutton_bck->AddTexture(TextureLoader::LoadTexture("Grey.jpg"));
-	terrain_auckland->AddTexture(TextureLoader::LoadTexture("map.png"));
-	
-	
-
-	shape_seafloor->AddTexture(TextureLoader::LoadTexture("beachsand.jpg"));
-	shape_sea->AddTexture(TextureLoader::LoadTexture("WaterTransparent2.png"));
-	shape_sea->AddTexture(TextureLoader::LoadTexture("WaterSpecular.png"));
 
 
 
@@ -467,9 +350,9 @@ void InitialSetup()
 
 
 	
-	Lighting::DirectionalLights[0].Direction = glm::vec3(-1.0f, -1.0f, -1.0f);
-	Lighting::DirectionalLights[0].Color = glm::vec3(1.0f, 0.8f, 0.8f);
-	Lighting::DirectionalLights[0].AmbientStrength = 0.15f;
+	Lighting::DirectionalLights[0].Direction = glm::vec3(0.0f, -1.0f, -1.0f);
+	Lighting::DirectionalLights[0].Color = glm::vec3(0.5f, 0.5f, 0.5f);
+	Lighting::DirectionalLights[0].AmbientStrength = 0.25f;
 	Lighting::DirectionalLights[0].SpecularStrength = 1.0f;
 
 	//Post Processing
@@ -495,47 +378,6 @@ void InitialSetup()
 //Resets the scene
 void ResetScene()
 {
-	//Delete objects
-	delete shape_cube;
-	delete shape_stencilcube;
-	delete shape_3Dbutton_fwd;
-	delete shape_3Dbutton_bck;
-	delete shape_seafloor;
-	delete shape_sea;
-	
-
-	//Create new objects and set position + orientation
-
-	shape_cube = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Chrome"));
-	shape_stencilcube = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Glossy"));
-	shape_3Dbutton_fwd = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Default"));;
-	shape_3Dbutton_bck = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Default"));;
-	shape_cube->Position(glm::vec3(0.0f, 3.8f, 2.0f));
-	shape_cube->Scale(glm::vec3(2.0f, 2.0f, 2.0f));
-	shape_3Dbutton_fwd->Position(glm::vec3(-4.0f, 5.0f, 2.0f));
-	shape_3Dbutton_fwd->Scale(glm::vec3(2.0f, 2.0f, 2.0f));
-	shape_3Dbutton_bck->Position(glm::vec3(4.0f, 5.0f, 2.0f));
-	shape_3Dbutton_bck->Scale(glm::vec3(2.0f, 2.0f, 2.0f));
-	shape_seafloor = new Renderable3D(Quad3D::GetMesh(), Lighting::GetMaterial("Default"));
-	shape_sea = new Renderable3D(Quad3D::GetMesh(), Lighting::GetMaterial("Glossy"));
-	shape_seafloor->Position(glm::vec3(0.0f, 3.5f, 0.0f));
-	shape_seafloor->Scale(glm::vec3(100.0f, 100.0f, 1.0f));
-	shape_seafloor->Rotation(glm::vec3(271.0f, 0.0f, 0.0f));
-	shape_sea->Position(glm::vec3(0.0f, 4.0f, 0.0f));
-	shape_sea->Scale(glm::vec3(100.0f, 100.0f, 1.0f));
-	shape_sea->Rotation(glm::vec3(270.0f, 0.0f, 0.0f));
-
-
-	//Set textures of objects
-	shape_cube->AddTexture(TextureLoader::LoadTexture("SciFi_Albedo.jpg"));
-	shape_cube->AddTexture(TextureLoader::LoadTexture("SciFi_Metallic.jpg"));
-	shape_stencilcube->AddTexture(TextureLoader::LoadTexture("Yellow.jpg"));
-	shape_stencilcube->AddTexture(TextureLoader::LoadTexture("Grey.jpg"));
-	shape_3Dbutton_fwd->AddTexture(TextureLoader::LoadTexture("Yellow.jpg"));
-	shape_3Dbutton_bck->AddTexture(TextureLoader::LoadTexture("Grey.jpg"));
-	shape_seafloor->AddTexture(TextureLoader::LoadTexture("beachsand.jpg"));
-	shape_sea->AddTexture(TextureLoader::LoadTexture("WaterTransparent2.png"));
-	shape_sea->AddTexture(TextureLoader::LoadTexture("WaterSpecular.png"));
 
 	//Set position of Cameras
 	camera->m_cameraPos = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -551,7 +393,7 @@ void ResetScene()
 	Lighting::DirectionalLights[0].Direction = glm::vec3(-1.0f, -1.0f, -1.0f);
 	Lighting::DirectionalLights[0].Color = glm::vec3(1.0f, 1.0f, 1.0f);
 	Lighting::DirectionalLights[0].AmbientStrength = 0.1f;
-	Lighting::DirectionalLights[0].SpecularStrength = 1.0f;
+	Lighting::DirectionalLights[0].SpecularStrength = 0.3f;
 }
 
 float mouseY, mouseX;
@@ -610,9 +452,11 @@ void Update()
 {
 	//Update all GameObjects
 	CObjectController::UpdateObjects();
-	clothEntity->GetBehaviour<ClothRenderer>()->GetCloth()->AddForce(glm::vec3(0.0f, -0.11f, 0.0f));
-	clothEntity->GetBehaviour<ClothRenderer>()->GetCloth()->AddWind(glm::vec3(1.0f, 0.0f, 0.2f));
+	clothEntity->GetBehaviour<ClothRenderer>()->GetCloth()->SetPegDistance(hookDistance);
+	
+	clothEntity->GetBehaviour<ClothRenderer>()->GetCloth()->AddWind(glm::vec3(sin(windDirection * (M_PI/180.0f)) * windStrength, 0.0f, sin(windDirection * (M_PI / 180.0f)) * windStrength));
 	CEntityManager::UpdateEntities();
+	clothEntity->GetBehaviour<ClothRenderer>()->GetCloth()->SphereCollision(ballEntity->m_transform.position, 10.0f);
 	
 	//Poll events for GLFW input
 	glfwPollEvents();
@@ -628,14 +472,14 @@ void Update()
 	//Process mouse input and Mouse picking
 	if (glfwGetMouseButton(CObjectController::GetMainWindow(), GLFW_MOUSE_BUTTON_1) == GLFW_PRESS)
 	{
-		if (CheckAABBIntersect(camera->m_cameraPos, rayDirection, shape_3Dbutton_fwd->Position(), shape_3Dbutton_fwd->Scale()))
+		/*if (CheckAABBIntersect(camera->m_cameraPos, rayDirection, shape_3Dbutton_fwd->Position(), shape_3Dbutton_fwd->Scale()))
 		{
 			camera->m_cameraPos.z += delta_time * 2.0f;
 		}
 		if (CheckAABBIntersect(camera->m_cameraPos, rayDirection, shape_3Dbutton_bck->Position(), shape_3Dbutton_bck->Scale()))
 		{
 			camera->m_cameraPos.z -= delta_time * 2.0f;
-		}
+		}*/
 	}
 	//Perform actions on key press
 	if (glfwGetKey(CObjectController::GetMainWindow(), GLFW_KEY_R) && !pressedLastFrame) ResetScene();
@@ -672,24 +516,14 @@ void Update()
 	pressedLastFrame = (glfwGetKey(CObjectController::GetMainWindow(), GLFW_KEY_R) || glfwGetKey(CObjectController::GetMainWindow(), GLFW_KEY_T) || glfwGetKey(CObjectController::GetMainWindow(), GLFW_KEY_Y) || glfwGetKey(CObjectController::GetMainWindow(), GLFW_KEY_U));
 
 	//Make camera follow cube
-	camera->m_cameraTargetPos = ppQuad->Position();
+	//camera->m_cameraTargetPos = ppQuad->Position();
 
-	shape_cube->Rotation(shape_cube->Rotation() + glm::vec3(0.0f, delta_time * 2, 0.0f));
-	shape_cube->Position(shape_cube->Position() + glm::vec3(0.0f, ((sin(current_time)/4) * delta_time), 0.0f));
 
-	shape_sea->Rotation(shape_sea->Rotation() + glm::vec3(0.0f, 0.0f, delta_time));
-
-	shape_stencilcube->Position(shape_cube->Position());
-	shape_stencilcube->Scale(shape_cube->Scale() + glm::vec3(0.2f, 0.2f, 0.2f));
-	shape_stencilcube->Rotation(shape_cube->Rotation());
-
-	float groundHeight = Terrain3D::GetTerrain("AucklandHarbor2.raw")->GetHeightFromWorldPos(terrain_auckland->Position(), terrain_auckland->Rotation(), freecam->GetCamera()->m_cameraPos);
-	freecam->GetCamera()->m_cameraPos.y = groundHeight + 1.0f;
 
 	
 
-	Lighting::DirectionalLights[0].Direction = glm::vec3(sin(timeOfDay), cos(timeOfDay), 0.0f);
-	Lighting::DirectionalLights[0].Color = glm::vec3(1.0f, 0.5f + (((sin(timeOfDay)+1.0f)/2.0f)*0.5f), 0.5f + (((sin(timeOfDay) + 1.0f) / 2.0f) * 0.5f));
+	//Lighting::DirectionalLights[0].Direction = glm::vec3(sin(timeOfDay), cos(timeOfDay), 0.0f);
+	//Lighting::DirectionalLights[0].Color = glm::vec3(1.0f, 0.5f + (((sin(timeOfDay)+1.0f)/2.0f)*0.5f), 0.5f + (((sin(timeOfDay) + 1.0f) / 2.0f) * 0.5f));
 	
 
 	//Set BG color
@@ -727,7 +561,7 @@ void RenderGUI()
 	ImGui::SliderFloat("Cloth Stiffness", &clothStiffness, 0.0f, 1.0f);
 
 	
-		if (ImGui::Button("Reset Cloth"))
+		if (ImGui::Button("Reset Cloth Params"))
 
 		{
 
@@ -737,11 +571,13 @@ void RenderGUI()
 
 			numberOfHooks = 3;
 
-			hookDistance = 20.0f;
+			hookDistance = 60.0f;
 
 			clothStiffness = 0.5f;
 
+			
 		}
+		if (ImGui::Button("Create Cloth with Params")) clothEntity->GetBehaviour<ClothRenderer>()->SetCloth(new Cloth(glm::vec2(clothWidth, clothLength), glm::ivec2(50, 50), 1000, numberOfHooks, clothStiffness));
 
 
 
@@ -795,57 +631,24 @@ void Render()
 	
 	glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
 	glEnable(GL_DEPTH_TEST);
-	glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	//Render the skybox
-	SceneManager::GetCurrentSkybox()->Render();
+	//SceneManager::GetCurrentSkybox()->Render();
 
 
 	//Render objects
 
 	
 
-	if (stencilEnabled)
-	{
-		glEnable(GL_STENCIL_TEST);
-		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-		glStencilFunc(GL_ALWAYS, 1, 0xFF);
-		glStencilMask(0xFF);
-		shape_cube->Render(*freecam->GetCamera(), program_blinnphongfog);
-		glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-		glStencilMask(0x00);
-		shape_stencilcube->Render(*freecam->GetCamera(), program_reflective);
-		glStencilMask(0x00);
-		glDisable(GL_STENCIL_TEST);
-		glStencilMask(0xFF);
-	}
-	else
-	{
-		shape_cube->Render(*freecam->GetCamera(), program_blinnphongfog);
-	}
 	
-
-	shape_3Dbutton_bck->Render(*freecam->GetCamera(), program_blinnphong);
-	shape_3Dbutton_fwd->Render(*freecam->GetCamera(), program_blinnphong);
-
-	
-	/*entityTest->GetBehaviour<MeshRenderer>()->Render(freecam->GetCamera());
-	childEntityTest->GetBehaviour<MeshRenderer>()->Render(freecam->GetCamera());
-	otherEntityTest->GetBehaviour<MeshRenderer>()->Render(freecam->GetCamera());*/
-	
-	clothEntity->GetBehaviour<ClothRenderer>()->Render(freecam->GetCamera());
-	entityTest->GetBehaviour<GeometryRenderer>()->Render(freecam->GetCamera());
+	clothEntity->GetBehaviour<ClothRenderer>()->Render(camera);
+	ballEntity->GetBehaviour<MeshRenderer>()->Render(camera);
 	
 	//Render the floor
 
-	//shape_seafloor->Render(*freecam->GetCamera(), program_blinnphongfog);
-	terrain_auckland->Render(*freecam->GetCamera(), program_blinnphongfog);
-	//std::for_each(testcubes.begin(), testcubes.end(), [](Renderable3D r) {r.Render(*freecam->GetCamera(), program_blinnphong); });
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	shape_sea->Render(*freecam->GetCamera(), program_reflectivefog);
-	glDisable(GL_BLEND);
+	
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glDisable(GL_DEPTH_TEST);

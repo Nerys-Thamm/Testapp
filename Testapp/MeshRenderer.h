@@ -22,5 +22,6 @@ private:
     Material* m_material;
     GLuint m_shader;
     GLuint m_texture;
+    
 };
 

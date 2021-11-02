@@ -49,6 +49,8 @@ CEntity::CEntity(CEntity* _parent) : m_parent(_parent), m_pNext(nullptr), m_pPre
 
 CEntity::~CEntity()
 {
+	m_children.clear();
+	m_behaviours.clear();
 	if (m_parent == nullptr)
 	{
 		CEntityManager::RemoveUpdater(this);

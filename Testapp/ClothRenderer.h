@@ -8,7 +8,7 @@ class ClothRenderer :
 public:
     ClothRenderer(CEntity& _parent);
     void Render(Camera* _camera);
-    void SetCloth(Cloth* _cloth) { m_cloth = _cloth; }
+    void SetCloth(Cloth* _cloth);
     Cloth* GetCloth() { return m_cloth; }
     void SetMaterial(Material* _material) { m_material = _material; }
     void SetShader(GLuint _shader) { m_shader = _shader; }
@@ -18,6 +18,7 @@ private:
     void OnFixedUpdate();
     Cloth* m_cloth;
     std::vector<std::unique_ptr<Tri3D>> m_tris;
+    std::vector<int> m_indices;
     Material* m_material;
     GLuint m_shader;
     GLuint m_texture;

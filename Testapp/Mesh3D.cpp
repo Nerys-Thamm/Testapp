@@ -614,7 +614,7 @@ Tri3D::Tri3D()
 {
 	m_verticesCount = sizeof(m_indices) / sizeof(int32_t);
 
-
+	
 
 	//Generate and bind vertex array to VAO
 	glGenVertexArrays(1, &m_VAO);
@@ -639,7 +639,7 @@ Tri3D::Tri3D()
 	glEnableVertexAttribArray(2);
 }
 
-void Tri3D::UpdateVertices(glm::vec3 _first, glm::vec3 _second, glm::vec3 _third)
+void Tri3D::UpdateVertices(glm::vec3 _first, glm::vec3 _second, glm::vec3 _third, glm::vec3 _normal, glm::vec2 _texCoordA, glm::vec2 _texCoordB, glm::vec2 _texCoordC)
 {
 	
 	//m_vertices = {
@@ -654,13 +654,39 @@ void Tri3D::UpdateVertices(glm::vec3 _first, glm::vec3 _second, glm::vec3 _third
 	m_vertices[1] = _first.y;
 	m_vertices[2] = _first.z;
 
+	m_vertices[3] = _texCoordA.x;
+	m_vertices[4] = _texCoordA.y;
+
+	m_vertices[5] = _normal.x;
+	m_vertices[6] = _normal.y;
+	m_vertices[7] = _normal.z;
+
+
+
 	m_vertices[8] = _second.x;
 	m_vertices[9] = _second.y;
 	m_vertices[10] = _second.z;
 
+	m_vertices[11] = _texCoordB.x;
+	m_vertices[12] = _texCoordB.y;
+
+	m_vertices[13] = _normal.x;
+	m_vertices[14] = _normal.y;
+	m_vertices[15] = _normal.z;
+
+
+
+
 	m_vertices[16] = _third.x;
 	m_vertices[17] = _third.y;
 	m_vertices[18] = _third.z;
+
+	m_vertices[19] = _texCoordC.x;
+	m_vertices[20] = _texCoordC.y;
+
+	m_vertices[21] = _normal.x;
+	m_vertices[22] = _normal.y;
+	m_vertices[23] = _normal.z;
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
 	glInvalidateBufferData(GL_ARRAY_BUFFER);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(m_vertices), m_vertices, GL_STREAM_DRAW);

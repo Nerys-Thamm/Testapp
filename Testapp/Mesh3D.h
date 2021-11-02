@@ -215,7 +215,7 @@ public:
 	/// <returns></returns>
 	// ********************************************************************************
 	Tri3D();
-	void UpdateVertices(glm::vec3 _first, glm::vec3 _second, glm::vec3 _third);
+	void UpdateVertices(glm::vec3 _first, glm::vec3 _second, glm::vec3 _third, glm::vec3 _normal, glm::vec2 _texCoordA, glm::vec2 _texCoordB, glm::vec2 _texCoordC);
 private:
 	
 	GLfloat m_vertices[24] = {
