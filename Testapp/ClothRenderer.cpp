@@ -52,27 +52,27 @@ void ClothRenderer::Render(Camera* _camera)
 		glUniform1f(glGetUniformLocation(m_shader, "Mat[0].Reflectivity"), m_material->Reflectivity);
 
 
-		//Lighting
-		//PointLights
-		for (size_t i = 0; i < Lighting::MAX_POINT_LIGHTS; i++)
-		{
-			glUniform3fv(glGetUniformLocation(m_shader, ("PointLights[" + std::to_string(i) + "].Position").c_str()), 1, glm::value_ptr(Lighting::PointLights[i].Position));
-			glUniform3fv(glGetUniformLocation(m_shader, ("PointLights[" + std::to_string(i) + "].Color").c_str()), 1, glm::value_ptr(Lighting::PointLights[i].Color));
-			glUniform1f(glGetUniformLocation(m_shader, ("PointLights[" + std::to_string(i) + "].AmbientStrength").c_str()), Lighting::PointLights[i].AmbientStrength);
-			glUniform1f(glGetUniformLocation(m_shader, ("PointLights[" + std::to_string(i) + "].SpecularStrength").c_str()), Lighting::PointLights[i].SpecularStrength);
-			glUniform1f(glGetUniformLocation(m_shader, ("PointLights[" + std::to_string(i) + "].AttenuationConstant").c_str()), Lighting::PointLights[i].AttenuationConstant);
-			glUniform1f(glGetUniformLocation(m_shader, ("PointLights[" + std::to_string(i) + "].AttenuationExponent").c_str()), Lighting::PointLights[i].AttenuationExponent);
-			glUniform1f(glGetUniformLocation(m_shader, ("PointLights[" + std::to_string(i) + "].AttenuationLinear").c_str()), Lighting::PointLights[i].AttenuationLinear);
-		}
+		////Lighting
+		////PointLights
+		//for (size_t i = 0; i < Lighting::MAX_POINT_LIGHTS; i++)
+		//{
+		//	glUniform3fv(glGetUniformLocation(m_shader, ("PointLights[" + std::to_string(i) + "].Position").c_str()), 1, glm::value_ptr(Lighting::PointLights[i].Position));
+		//	glUniform3fv(glGetUniformLocation(m_shader, ("PointLights[" + std::to_string(i) + "].Color").c_str()), 1, glm::value_ptr(Lighting::PointLights[i].Color));
+		//	glUniform1f(glGetUniformLocation(m_shader, ("PointLights[" + std::to_string(i) + "].AmbientStrength").c_str()), Lighting::PointLights[i].AmbientStrength);
+		//	glUniform1f(glGetUniformLocation(m_shader, ("PointLights[" + std::to_string(i) + "].SpecularStrength").c_str()), Lighting::PointLights[i].SpecularStrength);
+		//	glUniform1f(glGetUniformLocation(m_shader, ("PointLights[" + std::to_string(i) + "].AttenuationConstant").c_str()), Lighting::PointLights[i].AttenuationConstant);
+		//	glUniform1f(glGetUniformLocation(m_shader, ("PointLights[" + std::to_string(i) + "].AttenuationExponent").c_str()), Lighting::PointLights[i].AttenuationExponent);
+		//	glUniform1f(glGetUniformLocation(m_shader, ("PointLights[" + std::to_string(i) + "].AttenuationLinear").c_str()), Lighting::PointLights[i].AttenuationLinear);
+		//}
 
-		//DirectionalLights
-		for (size_t i = 0; i < Lighting::MAX_DIRECTIONAL_LIGHTS; i++)
-		{
-			glUniform3fv(glGetUniformLocation(m_shader, ("DirectionalLights[" + std::to_string(i) + "].Direction").c_str()), 1, glm::value_ptr(Lighting::DirectionalLights[i].Direction));
-			glUniform3fv(glGetUniformLocation(m_shader, ("DirectionalLights[" + std::to_string(i) + "].Color").c_str()), 1, glm::value_ptr(Lighting::DirectionalLights[i].Color));
-			glUniform1f(glGetUniformLocation(m_shader, ("DirectionalLights[" + std::to_string(i) + "].AmbientStrength").c_str()), Lighting::DirectionalLights[i].AmbientStrength);
-			glUniform1f(glGetUniformLocation(m_shader, ("DirectionalLights[" + std::to_string(i) + "].SpecularStrength").c_str()), Lighting::DirectionalLights[i].SpecularStrength);
-		}
+		////DirectionalLights
+		//for (size_t i = 0; i < Lighting::MAX_DIRECTIONAL_LIGHTS; i++)
+		//{
+		//	glUniform3fv(glGetUniformLocation(m_shader, ("DirectionalLights[" + std::to_string(i) + "].Direction").c_str()), 1, glm::value_ptr(Lighting::DirectionalLights[i].Direction));
+		//	glUniform3fv(glGetUniformLocation(m_shader, ("DirectionalLights[" + std::to_string(i) + "].Color").c_str()), 1, glm::value_ptr(Lighting::DirectionalLights[i].Color));
+		//	glUniform1f(glGetUniformLocation(m_shader, ("DirectionalLights[" + std::to_string(i) + "].AmbientStrength").c_str()), Lighting::DirectionalLights[i].AmbientStrength);
+		//	glUniform1f(glGetUniformLocation(m_shader, ("DirectionalLights[" + std::to_string(i) + "].SpecularStrength").c_str()), Lighting::DirectionalLights[i].SpecularStrength);
+		//}
 
 
 		if (m_texture != NULL)
@@ -126,7 +126,7 @@ void ClothRenderer::OnUpdate(float _fDeltaTime)
 		else
 		{
 			int Element = 0;
-			int IndexCount = (m_cloth->GetSize() - 1) * 4;
+			int IndexCount = (m_cloth->GetSize()) * 6;
 			int* Indices = new int[IndexCount];
 			for (int gridY = 0; gridY < (m_cloth->m_particleDensity.y - 1); ++gridY)
 			{
@@ -145,6 +145,7 @@ void ClothRenderer::OnUpdate(float _fDeltaTime)
 
 				}
 			}
+			
 			Element = 0;
 			for (int i = 0; i < m_tris.size(); i++)
 			{
@@ -154,11 +155,15 @@ void ClothRenderer::OnUpdate(float _fDeltaTime)
 					m_cloth->GetParticlePositionAtIndex(Indices[Element++])
 				);
 			}
+			delete[] Indices;
 		}
 	}
 }
 
 void ClothRenderer::OnFixedUpdate()
 {
-	m_cloth->FixedUpdate();
+	if (m_cloth != nullptr)
+	{
+		m_cloth->FixedUpdate();
+	}
 }

@@ -358,9 +358,9 @@ void InitialSetup()
 
 	clothEntity = new CEntity();
 	std::shared_ptr<ClothRenderer> clothrenderer = clothEntity->AddBehaviour<ClothRenderer>();
-	clothrenderer->SetCloth(new Cloth(glm::vec2(5.0f, 5.0f), glm::ivec2(4, 4)));
+	clothrenderer->SetCloth(new Cloth(glm::vec2(5.0f, 5.0f), glm::ivec2(10, 5)));
 	clothrenderer->SetMaterial(Lighting::GetMaterial("EntityTest"));
-	clothrenderer->SetShader(program_blinnphong);
+	clothrenderer->SetShader(program_texture);
 	clothrenderer->SetTexture(TextureLoader::LoadTexture("Yellow.jpg"));
 	clothEntity->m_transform.position = glm::vec3(6.0f, 10.0f, 8.0f);
 
@@ -610,9 +610,10 @@ void Update()
 {
 	//Update all GameObjects
 	CObjectController::UpdateObjects();
+	clothEntity->GetBehaviour<ClothRenderer>()->GetCloth()->AddForce(glm::vec3(0.0f, -0.11f, 0.0f));
+	clothEntity->GetBehaviour<ClothRenderer>()->GetCloth()->AddWind(glm::vec3(1.0f, 0.0f, 0.2f));
 	CEntityManager::UpdateEntities();
-	clothEntity->GetBehaviour<ClothRenderer>()->GetCloth()->AddForce(glm::vec3(0.0f, -0.2f, 0.0f));
-	clothEntity->GetBehaviour<ClothRenderer>()->GetCloth()->AddWind(glm::vec3(0.2f, 0.0f, 0.2f));
+	
 	//Poll events for GLFW input
 	glfwPollEvents();
 	MousePassive();

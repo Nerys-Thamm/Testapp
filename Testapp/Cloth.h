@@ -53,7 +53,7 @@ public: //Public Methods
     ClothParticleConstraint(ClothParticle* _firstParticle, ClothParticle* _secondParticle) : 
         m_firstParticle(_firstParticle), 
         m_secondParticle(_secondParticle), 
-        m_desiredSeperation((_firstParticle->Pos() - _secondParticle->Pos()).length()){}
+        m_desiredSeperation(glm::distance(_firstParticle->Pos(), _secondParticle->Pos())){}
 
     void Constrain();
     
