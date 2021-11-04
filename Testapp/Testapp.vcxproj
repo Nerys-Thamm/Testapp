@@ -149,7 +149,9 @@
   <ItemGroup>
     <ClCompile Include="Audiosystem.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="CameraHolder.cpp" />
     <ClCompile Include="Character.cpp" />
+    <ClCompile Include="CharacterMotor.cpp" />
     <ClCompile Include="Cloth.cpp" />
     <ClCompile Include="ClothRenderer.cpp" />
     <ClCompile Include="Collider2D.cpp" />
@@ -166,6 +168,7 @@
     <ClCompile Include="imgui\imgui_widgets.cpp" />
     <ClCompile Include="Lighting.cpp" />
     <ClCompile Include="MeshRenderer.cpp" />
+    <ClCompile Include="MouseLook.cpp" />
     <ClCompile Include="PointLightObj.cpp" />
     <ClCompile Include="Renderable3D.cpp" />
     <ClCompile Include="Skybox.cpp" />
@@ -183,7 +186,9 @@
   <ItemGroup>
     <ClInclude Include="Audiosystem.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="CameraHolder.h" />
     <ClInclude Include="Character.h" />
+    <ClInclude Include="CharacterMotor.h" />
     <ClInclude Include="Cloth.h" />
     <ClInclude Include="ClothRenderer.h" />
     <ClInclude Include="Collider2D.h" />
@@ -202,6 +207,7 @@
     <ClInclude Include="imgui\imstb_truetype.h" />
     <ClInclude Include="Lighting.h" />
     <ClInclude Include="MeshRenderer.h" />
+    <ClInclude Include="MouseLook.h" />
     <ClInclude Include="PointLightObj.h" />
     <ClInclude Include="Renderable3D.h" />
     <ClInclude Include="Skybox.h" />

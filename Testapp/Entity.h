@@ -52,6 +52,23 @@ public:
 	{
 		glm::vec3 position = glm::vec3(0,0,0);
 		glm::vec3 rotation = glm::vec3(0, 0, 0);
+		glm::vec3 Forward()
+		{
+			/*return glm::vec3(
+				sin((rotation.y / 180.0f) * M_PI),
+				(sin((rotation.x / 180.0f) * M_PI) * cos((rotation.y / 180.0f) * M_PI)),
+				-(cos((rotation.x / 180.0f) * M_PI) * cos((rotation.y / 180.0f) * M_PI))
+				);*/
+			return glm::vec3(
+				cos((rotation.x / 180.0f) * M_PI) * sin((rotation.y / 180.0f) * M_PI),
+				-sin((rotation.x / 180.0f) * M_PI),
+				cos((rotation.x / 180.0f) * M_PI) * cos((rotation.y / 180.0f) * M_PI)
+			);
+		}
+		glm::vec3 Right()
+		{
+			return glm::vec3(cos((rotation.y / 180.0f) * M_PI), 0.0f, -sin((rotation.y / 180.0f) * M_PI));
+		}
 		glm::vec3 scale = glm::vec3(1, 1, 1);
 		Transform& operator+=(const Transform& rhs)
 		{

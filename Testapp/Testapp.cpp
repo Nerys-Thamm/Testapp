@@ -40,6 +40,9 @@
 #include "Cloth.h"
 #include "ClothRenderer.h"
 #include "GeometryRenderer.h"
+#include "CameraHolder.h"
+#include "MouseLook.h"
+#include "CharacterMotor.h"
 
 
 //Pointer to window
@@ -75,6 +78,7 @@ float timer;
 
 //CAMERAS
 Camera* camera = nullptr;
+Camera* playerCam = nullptr;
 FreeCam* freecam = nullptr;
 Camera* orthocamera = nullptr;
 
@@ -119,7 +123,7 @@ CEntity* rootBone = nullptr;
 CEntity* secondBone = nullptr;
 CEntity* thirdBone = nullptr;
 
-CEntity* clothEntity = nullptr;
+CEntity* playerEntity = nullptr, *cameraGimbal = nullptr, *cameraHolder = nullptr;
 
 //---------------------------------------------------------------
 //GUI variables
@@ -305,6 +309,7 @@ void InitialSetup()
 
 	//Create camera
 	camera = new Camera(cfWINDOW_WIDTH(), cfWINDOW_HEIGHT(), current_time, true);
+	playerCam = new Camera(cfWINDOW_WIDTH(), cfWINDOW_HEIGHT(), current_time, true);
 	freecam = new FreeCam(main_window, cfWINDOW_WIDTH(), cfWINDOW_HEIGHT(), current_time, true);
 	orthocamera = new Camera(cfWINDOW_WIDTH(), cfWINDOW_HEIGHT(), current_time, false);
 
@@ -313,7 +318,7 @@ void InitialSetup()
 	//Create Skybox
 	std::string SkyboxFilepaths[] = {"MountainOutpost/Right.jpg","MountainOutpost/Left.jpg","MountainOutpost/Up.jpg","MountainOutpost/Down.jpg","MountainOutpost/Back.jpg","MountainOutpost/Front.jpg"};
 	
-	SceneManager::SetCurrentSkybox(new Skybox(freecam->GetCamera(), SkyboxFilepaths));
+	SceneManager::SetCurrentSkybox(new Skybox(playerCam, SkyboxFilepaths));
 
 
 
@@ -356,13 +361,29 @@ void InitialSetup()
 	entityTest->m_transform.position = glm::vec3(0.0f, 3.0f, 0.0f);
 	entityTest->AddBehaviour<TestBehaviour>();
 
-	clothEntity = new CEntity();
-	std::shared_ptr<ClothRenderer> clothrenderer = clothEntity->AddBehaviour<ClothRenderer>();
-	clothrenderer->SetCloth(new Cloth(glm::vec2(5.0f, 5.0f), glm::ivec2(10, 5)));
-	clothrenderer->SetMaterial(Lighting::GetMaterial("EntityTest"));
-	clothrenderer->SetShader(program_texture);
-	clothrenderer->SetTexture(TextureLoader::LoadTexture("Yellow.jpg"));
-	clothEntity->m_transform.position = glm::vec3(6.0f, 10.0f, 8.0f);
+	playerEntity = new CEntity();
+	playerEntity->AddBehaviour<MeshRenderer>();
+	playerEntity->GetBehaviour<MeshRenderer>()->SetMesh(Cube3D::GetMesh());
+	playerEntity->GetBehaviour<MeshRenderer>()->SetMaterial(Lighting::GetMaterial("EntityTest"));
+	playerEntity->GetBehaviour<MeshRenderer>()->SetShader(program_blinnphong);
+	playerEntity->GetBehaviour<MeshRenderer>()->SetTexture(TextureLoader::LoadTexture("Yellow.jpg"));
+	playerEntity->AddBehaviour<CharacterMotor>();
+	playerEntity->GetBehaviour<CharacterMotor>()->SetWindow(main_window);
+	playerEntity->AddBehaviour<MouseLook>();
+	playerEntity->GetBehaviour<MouseLook>()->SetWindow(main_window, glm::vec2(cfWINDOW_WIDTH(), cfWINDOW_HEIGHT()));
+	playerEntity->GetBehaviour<MouseLook>()->SetAxisLockState(false, true);
+	
+
+	cameraGimbal = new CEntity(playerEntity);
+	cameraGimbal->AddBehaviour<MouseLook>();
+	cameraGimbal->GetBehaviour<MouseLook>()->SetWindow(main_window, glm::vec2(cfWINDOW_WIDTH(), cfWINDOW_HEIGHT()));
+	cameraGimbal->GetBehaviour<MouseLook>()->SetAxisLockState(true, false);
+	cameraGimbal->GetBehaviour<MouseLook>()->SetSensitivity(0.5f);
+
+	cameraHolder = new CEntity(cameraGimbal);
+	cameraHolder->AddBehaviour<CameraHolder>()->SetCamera(playerCam);
+	cameraHolder->m_transform.position = glm::vec3(0.0f, 1.0f, -10.0f);
+	
 
 	shape_cube = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Chrome"));
 	shape_stencilcube = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Glossy"));
@@ -610,8 +631,7 @@ void Update()
 {
 	//Update all GameObjects
 	CObjectController::UpdateObjects();
-	clothEntity->GetBehaviour<ClothRenderer>()->GetCloth()->AddForce(glm::vec3(0.0f, -0.11f, 0.0f));
-	clothEntity->GetBehaviour<ClothRenderer>()->GetCloth()->AddWind(glm::vec3(1.0f, 0.0f, 0.2f));
+	
 	CEntityManager::UpdateEntities();
 	
 	//Poll events for GLFW input
@@ -674,6 +694,9 @@ void Update()
 	//Make camera follow cube
 	camera->m_cameraTargetPos = ppQuad->Position();
 
+	/*playerCam->m_cameraTargetPos = playerEntity->m_globalTransform.position;
+	playerCam->m_lookAtTarget = true;*/
+
 	shape_cube->Rotation(shape_cube->Rotation() + glm::vec3(0.0f, delta_time * 2, 0.0f));
 	shape_cube->Position(shape_cube->Position() + glm::vec3(0.0f, ((sin(current_time)/4) * delta_time), 0.0f));
 
@@ -683,8 +706,8 @@ void Update()
 	shape_stencilcube->Scale(shape_cube->Scale() + glm::vec3(0.2f, 0.2f, 0.2f));
 	shape_stencilcube->Rotation(shape_cube->Rotation());
 
-	float groundHeight = Terrain3D::GetTerrain("AucklandHarbor2.raw")->GetHeightFromWorldPos(terrain_auckland->Position(), terrain_auckland->Rotation(), freecam->GetCamera()->m_cameraPos);
-	freecam->GetCamera()->m_cameraPos.y = groundHeight + 1.0f;
+	float groundHeight = Terrain3D::GetTerrain("AucklandHarbor2.raw")->GetHeightFromWorldPos(terrain_auckland->Position(), terrain_auckland->Rotation(), playerEntity->m_transform.position);
+	playerEntity->m_transform.position.y = groundHeight + 0.5f;
 
 	
 
@@ -806,7 +829,7 @@ void Render()
 
 	
 
-	if (stencilEnabled)
+	/*if (stencilEnabled)
 	{
 		glEnable(GL_STENCIL_TEST);
 		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
@@ -823,7 +846,7 @@ void Render()
 	else
 	{
 		shape_cube->Render(*freecam->GetCamera(), program_blinnphongfog);
-	}
+	}*/
 	
 
 	shape_3Dbutton_bck->Render(*freecam->GetCamera(), program_blinnphong);
@@ -834,17 +857,19 @@ void Render()
 	childEntityTest->GetBehaviour<MeshRenderer>()->Render(freecam->GetCamera());
 	otherEntityTest->GetBehaviour<MeshRenderer>()->Render(freecam->GetCamera());*/
 	
-	clothEntity->GetBehaviour<ClothRenderer>()->Render(freecam->GetCamera());
-	entityTest->GetBehaviour<GeometryRenderer>()->Render(freecam->GetCamera());
+	
+	entityTest->GetBehaviour<GeometryRenderer>()->Render(playerCam);
+
+	playerEntity->GetBehaviour<MeshRenderer>()->Render(playerCam);
 	
 	//Render the floor
 
 	//shape_seafloor->Render(*freecam->GetCamera(), program_blinnphongfog);
-	terrain_auckland->Render(*freecam->GetCamera(), program_blinnphongfog);
+	terrain_auckland->Render(*playerCam, program_blinnphongfog);
 	//std::for_each(testcubes.begin(), testcubes.end(), [](Renderable3D r) {r.Render(*freecam->GetCamera(), program_blinnphong); });
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	shape_sea->Render(*freecam->GetCamera(), program_reflectivefog);
+	shape_sea->Render(*playerCam, program_reflectivefog);
 	glDisable(GL_BLEND);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
