@@ -292,8 +292,8 @@ void InitialSetup()
 	program_reflectivefog = ShaderLoader::CreateProgram("Resources/Shaders/3D_Normals.vs",
 		"Resources/Shaders/3DLight_ReflectiveFog.fs");
 	
-	program_postprocess = ShaderLoader::CreateProgram("Resources/Shaders/NDC_Texture.vs",
-		"Resources/Shaders/Texture.fs");
+	program_postprocess = ShaderLoader::CreateProgram("Resources/Shaders/3D_Normals.vs",
+		"Resources/Shaders/PostProcessing.fs");
 
 	program_geostar = ShaderLoader::CreateProgram("Resources/Shaders/GeoShader.vs",
 		"Resources/Shaders/GeoShader.fs", "Resources/Shaders/StarGeoShader.gs");
@@ -878,7 +878,7 @@ void Render()
 	glClear(GL_COLOR_BUFFER_BIT);
 	//ppQuad->Render(*freecam->GetCamera(), program_texture);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	shape_renderquad->Render(*camera, program_normals);
+	shape_renderquad->Render(*camera, program_postprocess);
 	if (SceneManager::m_isWireframe)
 	{
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
