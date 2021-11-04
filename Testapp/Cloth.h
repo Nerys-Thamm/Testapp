@@ -102,6 +102,7 @@ public: //Public Methods
     glm::vec3 GetTriNormal(ClothParticle* _a, ClothParticle* _b, ClothParticle* _c);
     glm::vec3 GetTriNormal(int _a, int _b, int _c);
     void DropCloth();
+    ~Cloth();
 
 private: //Private Methods
     ClothParticle* GetParticleAtIndex(int _X, int _Y) { return &m_particles[_Y * m_particleDensity.x + _X]; }

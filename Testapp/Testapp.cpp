@@ -405,22 +405,17 @@ void InitialSetup()
 //Resets the scene
 void ResetScene()
 {
+	clothLength = 30.0f;
 
-	//Set position of Cameras
-	camera->m_cameraPos = glm::vec3(0.0f, 0.0f, 0.0f);
-	camera->m_cameraTargetPos = shape_renderquad->Position();
-	camera->m_lookAtTarget = true;
+	clothWidth = 30.0f;
 
-	//Reset Audio
-	audio_main = Audiosystem::GetInstance();
-	//Start playing background track
-	audio_main->PlaySound("Track_BeachAmbience", 0.5f, true);
+	numberOfHooks = 4;
 
-	//Setup Lighting
-	Lighting::DirectionalLights[0].Direction = glm::vec3(-1.0f, -1.0f, -1.0f);
-	Lighting::DirectionalLights[0].Color = glm::vec3(1.0f, 1.0f, 1.0f);
-	Lighting::DirectionalLights[0].AmbientStrength = 0.1f;
-	Lighting::DirectionalLights[0].SpecularStrength = 0.3f;
+	hookDistance = 60.0f;
+
+	clothStiffness = 0.5f;
+	clothEntity->GetBehaviour<ClothRenderer>()->SetCloth(new Cloth(glm::vec2(clothWidth, clothLength), glm::ivec2(50, 50), 1000, numberOfHooks, clothStiffness));
+	dropped = false;
 }
 
 float mouseY, mouseX;

@@ -7,6 +7,7 @@ class ClothRenderer :
 {
 public:
     ClothRenderer(CEntity& _parent);
+    ~ClothRenderer();
     void Render(Camera* _camera);
     void SetCloth(Cloth* _cloth);
     Cloth* GetCloth() { return m_cloth; }

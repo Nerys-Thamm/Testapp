@@ -8,6 +8,12 @@ ClothRenderer::ClothRenderer(CEntity& _parent) : IBehaviour(_parent)
 	m_cloth = nullptr;
 }
 
+ClothRenderer::~ClothRenderer()
+{
+	delete m_cloth;
+
+}
+
 void ClothRenderer::Render(Camera* _camera)
 {
 	if (m_cloth == nullptr || m_shader == NULL)
