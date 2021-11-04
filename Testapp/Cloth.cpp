@@ -1,17 +1,34 @@
 #include "Cloth.h"
 
+// ********************************************************************************
+/// <summary>
+/// 
+/// </summary>
+/// <param name="_forceVector"></param>
+// ********************************************************************************
 void ClothParticle::ApplyForce(glm::vec3 _forceVector)
 {
     if (!m_dynamic) return;
     m_accel += _forceVector / m_particleMass;
 }
 
+// ********************************************************************************
+/// <summary>
+/// 
+/// </summary>
+// ********************************************************************************
 void ClothParticle::ApplyGravity()
 {
     if (!m_dynamic) return;
     m_accel += -glm::vec3(0.0f, (9.8f/2.0f), 0.0f);
 }
 
+// ********************************************************************************
+/// <summary>
+/// 
+/// </summary>
+/// <param name="_fDeltaTime"></param>
+// ********************************************************************************
 void ClothParticle::Update(float _fDeltaTime)
 {
     if (!m_dynamic) return;
@@ -21,6 +38,11 @@ void ClothParticle::Update(float _fDeltaTime)
     m_accel = glm::vec3{ 0.0f, 0.0f, 0.0f };
 }
 
+// ********************************************************************************
+/// <summary>
+/// 
+/// </summary>
+// ********************************************************************************
 void ClothParticleConstraint::Constrain()
 {
     
@@ -38,10 +60,17 @@ void ClothParticleConstraint::Constrain()
    
 }
 
+// ********************************************************************************
+/// <summary>
+/// 
+/// </summary>
+/// <param name="_origin"></param>
+/// <param name="_radius"></param>
+// ********************************************************************************
 void Cloth::SphereCollision(glm::vec3 _origin, float _radius)
 {
     
-    for (int i = 0; i < m_particles.size(); i++)
+    for (int i = 0; i < (int)m_particles.size(); i++)
     {
         if (!m_particles[i].Dynamic())
         {
@@ -56,14 +85,27 @@ void Cloth::SphereCollision(glm::vec3 _origin, float _radius)
     }
 }
 
+// ********************************************************************************
+/// <summary>
+/// 
+/// </summary>
+/// <param name="_distance"></param>
+// ********************************************************************************
 void Cloth::SetPegDistance(float _distance)
 {
-    for (int i = 0; i < m_pegXIndexes.size(); i++)
+    for (int i = 0; i < (int)m_pegXIndexes.size(); i++)
     {
         m_particles[m_pegXIndexes[i]].Pos(glm::vec3((_distance/m_numOfPegs) * i, 0.0f, (i % 2 == 0 ? -1.0f : 1.0f)));
     }
 }
 
+// ********************************************************************************
+/// <summary>
+/// 
+/// </summary>
+/// <param name="_stiffness"></param>
+/// <returns></returns>
+// ********************************************************************************
 Cloth::Cloth(glm::vec2 _scale, glm::ivec2 _density, float _mass, int _pegs, float& _stiffness) : m_particleDensity(_density), m_numOfPegs(_pegs), m_pegDistance(_scale.x / _pegs), m_stiffness(_stiffness)
 {
     int totalcount = _density.x * _density.y;
@@ -129,12 +171,23 @@ Cloth::Cloth(glm::vec2 _scale, glm::ivec2 _density, float _mass, int _pegs, floa
 }
 
 
+// ********************************************************************************
+/// <summary>
+/// 
+/// </summary>
+/// <param name="_fDeltaTime"></param>
+// ********************************************************************************
 void Cloth::Update(float _fDeltaTime)
 {
     
     
 }
 
+// ********************************************************************************
+/// <summary>
+/// 
+/// </summary>
+// ********************************************************************************
 void Cloth::FixedUpdate()
 {
    
@@ -165,15 +218,15 @@ void Cloth::FixedUpdate()
     t3.join();*/
     for (int i = 0; i < 2; i++)
     {
-        for (int i = 0; i < m_structuralConstraints.size(); i++)
+        for (int i = 0; i < (int)m_structuralConstraints.size(); i++)
         {
             m_structuralConstraints[i].Constrain();
         }
-        for (int i = 0; i < m_shearConstraints.size(); i++)
+        for (int i = 0; i < (int)m_shearConstraints.size(); i++)
         {
             m_shearConstraints[i].Constrain();
         }
-        for (int i = 0; i < m_bendConstraints.size(); i++)
+        for (int i = 0; i < (int)m_bendConstraints.size(); i++)
         {
             m_bendConstraints[i].Constrain();
         }
@@ -184,16 +237,33 @@ void Cloth::FixedUpdate()
     }*/
 }
 
+// ********************************************************************************
+/// <summary>
+/// 
+/// </summary>
+/// <param name="_force"></param>
+// ********************************************************************************
 void Cloth::AddForce(glm::vec3 _force)
 {
     std::for_each(m_particles.begin(), m_particles.end(), [&](ClothParticle& _p) { _p.ApplyForce(_force); });
 }
 
+// ********************************************************************************
+/// <summary>
+/// 
+/// </summary>
+// ********************************************************************************
 void Cloth::ApplyGravity()
 {
     std::for_each(m_particles.begin(), m_particles.end(), [&](ClothParticle& _p) { _p.ApplyGravity(); });
 }
 
+// ********************************************************************************
+/// <summary>
+/// 
+/// </summary>
+/// <param name="_force"></param>
+// ********************************************************************************
 void Cloth::AddWind(glm::vec3 _force)
 {
     for (int x = 0; x < m_particleDensity.x - 1; x++)
@@ -206,24 +276,56 @@ void Cloth::AddWind(glm::vec3 _force)
     }
 }
 
+// ********************************************************************************
+/// <summary>
+/// 
+/// </summary>
+/// <param name="_a"></param>
+/// <param name="_b"></param>
+/// <param name="_c"></param>
+/// <returns></returns>
+// ********************************************************************************
 glm::vec3 Cloth::GetTriNormal(ClothParticle* _a, ClothParticle* _b, ClothParticle* _c)
 {
     return glm::cross((_b->Pos() - _a->Pos()), (_c->Pos() - _a->Pos()));
 }
 
+// ********************************************************************************
+/// <summary>
+/// 
+/// </summary>
+/// <param name="_a"></param>
+/// <param name="_b"></param>
+/// <param name="_c"></param>
+/// <returns></returns>
+// ********************************************************************************
 glm::vec3 Cloth::GetTriNormal(int _a, int _b, int _c)
 {
     return GetTriNormal(&m_particles[_a], &m_particles[_b], &m_particles[_c]);
 }
 
+// ********************************************************************************
+/// <summary>
+/// 
+/// </summary>
+// ********************************************************************************
 void Cloth::DropCloth()
 {
-    for (int i = 0; i < m_particles.size(); i++)
+    for (int i = 0; i < (int)m_particles.size(); i++)
     {
         m_particles[i].Dynamic(true);
     }
 }
 
+// ********************************************************************************
+/// <summary>
+/// 
+/// </summary>
+/// <param name="_a"></param>
+/// <param name="_b"></param>
+/// <param name="_c"></param>
+/// <param name="_force"></param>
+// ********************************************************************************
 void Cloth::ApplyWindForce(ClothParticle* _a, ClothParticle* _b, ClothParticle* _c, glm::vec3 _force)
 {
     glm::vec3 norm = GetTriNormal(_a, _b, _c);

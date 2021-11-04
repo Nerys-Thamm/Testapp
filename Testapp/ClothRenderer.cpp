@@ -45,7 +45,7 @@ void ClothRenderer::Render(Camera* _camera)
 		glUniform1f(glGetUniformLocation(m_shader, ("DirectionalLights[" + std::to_string(i) + "].AmbientStrength").c_str()), Lighting::DirectionalLights[i].AmbientStrength);
 		glUniform1f(glGetUniformLocation(m_shader, ("DirectionalLights[" + std::to_string(i) + "].SpecularStrength").c_str()), Lighting::DirectionalLights[i].SpecularStrength);
 	}
-	for (int i = 0; i < m_tris.size(); i++)
+	for (int i = 0; i < (int)m_tris.size(); i++)
 	{
 
 
@@ -57,7 +57,7 @@ void ClothRenderer::Render(Camera* _camera)
 
 		//Time
 		GLint CurrentTimeLoc = glGetUniformLocation(m_shader, "CurrentTime");
-		glUniform1f(CurrentTimeLoc, glfwGetTime());
+		glUniform1f(CurrentTimeLoc, (GLfloat)glfwGetTime());
 
 		//Matrices
 		GLint PVMMatLoc = glGetUniformLocation(m_shader, "PVMMat");
@@ -158,7 +158,7 @@ void ClothRenderer::OnUpdate(float _fDeltaTime)
 			
 			
 			int Element = 0;
-			for (int i = 0; i < m_tris.size(); i++)
+			for (int i = 0; i < (int)m_tris.size(); i++)
 			{
 
 				int indexA = m_indices[Element++];

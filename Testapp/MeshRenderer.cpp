@@ -30,7 +30,7 @@ void MeshRenderer::Render(Camera* _camera)
 
 	//Time
 	GLint CurrentTimeLoc = glGetUniformLocation(m_shader, "CurrentTime");
-	glUniform1f(CurrentTimeLoc, glfwGetTime());
+	glUniform1f(CurrentTimeLoc, (GLfloat)glfwGetTime());
 
 	//Matrices
 	GLint PVMMatLoc = glGetUniformLocation(m_shader, "PVMMat");

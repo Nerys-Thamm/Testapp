@@ -115,7 +115,7 @@ public:
 	template <typename B, typename std::enable_if<std::is_base_of<IBehaviour, B>::value>::type* = nullptr>
 	B* GetBehaviour()
 	{
-		for (int i = 0; i < m_behaviours.size(); i++)
+		for (int i = 0; i < (int)m_behaviours.size(); i++)
 		{
 			if (dynamic_cast<B*>(m_behaviours[i].get()))
 			{

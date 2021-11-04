@@ -383,7 +383,7 @@ void InitialSetup()
 	Lighting::DirectionalLights[0].SpecularStrength = 1.0f;
 
 	//Post Processing
-	TextureLoader::CreateFrameBuffer(cfWINDOW_WIDTH(), cfWINDOW_HEIGHT(), renderTexture, frameBuffer);
+	TextureLoader::CreateFrameBuffer((int)cfWINDOW_WIDTH(), (int)cfWINDOW_HEIGHT(), renderTexture, frameBuffer);
 	ppQuad = new Quad2D();
 	ppQuad->AddTexture(TextureLoader::LoadTexture("Yellow.jpg"));
 	ppQuad->Position(glm::vec3{ 300.0f,300.0f,4.0f });
@@ -431,8 +431,8 @@ void MousePassive()
 {
 	double x, y;
 	glfwGetCursorPos(CObjectController::GetMainWindow(), &x, &y);
-	mouseX = (2.0f * x) / cfWINDOW_WIDTH() - 1.0f;
-	mouseY = 1.0f - (2.0f * y) / cfWINDOW_HEIGHT();
+	mouseX = (2.0f * (float)x) / (float)cfWINDOW_WIDTH() - 1.0f;
+	mouseY = 1.0f - (2.0f * (float)y) / (float)cfWINDOW_HEIGHT();
 }
 
 //Update mouse picking ray
@@ -584,7 +584,7 @@ void RenderGUI()
 
 	clothEntity->m_transform.rotation = glm::vec3(0.0f, clothRotation, 0.0f);
 
-	ImGui::SliderInt("Number Of Hooks", &numberOfHooks, 0, floorf(clothWidth));
+	ImGui::SliderInt("Number Of Hooks", &numberOfHooks, 0, (int)floorf(clothWidth));
 
 	ImGui::SliderFloat("Hook Distance", &hookDistance, 1.0f, 100.0f);
 

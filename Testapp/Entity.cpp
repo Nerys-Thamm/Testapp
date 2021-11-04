@@ -71,11 +71,11 @@ void CEntity::Update(float _fDeltaTime)
 	{
 		m_globalTransform = m_transform + m_parent->m_globalTransform;
 	}
-	for (int i = 0; i < m_behaviours.size(); i++)
+	for (int i = 0; i < (int)m_behaviours.size(); i++)
 	{
 		m_behaviours[i]->OnUpdate(_fDeltaTime);
 	}
-	for (int i = 0; i < m_children.size(); i++)
+	for (int i = 0; i < (int)m_children.size(); i++)
 	{
 		m_children[i]->Update(_fDeltaTime);
 	}
@@ -83,11 +83,11 @@ void CEntity::Update(float _fDeltaTime)
 
 void CEntity::FixedUpdate()
 {
-	for (int i = 0; i < m_behaviours.size(); i++)
+	for (int i = 0; i < (int)m_behaviours.size(); i++)
 	{
 		m_behaviours[i]->OnFixedUpdate();
 	}
-	for (int i = 0; i < m_children.size(); i++)
+	for (int i = 0; i < (int)m_children.size(); i++)
 	{
 		m_children[i]->FixedUpdate();
 	}
@@ -96,7 +96,7 @@ void CEntity::FixedUpdate()
 
 void CEntity::LateUpdate(float _fDeltaTime)
 {
-	for (int i = 0; i < m_behaviours.size(); i++)
+	for (int i = 0; i < (int)m_behaviours.size(); i++)
 	{
 		m_behaviours[i]->OnLateUpdate(_fDeltaTime);
 	}
