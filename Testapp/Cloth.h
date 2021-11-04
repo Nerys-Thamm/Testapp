@@ -79,7 +79,7 @@ class Cloth
 public: //Public Vars
     int GetSize() { return m_particles.size(); }
     glm::ivec2 m_particleDensity;
-    glm::vec3 GetParticlePositionAtIndex(int _index) { return m_particles[_index].LocalPos(); }
+    glm::vec3 GetParticlePositionAtIndex(int _index) { return m_particles[_index].Pos(); }
     void SetPegDistance(float _distance);
 private: //Private Vars
     
@@ -101,6 +101,7 @@ public: //Public Methods
     void SphereCollision(glm::vec3 _origin, float _radius);
     glm::vec3 GetTriNormal(ClothParticle* _a, ClothParticle* _b, ClothParticle* _c);
     glm::vec3 GetTriNormal(int _a, int _b, int _c);
+    void DropCloth();
 
 private: //Private Methods
     ClothParticle* GetParticleAtIndex(int _X, int _Y) { return &m_particles[_Y * m_particleDensity.x + _X]; }
