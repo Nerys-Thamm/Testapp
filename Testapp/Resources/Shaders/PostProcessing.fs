@@ -51,7 +51,7 @@ void main()
 
     col /= Quality * Directions - 15.0;
    	// scanline
-    float scanline = sin(uv.y*1600.0)*0.04;
+    float scanline = sin((uv.y*1600.0) + (CurrentTime*100.0))*0.04;
     col -= scanline;
    	
  

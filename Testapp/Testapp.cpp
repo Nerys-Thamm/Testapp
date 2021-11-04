@@ -144,7 +144,7 @@ int selectedCollision = 0;
 float windDirection = 0.0f;
 float windStrength = 10.0f;
 
-float timeOfDay = 0.0f;
+float timeOfDay = 2.7f;
 
 //----------------------------------------------------
 
