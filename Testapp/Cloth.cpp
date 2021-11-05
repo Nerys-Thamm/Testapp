@@ -56,14 +56,26 @@ void ClothParticle::Update(float _fDeltaTime)
 // ********************************************************************************
 void ClothParticleConstraint::Constrain()
 {
-    
+    //Get the particle positions
     glm::vec3 firstPos = m_firstParticle->Pos();
     glm::vec3 secondPos = m_secondParticle->Pos();
+
+    //Find the vector between the particles
     glm::vec3 AB = secondPos - firstPos;
+
+    //Find the distance between the particles
     float len = glm::distance(secondPos, firstPos);
+
+    //Get the normalised direction vector
     AB = glm::normalize(AB);
+    
+    //Get the correction vector
     glm::vec3 halfCorrection = (AB * (len - m_desiredSeperation)) * (0.5f*m_stiffness);
+
+    //Lock this method to protect thread safety when multithreading the simulation
     std::lock_guard<std::mutex> guard(*cloth_constraint_mutex);
+
+    //Apply the Constraint
     if (m_firstParticle->Dynamic() && m_firstParticle->Pos().y < -50.0f) m_firstParticle->Pos(glm::vec3((firstPos + halfCorrection).x, -50.0f, (firstPos + halfCorrection).z));
     else if (m_firstParticle->Dynamic()) m_firstParticle->Pos(firstPos + halfCorrection);
     if (m_secondParticle->Dynamic() && m_secondParticle->Pos().y < -50.0f) m_secondParticle->Pos(glm::vec3((secondPos - halfCorrection).x, -50.0f, (secondPos - halfCorrection).z));
@@ -166,17 +178,16 @@ Cloth::Cloth(glm::vec2 _scale, glm::ivec2 _density, float _mass, int _pegs, floa
     }
 
 
+    //Make the Pegs hang up the cloth
     if (m_numOfPegs > 0 && m_numOfPegs <= m_particleDensity.x)
     {
-        for (int i = 0; i < m_particleDensity.x; i++)
+        
+        for (int i = 0; i < m_numOfPegs; i++)
         {
-            if ((i % (m_particleDensity.x / m_numOfPegs)) == 0)
-            {
-                GetParticleAtIndex(i, 0)->Dynamic(false);
-                m_pegXIndexes.push_back(i);
-            }
+            int index = (int)floorf(i * (m_particleDensity.x / (float)m_numOfPegs));
+            GetParticleAtIndex(index, 0)->Dynamic(false);
+            m_pegXIndexes.push_back(index);
         }
-
         
     }
 }

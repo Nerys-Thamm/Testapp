@@ -110,11 +110,11 @@ CEntity* railEntity = nullptr;
 //---------------------------------------------------------------
 //GUI variables
 bool bWireFrameMode = false;
-float clothLength = 60.0f;
-float clothWidth = 60.0f;
+float clothLength = 40.0f;
+float clothWidth = 40.0f;
 float clothRotation = 0.0f;
 
-int numberOfHooks = 3;
+int numberOfHooks = 4;
 float hookDistance = 20.0f;
 float clothStiffness = 0.5f;
 
@@ -494,14 +494,7 @@ void Update()
 	//Process mouse input and Mouse picking
 	if (glfwGetMouseButton(CObjectController::GetMainWindow(), GLFW_MOUSE_BUTTON_1) == GLFW_PRESS)
 	{
-		/*if (CheckAABBIntersect(camera->m_cameraPos, rayDirection, shape_3Dbutton_fwd->Position(), shape_3Dbutton_fwd->Scale()))
-		{
-			camera->m_cameraPos.z += delta_time * 2.0f;
-		}
-		if (CheckAABBIntersect(camera->m_cameraPos, rayDirection, shape_3Dbutton_bck->Position(), shape_3Dbutton_bck->Scale()))
-		{
-			camera->m_cameraPos.z -= delta_time * 2.0f;
-		}*/
+		
 	}
 	//Perform actions on key press
 	if (glfwGetKey(CObjectController::GetMainWindow(), GLFW_KEY_R) && !pressedLastFrame) ResetScene();
@@ -537,15 +530,6 @@ void Update()
 	}
 	pressedLastFrame = (glfwGetKey(CObjectController::GetMainWindow(), GLFW_KEY_R) || glfwGetKey(CObjectController::GetMainWindow(), GLFW_KEY_T) || glfwGetKey(CObjectController::GetMainWindow(), GLFW_KEY_Y) || glfwGetKey(CObjectController::GetMainWindow(), GLFW_KEY_U));
 
-	//Make camera follow cube
-	//camera->m_cameraTargetPos = ppQuad->Position();
-
-
-
-	
-
-	//Lighting::DirectionalLights[0].Direction = glm::vec3(sin(timeOfDay), cos(timeOfDay), 0.0f);
-	//Lighting::DirectionalLights[0].Color = glm::vec3(1.0f, 0.5f + (((sin(timeOfDay)+1.0f)/2.0f)*0.5f), 0.5f + (((sin(timeOfDay) + 1.0f) / 2.0f) * 0.5f));
 	
 
 	//Set BG color
