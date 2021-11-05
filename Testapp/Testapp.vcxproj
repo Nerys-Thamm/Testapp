@@ -170,6 +170,10 @@
     <ClCompile Include="Lighting.cpp" />
     <ClCompile Include="MeshRenderer.cpp" />
     <ClCompile Include="MouseLook.cpp" />
+    <ClCompile Include="NewBehaviour.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="PointLightObj.cpp" />
     <ClCompile Include="Renderable3D.cpp" />
     <ClCompile Include="Skybox.cpp" />
@@ -211,6 +215,10 @@
     <ClInclude Include="Lighting.h" />
     <ClInclude Include="MeshRenderer.h" />
     <ClInclude Include="MouseLook.h" />
+    <ClInclude Include="NewBehaviour.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
     <ClInclude Include="PointLightObj.h" />
     <ClInclude Include="Renderable3D.h" />
     <ClInclude Include="Skybox.h" />
