@@ -2,7 +2,7 @@
 
 // ********************************************************************************
 /// <summary>
-/// 
+/// Applies force to the Particle
 /// </summary>
 /// <param name="_forceVector"></param>
 // ********************************************************************************
@@ -14,7 +14,7 @@ void ClothParticle::ApplyForce(glm::vec3 _forceVector)
 
 // ********************************************************************************
 /// <summary>
-/// 
+/// Applies Gravity force to the Particle
 /// </summary>
 // ********************************************************************************
 void ClothParticle::ApplyGravity()
@@ -25,7 +25,7 @@ void ClothParticle::ApplyGravity()
 
 // ********************************************************************************
 /// <summary>
-/// 
+/// Update the position and acceleration of the Particle
 /// </summary>
 /// <param name="_fDeltaTime"></param>
 // ********************************************************************************
@@ -40,7 +40,7 @@ void ClothParticle::Update(float _fDeltaTime)
 
 // ********************************************************************************
 /// <summary>
-/// 
+/// Apply the constraint to the particles
 /// </summary>
 // ********************************************************************************
 void ClothParticleConstraint::Constrain()
@@ -62,7 +62,7 @@ void ClothParticleConstraint::Constrain()
 
 // ********************************************************************************
 /// <summary>
-/// 
+/// Apply a Sphere collision check TODO: MAKE THIS WORK
 /// </summary>
 /// <param name="_origin"></param>
 /// <param name="_radius"></param>
@@ -87,7 +87,7 @@ void Cloth::SphereCollision(glm::vec3 _origin, float _radius)
 
 // ********************************************************************************
 /// <summary>
-/// 
+/// Sets the distance of the pegs the cloth is hung by
 /// </summary>
 /// <param name="_distance"></param>
 // ********************************************************************************
@@ -101,7 +101,7 @@ void Cloth::SetPegDistance(float _distance)
 
 // ********************************************************************************
 /// <summary>
-/// 
+/// Constructor
 /// </summary>
 /// <param name="_stiffness"></param>
 /// <returns></returns>
@@ -173,7 +173,7 @@ Cloth::Cloth(glm::vec2 _scale, glm::ivec2 _density, float _mass, int _pegs, floa
 
 // ********************************************************************************
 /// <summary>
-/// 
+/// Called every frame
 /// </summary>
 /// <param name="_fDeltaTime"></param>
 // ********************************************************************************
@@ -185,7 +185,7 @@ void Cloth::Update(float _fDeltaTime)
 
 // ********************************************************************************
 /// <summary>
-/// 
+/// Called at a fixed timestep
 /// </summary>
 // ********************************************************************************
 void Cloth::FixedUpdate()
@@ -195,27 +195,7 @@ void Cloth::FixedUpdate()
     ApplyGravity();
     std::for_each(m_particles.begin(), m_particles.end(), [&](ClothParticle& _p) { _p.Update(1.0f/60.0f); _p.LocalPos(_p.Pos() - m_particles[0].Pos()); });
     //Apply the constraints
-    /*std::thread t1([&] {
-        for (int i = 0; i < m_structuralConstraints.size(); i++)
-        {
-            m_structuralConstraints[i].Constrain();
-        }
-        });
-    std::thread t2([&] {
-        for (int i = 0; i < m_shearConstraints.size(); i++)
-        {
-            m_shearConstraints[i].Constrain();
-        }
-        });
-    std::thread t3([&] {
-        for (int i = 0; i < m_bendConstraints.size(); i++)
-        {
-            m_bendConstraints[i].Constrain();
-        }
-        });
-    t1.join();
-    t2.join();
-    t3.join();*/
+    
     for (int i = 0; i < 2; i++)
     {
         for (int i = 0; i < (int)m_structuralConstraints.size(); i++)
@@ -231,15 +211,12 @@ void Cloth::FixedUpdate()
             m_bendConstraints[i].Constrain();
         }
     }
-   /* for (int i = 0; i < 2; i++)
-    {
-        std::for_each(m_constraints.begin(), m_constraints.end(), [&](ClothParticleConstraint& _c) { _c.Constrain(); });
-    }*/
+  
 }
 
 // ********************************************************************************
 /// <summary>
-/// 
+/// Add a force to all particles in the cloth
 /// </summary>
 /// <param name="_force"></param>
 // ********************************************************************************
@@ -250,7 +227,7 @@ void Cloth::AddForce(glm::vec3 _force)
 
 // ********************************************************************************
 /// <summary>
-/// 
+/// Apply gravity to the cloth
 /// </summary>
 // ********************************************************************************
 void Cloth::ApplyGravity()
@@ -260,7 +237,7 @@ void Cloth::ApplyGravity()
 
 // ********************************************************************************
 /// <summary>
-/// 
+/// Apply a wind force to the cloth
 /// </summary>
 /// <param name="_force"></param>
 // ********************************************************************************
@@ -278,7 +255,7 @@ void Cloth::AddWind(glm::vec3 _force)
 
 // ********************************************************************************
 /// <summary>
-/// 
+/// Get the normal of a triangle defined by three Particles
 /// </summary>
 /// <param name="_a"></param>
 /// <param name="_b"></param>
@@ -292,7 +269,7 @@ glm::vec3 Cloth::GetTriNormal(ClothParticle* _a, ClothParticle* _b, ClothParticl
 
 // ********************************************************************************
 /// <summary>
-/// 
+/// Get the normal of a triangle defined by three Indices
 /// </summary>
 /// <param name="_a"></param>
 /// <param name="_b"></param>
@@ -306,7 +283,7 @@ glm::vec3 Cloth::GetTriNormal(int _a, int _b, int _c)
 
 // ********************************************************************************
 /// <summary>
-/// 
+/// Make all particles dynamic so it falls
 /// </summary>
 // ********************************************************************************
 void Cloth::DropCloth()
@@ -324,7 +301,7 @@ Cloth::~Cloth()
 
 // ********************************************************************************
 /// <summary>
-/// 
+/// Apply a force proportional to the dot product of the triangle and force vector
 /// </summary>
 /// <param name="_a"></param>
 /// <param name="_b"></param>

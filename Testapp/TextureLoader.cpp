@@ -1,15 +1,3 @@
-// Bachelor of Software Engineering
-// Media Design School
-// Auckland
-// New Zealand
-//
-// (c) 2021 Media Design School
-//
-// File Name   : TextureLoader.cpp
-// Description : Implements methods for loading textures from files
-// Author      : Nerys Thamm
-// Mail        : nerys.thamm@mds.ac.nz
-
 #include "TextureLoader.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"

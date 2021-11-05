@@ -1,15 +1,3 @@
-// Bachelor of Software Engineering
-// Media Design School
-// Auckland
-// New Zealand
-//
-// (c) 2021 Media Design School
-//
-// File Name   : PointLightObj.cpp
-// Description : Defines methods and members for a point light object that represents a point light in the scene
-// Author      : Nerys Thamm
-// Mail        : nerys.thamm@mds.ac.nz
-
 #include "PointLightObj.h"
 
 // ********************************************************************************

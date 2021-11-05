@@ -1,15 +1,3 @@
-// Bachelor of Software Engineering
-// Media Design School
-// Auckland
-// New Zealand
-//
-// (c) 2021 Media Design School
-//
-// File Name   : Shape2D.cpp
-// Description : Defines 2D shape rendering classes
-// Author      : Nerys Thamm
-// Mail        : nerys.thamm@mds.ac.nz
-
 #include "Shape2D.h"
 
 // ********************************************************************************

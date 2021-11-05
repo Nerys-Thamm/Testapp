@@ -1,15 +1,3 @@
-// Bachelor of Software Engineering
-// Media Design School
-// Auckland
-// New Zealand
-//
-// (c) 2021 Media Design School
-//
-// File Name   : ShaderLoader.cpp
-// Description : Loads shader code from files
-// Author      : Nerys Thamm
-// Mail        : nerys.thamm@mds.ac.nz
-
 #include "ShaderLoader.h"
 #include<iostream>
 #include<fstream>

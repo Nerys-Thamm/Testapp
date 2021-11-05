@@ -1,15 +1,3 @@
-// Bachelor of Software Engineering
-// Media Design School
-// Auckland
-// New Zealand
-//
-// (c) 2021 Media Design School
-//
-// File Name   : CubeObject.cpp
-// Description : Implementation file for CubeObject class
-// Author      : Nerys Thamm
-// Mail        : nerys.thamm@mds.ac.nz
-
 #include "Renderable3D.h"
 // ********************************************************************************
 /// <summary>

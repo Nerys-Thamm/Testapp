@@ -1,5 +1,12 @@
 #include "ClothRenderer.h"
 
+// ********************************************************************************
+/// <summary>
+/// Constructor
+/// </summary>
+/// <param name="_parent"></param>
+/// <returns></returns>
+// ********************************************************************************
 ClothRenderer::ClothRenderer(CEntity& _parent) : IBehaviour(_parent)
 {
 	m_material = nullptr;
@@ -8,19 +15,33 @@ ClothRenderer::ClothRenderer(CEntity& _parent) : IBehaviour(_parent)
 	m_cloth = nullptr;
 }
 
+// ********************************************************************************
+/// <summary>
+/// Destructor
+/// </summary>
+/// <returns></returns>
+// ********************************************************************************
 ClothRenderer::~ClothRenderer()
 {
 	delete m_cloth;
 
 }
 
+// ********************************************************************************
+/// <summary>
+/// Renders the cloth
+/// </summary>
+/// <param name="_camera"></param>
+// ********************************************************************************
 void ClothRenderer::Render(Camera* _camera)
 {
-	if (m_cloth == nullptr || m_shader == NULL)
+	if (m_cloth == nullptr || m_shader == NULL) //Return immediately if any required variables are null
 	{
 		return;
 	}
-	glDisable(GL_CULL_FACE);
+
+	glDisable(GL_CULL_FACE); //Disable backface culling to make the cloth two sided
+
 	//Calculate model matrix
 	glm::mat4 translationMat = glm::translate(glm::mat4(), m_entity.m_globalTransform.position);
 	glm::mat4 rotationMat = glm::rotate(glm::mat4(), glm::radians(m_entity.m_globalTransform.rotation.x), glm::vec3(1.0f, 0.0f, 0.0f)) * glm::rotate(glm::mat4(), glm::radians(m_entity.m_globalTransform.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f)) * glm::rotate(glm::mat4(), glm::radians(m_entity.m_globalTransform.rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
@@ -109,35 +130,45 @@ void ClothRenderer::Render(Camera* _camera)
 	glEnable(GL_CULL_FACE);
 }
 
+// ********************************************************************************
+/// <summary>
+/// Sets the Cloth for the ClothRenderer to use
+/// </summary>
+/// <param name="_cloth"></param>
+// ********************************************************************************
 void ClothRenderer::SetCloth(Cloth* _cloth)
 {
-	if (m_cloth != nullptr) delete m_cloth;
+	if (m_cloth != nullptr) delete m_cloth; //Delete any existing Cloth data then use the new one
 	m_tris.clear();
 	m_indices.clear();
 	m_cloth = _cloth;
 }
 
+// ********************************************************************************
+/// <summary>
+/// Updates the Vertices of the Tri's used to draw the cloth
+/// </summary>
+/// <param name="_fDeltaTime"></param>
+// ********************************************************************************
 void ClothRenderer::OnUpdate(float _fDeltaTime)
 {
 	
-	if (m_cloth != nullptr)
+	if (m_cloth != nullptr) //If the cloth is not null
 	{
-		m_cloth->Update(_fDeltaTime);
-		if (m_tris.size() == 0)
-		{
+		m_cloth->Update(_fDeltaTime); //Update the cloth
 
+		if (m_tris.size() == 0) //If there are no Tris, make them
+		{
+			//Create the Tris
 			for (int gridY = 0; gridY < (m_cloth->m_particleDensity.y - 1); ++gridY)
 			{
 				for (int gridX = 0; gridX < (m_cloth->m_particleDensity.x - 1); ++gridX)
 				{
-
-
 					m_tris.push_back(std::unique_ptr<Tri3D>(new Tri3D()));
 					m_tris.push_back(std::unique_ptr<Tri3D>(new Tri3D()));
-
-
 				}
 			}
+			//Set the indices of the Tri's within the overall cloth
 			int Element = 0;
 			int IndexCount = (m_tris.size()) * 3;
 			m_indices.resize(IndexCount);
@@ -159,10 +190,10 @@ void ClothRenderer::OnUpdate(float _fDeltaTime)
 				}
 			}
 		}
-		else
+		else //Otherwise, if there are already Tris
 		{
 			
-			
+			//Update the position and normal of all vertices based on particle positions
 			int Element = 0;
 			for (int i = 0; i < (int)m_tris.size(); i++)
 			{
@@ -188,6 +219,11 @@ void ClothRenderer::OnUpdate(float _fDeltaTime)
 	}
 }
 
+// ********************************************************************************
+/// <summary>
+/// Update the cloth at a fixed timestep
+/// </summary>
+// ********************************************************************************
 void ClothRenderer::OnFixedUpdate()
 {
 	if (m_cloth != nullptr)
