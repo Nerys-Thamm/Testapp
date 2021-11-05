@@ -1,3 +1,15 @@
+// Bachelor of Software Engineering
+// Media Design School
+// Auckland
+// New Zealand
+// 
+// (c) 2021 Media Design School
+//
+// File Name   : Testapp.cpp
+// Description : Implementation file
+// Author      : Nerys Thamm
+// Mail        : nerys.thamm@mds.ac.nz
+
 //Lib includes
 #include <iostream>
 #include <glew.h>

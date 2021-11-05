@@ -220,6 +220,7 @@
     <None Include="Resources\Shaders\FixedColor.fs" />
     <None Include="Resources\Shaders\FixedTriangle.vs" />
     <None Include="Resources\Shaders\TextureMix.fs" />
+    <None Include="Testapp.licenseheader" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

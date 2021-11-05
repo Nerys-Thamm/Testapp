@@ -232,5 +232,6 @@
     <None Include="Resources\Shaders\TextureMix.fs">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="Testapp.licenseheader" />
   </ItemGroup>
 </Project>

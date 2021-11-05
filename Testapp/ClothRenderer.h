@@ -1,3 +1,14 @@
+// Bachelor of Software Engineering
+// Media Design School
+// Auckland
+// New Zealand
+// 
+// (c) 2021 Media Design School
+//
+// File Name   : ClothRenderer.h
+// Description : Header file
+// Author      : Nerys Thamm
+// Mail        : nerys.thamm@mds.ac.nz
 #pragma once
 #include "Entity.h"
 #include "Cloth.h"
