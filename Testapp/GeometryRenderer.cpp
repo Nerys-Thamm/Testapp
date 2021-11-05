@@ -11,6 +11,13 @@
 // Mail        : nerys.thamm@mds.ac.nz
 #include "GeometryRenderer.h"
 
+// ********************************************************************************
+/// <summary>
+/// Constructor
+/// </summary>
+/// <param name="_parent"></param>
+/// <returns></returns>
+// ********************************************************************************
 GeometryRenderer::GeometryRenderer(CEntity& _parent) : IBehaviour(_parent)
 {
 	GLfloat points[] = { 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f };
@@ -30,6 +37,12 @@ GeometryRenderer::GeometryRenderer(CEntity& _parent) : IBehaviour(_parent)
 	m_texture = NULL;
 }
 
+// ********************************************************************************
+/// <summary>
+/// Renders the Geometry
+/// </summary>
+/// <param name="_camera"></param>
+// ********************************************************************************
 void GeometryRenderer::Render(Camera* _camera)
 {
 	if (m_shader == NULL)

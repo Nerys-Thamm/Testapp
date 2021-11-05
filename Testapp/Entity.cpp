@@ -11,6 +11,12 @@
 // Mail        : nerys.thamm@mds.ac.nz
 #include "Entity.h"
 
+// ********************************************************************************
+/// <summary>
+/// Adds an Updater to the list
+/// </summary>
+/// <param name="_updateable"></param>
+// ********************************************************************************
 void CEntityManager::AddUpdater(CEntity* _updateable)
 {
 	CEntity** m_pHead = GetHead(); //get the head node
@@ -29,6 +35,12 @@ void CEntityManager::AddUpdater(CEntity* _updateable)
 	*m_pHead = _updateable; //make the new node into the new Head
 }
 
+// ********************************************************************************
+/// <summary>
+/// Removes an Updater from the list
+/// </summary>
+/// <param name="_updateable"></param>
+// ********************************************************************************
 void CEntityManager::RemoveUpdater(CEntity* _updateable)
 {
 	CEntity** m_pHead = GetHead(); //get the head node
@@ -48,16 +60,36 @@ void CEntityManager::RemoveUpdater(CEntity* _updateable)
 
 
 
+// ********************************************************************************
+/// <summary>
+/// Constructor
+/// </summary>
+/// <param name="true"></param>
+/// <returns></returns>
+// ********************************************************************************
 CEntity::CEntity() : m_pNext(nullptr), m_pPrev(nullptr), m_isEnabled(true)
 {
 	CEntityManager::AddUpdater(this);
 }
 
+// ********************************************************************************
+/// <summary>
+/// Constructor
+/// </summary>
+/// <param name="nullptr"></param>
+/// <returns></returns>
+// ********************************************************************************
 CEntity::CEntity(CEntity* _parent) : m_parent(_parent), m_pNext(nullptr), m_pPrev(nullptr)
 {
 	m_parent->m_children.push_back(std::shared_ptr<CEntity>(this));
 }
 
+// ********************************************************************************
+/// <summary>
+/// Destructor
+/// </summary>
+/// <returns></returns>
+// ********************************************************************************
 CEntity::~CEntity()
 {
 	if (m_parent == nullptr)
@@ -70,26 +102,37 @@ CEntity::~CEntity()
 	}
 }
 
+// ********************************************************************************
+/// <summary>
+/// Updates all behaviours
+/// </summary>
+/// <param name="_fDeltaTime"></param>
+// ********************************************************************************
 void CEntity::Update(float _fDeltaTime)
 {
-	if (m_parent == nullptr)
+	if (m_parent == nullptr) //If the entity has no parent, its local transform is its global transform
 	{
 		m_globalTransform = m_transform;
 	}
-	else
+	else //Otherwise, its global transform is its local transform, transformed by its parents global transform
 	{
 		m_globalTransform = m_transform + m_parent->m_globalTransform;
 	}
-	for (int i = 0; i < m_behaviours.size(); i++)
+	for (int i = 0; i < m_behaviours.size(); i++) //Update behaviours
 	{
 		m_behaviours[i]->OnUpdate(_fDeltaTime);
 	}
-	for (int i = 0; i < m_children.size(); i++)
+	for (int i = 0; i < m_children.size(); i++) //Update children
 	{
 		m_children[i]->Update(_fDeltaTime);
 	}
 }
 
+// ********************************************************************************
+/// <summary>
+/// Updates all behaviours at a fixed timestep
+/// </summary>
+// ********************************************************************************
 void CEntity::FixedUpdate()
 {
 	for (int i = 0; i < m_behaviours.size(); i++)
@@ -103,6 +146,12 @@ void CEntity::FixedUpdate()
 	
 }
 
+// ********************************************************************************
+/// <summary>
+/// Updates all behaviours after other updates are complete
+/// </summary>
+/// <param name="_fDeltaTime"></param>
+// ********************************************************************************
 void CEntity::LateUpdate(float _fDeltaTime)
 {
 	for (int i = 0; i < m_behaviours.size(); i++)
@@ -111,32 +160,72 @@ void CEntity::LateUpdate(float _fDeltaTime)
 	}
 }
 
+// ********************************************************************************
+/// <summary>
+/// Constructor
+/// </summary>
+/// <param name="_entity"></param>
+/// <returns></returns>
+// ********************************************************************************
 IBehaviour::IBehaviour(CEntity& _entity) : m_entity(_entity)
 {
 	
 }
 
+// ********************************************************************************
+/// <summary>
+/// Destructor
+/// </summary>
+/// <returns></returns>
+// ********************************************************************************
 IBehaviour::~IBehaviour()
 {
 
 }
 
+// ********************************************************************************
+/// <summary>
+/// Runs after First Update
+/// </summary>
+// ********************************************************************************
 void IBehaviour::OnAwake()
 {
 }
 
+// ********************************************************************************
+/// <summary>
+/// Runs every frame
+/// </summary>
+/// <param name="_fDeltaTime"></param>
+// ********************************************************************************
 void IBehaviour::OnUpdate(float _fDeltaTime)
 {
 }
 
+// ********************************************************************************
+/// <summary>
+/// Runs at a fixed time interval
+/// </summary>
+// ********************************************************************************
 void IBehaviour::OnFixedUpdate()
 {
 }
 
+// ********************************************************************************
+/// <summary>
+/// Runs after all other updates are complete
+/// </summary>
+/// <param name="_fDeltaTime"></param>
+// ********************************************************************************
 void IBehaviour::OnLateUpdate(float _fDeltaTime)
 {
 }
 
+// ********************************************************************************
+/// <summary>
+/// Updates all Entities
+/// </summary>
+// ********************************************************************************
 void CEntityManager::UpdateEntities()
 {
 	//Get the current time
@@ -154,6 +243,12 @@ void CEntityManager::UpdateEntities()
 	LateUpdate(deltaTime + ((float)glfwGetTime() - currentTime)); //Call LastUpdate on classes that have implemented it
 }
 
+// ********************************************************************************
+/// <summary>
+/// Call Update on all entities
+/// </summary>
+/// <param name="_fDeltaTime"></param>
+// ********************************************************************************
 void CEntityManager::Update(float _fDeltaTime)
 {
 	//Traverse until the starting node is reached
@@ -172,6 +267,11 @@ void CEntityManager::Update(float _fDeltaTime)
 	}
 }
 
+// ********************************************************************************
+/// <summary>
+/// Call Fixedupdate on all entities
+/// </summary>
+// ********************************************************************************
 void CEntityManager::FixedUpdate()
 {
 	//Traverse until the starting node is reached
@@ -190,6 +290,12 @@ void CEntityManager::FixedUpdate()
 	}
 }
 
+// ********************************************************************************
+/// <summary>
+/// Call lateupdate on all entities
+/// </summary>
+/// <param name="_fDeltaTime"></param>
+// ********************************************************************************
 void CEntityManager::LateUpdate(float _fDeltaTime)
 {
 	//Traverse until the starting node is reached
@@ -210,6 +316,12 @@ void CEntityManager::LateUpdate(float _fDeltaTime)
 
 
 
+// ********************************************************************************
+/// <summary>
+/// Gets the head node
+/// </summary>
+/// <returns></returns>
+// ********************************************************************************
 CEntity** CEntityManager::GetHead()
 {
 	static CEntity* pHead = nullptr;

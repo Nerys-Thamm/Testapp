@@ -26,6 +26,12 @@
 
 class CEntity;
 
+
+// --------------------------------------------------------------------------------
+/// <summary>
+/// Behaviour Interface for scripting behaviour for Entities
+/// </summary>
+// --------------------------------------------------------------------------------
 class IBehaviour
 {
 	friend class CEntity;
@@ -42,6 +48,11 @@ private:
 	virtual void OnLateUpdate(float _fDeltaTime);
 };
 
+// --------------------------------------------------------------------------------
+/// <summary>
+/// Entity Class
+/// </summary>
+// --------------------------------------------------------------------------------
 class CEntity
 {
 	friend class CEntityManager;
@@ -51,20 +62,15 @@ public:
 	{
 		glm::vec3 position = glm::vec3(0,0,0);
 		glm::vec3 rotation = glm::vec3(0, 0, 0);
-		glm::vec3 Forward()
+		glm::vec3 Forward() //Get the forward Vector
 		{
-			/*return glm::vec3(
-				sin((rotation.y / 180.0f) * M_PI),
-				(sin((rotation.x / 180.0f) * M_PI) * cos((rotation.y / 180.0f) * M_PI)),
-				-(cos((rotation.x / 180.0f) * M_PI) * cos((rotation.y / 180.0f) * M_PI))
-				);*/
 			return glm::vec3(
 				cos((rotation.x / 180.0f) * M_PI) * sin((rotation.y / 180.0f) * M_PI),
 				-sin((rotation.x / 180.0f) * M_PI),
 				cos((rotation.x / 180.0f) * M_PI) * cos((rotation.y / 180.0f) * M_PI)
 			);
 		}
-		glm::vec3 Right()
+		glm::vec3 Right() //Get the right Vector
 		{
 			return glm::vec3(cos((rotation.y / 180.0f) * M_PI), 0.0f, -sin((rotation.y / 180.0f) * M_PI));
 		}
@@ -127,7 +133,12 @@ public:
 	Transform m_transform;
 
 
-
+	// ********************************************************************************
+	/// <summary>
+	/// Get a Behaviour from an Entity
+	/// </summary>
+	/// <returns></returns>
+	// ********************************************************************************
 	template <typename B, typename std::enable_if<std::is_base_of<IBehaviour, B>::value>::type* = nullptr>
 	B* GetBehaviour()
 	{
@@ -140,6 +151,15 @@ public:
 		}
 		return nullptr;
 	}
+
+
+	// ********************************************************************************
+	/// <summary>
+	/// Get a Behaviour from an Entity or its Children
+	/// </summary>
+	/// <param name="_maxDepth"></param>
+	/// <returns></returns>
+	// ********************************************************************************
 	template <typename B, typename std::enable_if<std::is_base_of<IBehaviour, B>::value>::type* = nullptr>
 	B* GetBehaviourInChildren(int _maxDepth = 1)
 	{
@@ -153,6 +173,14 @@ public:
 		}
 		return nullptr;
 	}
+
+
+	// ********************************************************************************
+	/// <summary>
+	/// Add a Behaviour to this Entity
+	/// </summary>
+	/// <returns></returns>
+	// ********************************************************************************
 	template <typename B, typename std::enable_if<std::is_base_of<IBehaviour, B>::value>::type* = nullptr>
 	std::shared_ptr<B> AddBehaviour()
 	{

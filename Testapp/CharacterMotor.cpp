@@ -11,15 +11,33 @@
 // Mail        : nerys.thamm@mds.ac.nz
 #include "CharacterMotor.h"
 
+// ********************************************************************************
+/// <summary>
+/// Constructor
+/// </summary>
+/// <param name="_parent"></param>
+/// <returns></returns>
+// ********************************************************************************
 CharacterMotor::CharacterMotor(CEntity& _parent) : IBehaviour(_parent)
 {
 	m_Window = nullptr;
 }
 
+// ********************************************************************************
+/// <summary>
+/// Runs on first update
+/// </summary>
+// ********************************************************************************
 void CharacterMotor::OnAwake()
 {
 }
 
+// ********************************************************************************
+/// <summary>
+/// Runs every frame
+/// </summary>
+/// <param name="_fDeltaTime"></param>
+// ********************************************************************************
 void CharacterMotor::OnUpdate(float _fDeltaTime)
 {
 	if (m_Window == nullptr) return;
@@ -60,10 +78,21 @@ void CharacterMotor::OnUpdate(float _fDeltaTime)
 	}
 }
 
+// ********************************************************************************
+/// <summary>
+/// Runs at a fixed time interval
+/// </summary>
+// ********************************************************************************
 void CharacterMotor::OnFixedUpdate()
 {
 }
 
+// ********************************************************************************
+/// <summary>
+/// Runs after other updates are complete
+/// </summary>
+/// <param name="_fDeltaTime"></param>
+// ********************************************************************************
 void CharacterMotor::OnLateUpdate(float _fDeltaTime)
 {
 }

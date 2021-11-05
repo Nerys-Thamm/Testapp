@@ -11,15 +11,33 @@
 // Mail        : nerys.thamm@mds.ac.nz
 #include "TestBehaviour.h"
 
+// ********************************************************************************
+/// <summary>
+/// Constructor
+/// </summary>
+/// <param name="_parent"></param>
+/// <returns></returns>
+// ********************************************************************************
 TestBehaviour::TestBehaviour(CEntity& _parent) : IBehaviour(_parent)
 {
 }
 
+// ********************************************************************************
+/// <summary>
+/// 
+/// </summary>
+// ********************************************************************************
 void TestBehaviour::OnAwake()
 {
 	return;
 }
 
+// ********************************************************************************
+/// <summary>
+/// 
+/// </summary>
+/// <param name="_fDeltaTime"></param>
+// ********************************************************************************
 void TestBehaviour::OnUpdate(float _fDeltaTime)
 {
 	m_entity.m_transform.rotation.y = ((sin(glfwGetTime()) * 30.0f));
@@ -30,11 +48,22 @@ void TestBehaviour::OnUpdate(float _fDeltaTime)
 
 }
 
+// ********************************************************************************
+/// <summary>
+/// 
+/// </summary>
+// ********************************************************************************
 void TestBehaviour::OnFixedUpdate()
 {
 	return;
 }
 
+// ********************************************************************************
+/// <summary>
+/// 
+/// </summary>
+/// <param name="_fDeltaTime"></param>
+// ********************************************************************************
 void TestBehaviour::OnLateUpdate(float _fDeltaTime)
 {
 	return;

@@ -11,6 +11,13 @@
 // Mail        : nerys.thamm@mds.ac.nz
 #include "TessRenderer.h"
 
+// ********************************************************************************
+/// <summary>
+/// Constructor
+/// </summary>
+/// <param name="_parent"></param>
+/// <returns></returns>
+// ********************************************************************************
 TessRenderer::TessRenderer(CEntity& _parent) : IBehaviour(_parent)
 {
 	GLfloat points[] = {
@@ -34,6 +41,12 @@ TessRenderer::TessRenderer(CEntity& _parent) : IBehaviour(_parent)
 	m_texture = NULL;
 }
 
+// ********************************************************************************
+/// <summary>
+/// Renders the Tesselated quad
+/// </summary>
+/// <param name="_camera"></param>
+// ********************************************************************************
 void TessRenderer::Render(Camera* _camera)
 {
 	if (m_shader == NULL)
@@ -56,7 +69,7 @@ void TessRenderer::Render(Camera* _camera)
 
 	if (m_useLOD)
 	{
-		int distance = (int)std::clamp(floorf(glm::distance(_camera->m_cameraPos, m_entity.m_globalTransform.position)/2.0f), 0.0f, 9.0f);
+		int distance = (int)std::clamp(floorf(glm::distance(_camera->m_cameraPos, m_entity.m_globalTransform.position)/2.0f), 0.0f, 9.0f); //Pick the LOD based on camera distance
 
 		glUniform1i(InLODLoc, innerLOD[distance]);
 		glUniform1i(OutLODLoc, outerLOD[distance]);

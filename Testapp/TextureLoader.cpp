@@ -108,6 +108,15 @@ GLuint TextureLoader::LoadCubeMap(std::string _filepaths[6])
 	return out;
 }
 
+// ********************************************************************************
+/// <summary>
+/// Creates a Framebuffer and a Rendertexture
+/// </summary>
+/// <param name="_xResolution"></param>
+/// <param name="_yResolution"></param>
+/// <param name="out_renderTexture"></param>
+/// <param name="out_frameBuffer"></param>
+// ********************************************************************************
 void TextureLoader::CreateFrameBuffer(int _xResolution, int _yResolution, GLuint& out_renderTexture, GLuint& out_frameBuffer)
 {
 	

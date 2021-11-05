@@ -11,6 +11,13 @@
 // Mail        : nerys.thamm@mds.ac.nz
 #include "MeshRenderer.h"
 
+// ********************************************************************************
+/// <summary>
+/// Constructor
+/// </summary>
+/// <param name="_parent"></param>
+/// <returns></returns>
+// ********************************************************************************
 MeshRenderer::MeshRenderer(CEntity& _parent) : IBehaviour(_parent)
 {
 	m_material = nullptr;
@@ -19,6 +26,12 @@ MeshRenderer::MeshRenderer(CEntity& _parent) : IBehaviour(_parent)
 	m_mesh = nullptr;
 }
 
+// ********************************************************************************
+/// <summary>
+/// Renders the Mesh
+/// </summary>
+/// <param name="_camera"></param>
+// ********************************************************************************
 void MeshRenderer::Render(Camera* _camera)
 {
 	if (m_mesh == nullptr || m_shader == NULL)

@@ -118,7 +118,7 @@ GLuint frameBuffer;
 
 std::vector<Renderable3D> testcubes;
 
-CEntity* entityTest = nullptr;
+CEntity* geostarEntity = nullptr;
 
 CEntity* tessEntity = nullptr;
 
@@ -128,22 +128,6 @@ CEntity* playerEntity = nullptr, *cameraGimbal = nullptr, *cameraHolder = nullpt
 
 //---------------------------------------------------------------
 //GUI variables
-bool bWireFrameMode = false;
-float clothLength = 60.0f;
-float clothWidth = 60.0f;
-
-int numberOfHooks = 3;
-float hookDistance = 20.0f;
-float clothStiffness = 0.5f;
-
-const char* mouseModeItems[]{ "Pull", "Push", "Tear", "Fire", "Pin" };
-int selectedMouseMode = 0;
-
-const char* collisionItems[]{ "No Object", "Sphere", "Capsule", "Pyramid" };
-int selectedCollision = 0;
-
-float windDirection = 0.0f;
-float windStrength = 10.0f;
 
 float timeOfDay = 2.7f;
 
@@ -330,50 +314,55 @@ void InitialSetup()
 
 
 
-	//Create objects
-	
+	//Create Entities
 
-	entityTest = new CEntity();
-	entityTest->AddBehaviour<GeometryRenderer>();
-	entityTest->GetBehaviour<GeometryRenderer>()->SetShader(program_geostar);
-	entityTest->m_transform.position = glm::vec3(0.0f, 1.5f, 0.0f);
-	entityTest->AddBehaviour<TestBehaviour>();
+	//Create Geometry Shader Star
+	geostarEntity = new CEntity();
+	geostarEntity->AddBehaviour<GeometryRenderer>();
+	geostarEntity->GetBehaviour<GeometryRenderer>()->SetShader(program_geostar);
+	geostarEntity->m_transform.position = glm::vec3(0.0f, 1.5f, 0.0f);
+	geostarEntity->AddBehaviour<TestBehaviour>();
 
+	//Create Player Entity
 	playerEntity = new CEntity();
-	playerEntity->AddBehaviour<MeshRenderer>();
+	playerEntity->AddBehaviour<MeshRenderer>(); //Add a mesh
 	playerEntity->GetBehaviour<MeshRenderer>()->SetMesh(Sphere3D::GetMesh(0.5f, 20));
 	playerEntity->GetBehaviour<MeshRenderer>()->SetMaterial(Lighting::GetMaterial("EntityTest"));
 	playerEntity->GetBehaviour<MeshRenderer>()->SetShader(program_blinnphong);
 	playerEntity->GetBehaviour<MeshRenderer>()->SetTexture(TextureLoader::LoadTexture("FlushedNew.png"));
-	playerEntity->AddBehaviour<CharacterMotor>();
+	playerEntity->AddBehaviour<CharacterMotor>(); //Add a Character motor
 	playerEntity->GetBehaviour<CharacterMotor>()->SetWindow(main_window);
-	playerEntity->AddBehaviour<MouseLook>();
+	playerEntity->AddBehaviour<MouseLook>(); //Add horizontal mouselook rotation
 	playerEntity->GetBehaviour<MouseLook>()->SetWindow(main_window, glm::vec2(cfWINDOW_WIDTH(), cfWINDOW_HEIGHT()));
 	playerEntity->GetBehaviour<MouseLook>()->SetAxisLockState(false, true);
 	
-
+	//Create a Camera gimbal for vertical third person camera rotation
 	cameraGimbal = new CEntity(playerEntity);
-	cameraGimbal->AddBehaviour<MouseLook>();
+	cameraGimbal->AddBehaviour<MouseLook>(); //Add vertical mouselook rotation
 	cameraGimbal->GetBehaviour<MouseLook>()->SetWindow(main_window, glm::vec2(cfWINDOW_WIDTH(), cfWINDOW_HEIGHT()));
 	cameraGimbal->GetBehaviour<MouseLook>()->SetAxisLockState(true, false);
 	cameraGimbal->GetBehaviour<MouseLook>()->SetSensitivity(0.5f);
 
+	//Create a camera holder to hold a camera
 	cameraHolder = new CEntity(cameraGimbal);
 	cameraHolder->AddBehaviour<CameraHolder>()->SetCamera(playerCam);
 	cameraHolder->m_transform.position = glm::vec3(0.0f, 1.0f, -10.0f);
 
+	//Create the Tesselated Quad with LOD
 	tessEntityLOD = new CEntity();
 	tessEntityLOD->AddBehaviour<TessRenderer>()->SetShader(program_tesselationtest);
 	tessEntityLOD->GetBehaviour<TessRenderer>()->SetUseLOD(true);
 	tessEntityLOD->m_transform.position = glm::vec3(4.0f, 1.0f, 0.0f);
 
+	//Create the Tesselated Quad without LOD
 	tessEntity = new CEntity();
 	tessEntity->AddBehaviour<TessRenderer>()->SetShader(program_tesselationtest);
 	tessEntity->m_transform.position = glm::vec3(2.0f, 1.0f, 0.0f);
 	
+
 	shape_renderquad = new Renderable3D(Quad3D::GetMesh(), Lighting::GetMaterial("Default"));
 
-	Terrain3D::LoadFromRaw("AucklandHarbor2.raw", 1081, 0.1f, 0.025f);
+	Terrain3D::LoadFromRaw("AucklandHarbor2.raw", 1081, 0.1f, 0.025f); //Load the terrain
 
 	terrain_auckland = new Renderable3D(Terrain3D::GetTerrainMesh("AucklandHarbor2.raw"), Lighting::GetMaterial("Default"));
 	
@@ -405,9 +394,6 @@ void InitialSetup()
 	//Set textures of objects
 
 	terrain_auckland->AddTexture(TextureLoader::LoadTexture("map.png"));
-	
-	
-
 	shape_seafloor->AddTexture(TextureLoader::LoadTexture("beachsand.jpg"));
 	shape_sea->AddTexture(TextureLoader::LoadTexture("WaterTransparent2.png"));
 	shape_sea->AddTexture(TextureLoader::LoadTexture("WaterSpecular.png"));
@@ -569,6 +555,7 @@ void Update()
 	//Update all GameObjects
 	CObjectController::UpdateObjects();
 	
+	//Update all Entities in the new Entity System
 	CEntityManager::UpdateEntities();
 	
 	//Poll events for GLFW input
@@ -630,20 +617,14 @@ void Update()
 
 	//Make camera follow cube
 	camera->m_cameraTargetPos = ppQuad->Position();
-
-	
-
-	
-
 	shape_sea->Rotation(shape_sea->Rotation() + glm::vec3(0.0f, 0.0f, delta_time));
 
 	
-
+	//Make Players y position conform to terrain
 	float groundHeight = Terrain3D::GetTerrain("AucklandHarbor2.raw")->GetHeightFromWorldPos(terrain_auckland->Position(), terrain_auckland->Rotation(), playerEntity->m_transform.position);
 	playerEntity->m_transform.position.y = groundHeight + 0.5f;
 
-	
-
+	//Set lighting
 	Lighting::DirectionalLights[0].Direction = glm::vec3(sin(timeOfDay), cos(timeOfDay), 0.0f);
 	Lighting::DirectionalLights[0].Color = glm::vec3(1.0f, 0.5f + (((sin(timeOfDay)+1.0f)/2.0f)*0.5f), 0.5f + (((sin(timeOfDay) + 1.0f) / 2.0f) * 0.5f));
 	
@@ -656,87 +637,17 @@ void RenderGUI()
 {
 	// ImGUI window creation
 
-	ImGui::Begin("Physics Framework");
-
-	ImGui::Text(std::to_string(freecam->GetCamera()->m_cameraPos.y).c_str());
-
-	ImGui::Text("General Controls:");
-
-	ImGui::Checkbox("Wireframe Mode", &bWireFrameMode);
-
-	ImGui::Combo("Mouse Mode", &selectedMouseMode, mouseModeItems, IM_ARRAYSIZE(mouseModeItems));
-
-	ImGui::Text("Environment");
-
-	ImGui::SliderAngle("Time of Day", &timeOfDay);
-
-	ImGui::Text("Cloth Shape:");
-
-	ImGui::SliderFloat("Cloth Length", &clothLength, 1.0f, 200.0f);
-
-	ImGui::SliderFloat("Cloth Width", &clothWidth, 1.0f, 200.0f);
-
-	ImGui::SliderInt("Number Of Hooks", &numberOfHooks, 0, 20);
-
-	ImGui::SliderFloat("Hook Distance", &hookDistance, 1.0f, 100.0f);
-
-	ImGui::SliderFloat("Cloth Stiffness", &clothStiffness, 0.0f, 1.0f);
-
-	
-		if (ImGui::Button("Reset Cloth"))
-
-		{
-
-			clothLength = 60.0f;
-
-			clothWidth = 60.0f;
-
-			numberOfHooks = 3;
-
-			hookDistance = 20.0f;
-
-			clothStiffness = 0.5f;
-
-		}
-
-
-
-	ImGui::Text("Object Interation:");
-
-	ImGui::Combo("Selected Object: ", &selectedCollision, collisionItems, IM_ARRAYSIZE(collisionItems));
-
-
-
-	ImGui::Text("Wind:");
-
-	ImGui::SliderFloat("Wind Direction (Degrees):", &windDirection, 0.0f, 360.0f);
-
-	ImGui::SliderFloat("Wind Strength:", &windStrength, 0.0f, 100.0f);
-
-		if (ImGui::Button("Reset Wind"))
-
-		{
-
-			windDirection = 0.0f;
-
-			windStrength = 10.0f;
-
-		}
-
-
+	ImGui::Begin("Terrain Summative");
 
 	// Closes the window
 
 	ImGui::End();
-
-
 
 	// Render the ImGUI elements
 
 	ImGui::Render();
 
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
 }
 
 //Render all objects
@@ -749,6 +660,7 @@ void Render()
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
 	
+	//Bind the framebuffer so its drawn to
 	glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
 	glEnable(GL_DEPTH_TEST);
 	glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
@@ -759,11 +671,7 @@ void Render()
 
 
 	//Render objects
-
-
-	
-	
-	entityTest->GetBehaviour<GeometryRenderer>()->Render(playerCam);
+	geostarEntity->GetBehaviour<GeometryRenderer>()->Render(playerCam);
 
 	playerEntity->GetBehaviour<MeshRenderer>()->Render(playerCam);
 
@@ -782,13 +690,13 @@ void Render()
 	shape_sea->Render(*playerCam, program_reflectivefog);
 	glDisable(GL_BLEND);
 
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0); //Unbind the framebuffer
 	glDisable(GL_DEPTH_TEST);
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 	
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	shape_renderquad->Render(*camera, program_postprocess);
+	shape_renderquad->Render(*camera, program_postprocess); //Render the quad with the post processing
 	if (SceneManager::m_isWireframe)
 	{
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);

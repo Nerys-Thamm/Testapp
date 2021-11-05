@@ -5,11 +5,11 @@
 // 
 // (c) 2021 Media Design School
 //
-// File Name   : CameraHolder.cpp
+// File Name   : Behaviour.cpp
 // Description : Implementation file
 // Author      : Nerys Thamm
 // Mail        : nerys.thamm@mds.ac.nz
-#include "CameraHolder.h"
+#include "Behaviour.h"
 
 // ********************************************************************************
 /// <summary>
@@ -18,17 +18,16 @@
 /// <param name="_parent"></param>
 /// <returns></returns>
 // ********************************************************************************
-CameraHolder::CameraHolder(CEntity& _parent) : IBehaviour(_parent)
+Behaviour::Behaviour(CEntity& _parent) : IBehaviour(_parent)
 {
-	m_camera = nullptr;
 }
 
 // ********************************************************************************
 /// <summary>
-/// Runs on first update
+/// Runs before the object is updated for the first time
 /// </summary>
 // ********************************************************************************
-void CameraHolder::OnAwake()
+void Behaviour::OnAwake()
 {
 }
 
@@ -38,28 +37,25 @@ void CameraHolder::OnAwake()
 /// </summary>
 /// <param name="_fDeltaTime"></param>
 // ********************************************************************************
-void CameraHolder::OnUpdate(float _fDeltaTime)
+void Behaviour::OnUpdate(float _fDeltaTime)
 {
-	if (m_camera == nullptr)return;
-	m_camera->m_cameraPos = m_entity.m_globalTransform.position;
-	m_camera->m_cameraLookDir = m_entity.m_globalTransform.Forward();
 }
 
 // ********************************************************************************
 /// <summary>
-/// Runs every fixed timestep
+/// Runs every frame, at a fixed interval
 /// </summary>
 // ********************************************************************************
-void CameraHolder::OnFixedUpdate()
+void Behaviour::OnFixedUpdate()
 {
 }
 
 // ********************************************************************************
 /// <summary>
-/// Runs after all other Updates
+/// Runs every frame, after all other updates have completed
 /// </summary>
 /// <param name="_fDeltaTime"></param>
 // ********************************************************************************
-void CameraHolder::OnLateUpdate(float _fDeltaTime)
+void Behaviour::OnLateUpdate(float _fDeltaTime)
 {
 }
