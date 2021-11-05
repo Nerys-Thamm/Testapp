@@ -2,14 +2,13 @@
 // Media Design School
 // Auckland
 // New Zealand
-//
+// 
 // (c) 2021 Media Design School
 //
 // File Name   : Mesh3D.cpp
-// Description : Implementation file for the Mesh3D class
+// Description : Implementation file
 // Author      : Nerys Thamm
 // Mail        : nerys.thamm@mds.ac.nz
-
 #include "Mesh3D.h"
 
 
@@ -308,8 +307,8 @@ Sphere3D::Sphere3D(float Radius, int Fidelity)
 			Vertices[Element++] = z * Radius;
 
 			// Set the texture coordinates of the current vertex point
-			Vertices[Element++] = (float)i / (Fidelity - 1);
-			Vertices[Element++] = 1 - ((float)j / (Fidelity - 1)); // 1 minus in order to flip the direction of 0-1 (0 at the bottom)
+			Vertices[Element++] = ((float)i / (Fidelity - 1));
+			Vertices[Element++] = (1 - ((float)j / (Fidelity - 1))); // 1 minus in order to flip the direction of 0-1 (0 at the bottom)
 
 			// Set the normal direction of the current vertex point
 			Vertices[Element++] = x;

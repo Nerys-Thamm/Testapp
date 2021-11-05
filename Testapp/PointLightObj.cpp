@@ -2,14 +2,13 @@
 // Media Design School
 // Auckland
 // New Zealand
-//
+// 
 // (c) 2021 Media Design School
 //
 // File Name   : PointLightObj.cpp
-// Description : Defines methods and members for a point light object that represents a point light in the scene
+// Description : Implementation file
 // Author      : Nerys Thamm
 // Mail        : nerys.thamm@mds.ac.nz
-
 #include "PointLightObj.h"
 
 // ********************************************************************************
@@ -48,8 +47,8 @@ PointLightObj::PointLightObj(PointLight* _light, glm::vec3 _position, glm::vec3 
 	m_Position = _position;
 
 	//Get Unlit Shader
-	m_Shader = ShaderLoader::CreateProgram("Resources/Shaders/ClipSpace.vs",
-		"Resources/Shaders/FixedColor.fs");
+	m_Shader = ShaderLoader::CreateProgram("Resources/Shaders/ClipSpace.vert",
+		"Resources/Shaders/FixedColor.frag");
 }
 
 // ********************************************************************************

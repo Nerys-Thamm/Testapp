@@ -126,6 +126,9 @@
     <ClCompile Include="CharacterMotor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="TessRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ShaderLoader.h">
@@ -239,6 +242,9 @@
     <ClInclude Include="CharacterMotor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="TessRenderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\FixedColor.fs">
@@ -250,5 +256,7 @@
     <None Include="Resources\Shaders\TextureMix.fs">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include=".editorconfig" />
+    <None Include="Testapp.licenseheader" />
   </ItemGroup>
 </Project>

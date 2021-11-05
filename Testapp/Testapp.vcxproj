@@ -172,6 +172,7 @@
     <ClCompile Include="PointLightObj.cpp" />
     <ClCompile Include="Renderable3D.cpp" />
     <ClCompile Include="Skybox.cpp" />
+    <ClCompile Include="TessRenderer.cpp" />
     <ClCompile Include="TestBehaviour.cpp" />
     <ClCompile Include="TextureLoader.cpp" />
     <ClCompile Include="UIButton.cpp" />
@@ -211,6 +212,7 @@
     <ClInclude Include="PointLightObj.h" />
     <ClInclude Include="Renderable3D.h" />
     <ClInclude Include="Skybox.h" />
+    <ClInclude Include="TessRenderer.h" />
     <ClInclude Include="TestBehaviour.h" />
     <ClInclude Include="TextureLoader.h" />
     <ClInclude Include="UIButton.h" />
@@ -223,9 +225,11 @@
     <ClInclude Include="TextLabel.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include=".editorconfig" />
     <None Include="Resources\Shaders\FixedColor.fs" />
     <None Include="Resources\Shaders\FixedTriangle.vs" />
     <None Include="Resources\Shaders\TextureMix.fs" />
+    <None Include="Testapp.licenseheader" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

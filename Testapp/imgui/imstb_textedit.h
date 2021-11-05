@@ -1,3 +1,15 @@
+// Bachelor of Software Engineering
+// Media Design School
+// Auckland
+// New Zealand
+// 
+// (c) 2021 Media Design School
+//
+// File Name   : imstb_textedit.h
+// Description : Header file
+// Author      : Nerys Thamm
+// Mail        : nerys.thamm@mds.ac.nz
+
 // [DEAR IMGUI]
 // This is a slightly modified version of stb_textedit.h 1.13.
 // Those changes would need to be pushed into nothings/stb:

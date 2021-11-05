@@ -2,14 +2,13 @@
 // Media Design School
 // Auckland
 // New Zealand
-//
+// 
 // (c) 2021 Media Design School
 //
 // File Name   : ShaderLoader.cpp
-// Description : Loads shader code from files
+// Description : Implementation file
 // Author      : Nerys Thamm
 // Mail        : nerys.thamm@mds.ac.nz
-
 #include "ShaderLoader.h"
 #include<iostream>
 #include<fstream>
@@ -63,6 +62,33 @@ GLuint ShaderLoader::CreateProgram(const char* VertexShaderFilename, const char*
 	if (link_result == GL_FALSE)
 	{
 		std::string programName = VertexShaderFilename + *FragmentShaderFilename + *GeometryShaderFilename;
+		PrintErrorDetails(false, program, programName.c_str());
+		return 0;
+	}
+	return program;
+}
+
+GLuint ShaderLoader::CreateProgram(const std::initializer_list<ShaderFile> _shaders)
+{
+	
+	std::string programName = "";
+	// Create the program handle, attach the shaders and link it
+	GLuint program = 0;
+	// ...
+	program = glCreateProgram();
+	for (auto elem : _shaders)
+	{
+		glAttachShader(program, CreateShader(elem.Type, elem.Filename));
+		programName += elem.Filename;
+	}
+	glLinkProgram(program);
+
+	// Check for link errors
+	int link_result = 0;
+	glGetProgramiv(program, GL_LINK_STATUS, &link_result);
+	if (link_result == GL_FALSE)
+	{
+		
 		PrintErrorDetails(false, program, programName.c_str());
 		return 0;
 	}

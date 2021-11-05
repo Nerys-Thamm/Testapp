@@ -2,14 +2,13 @@
 // Media Design School
 // Auckland
 // New Zealand
-//
+// 
 // (c) 2021 Media Design School
 //
 // File Name   : Audiosystem.cpp
-// Description : Implementation file for the Audiosystem class
+// Description : Implementation file
 // Author      : Nerys Thamm
 // Mail        : nerys.thamm@mds.ac.nz
-
 #include "Audiosystem.h"
 
 // ********************************************************************************

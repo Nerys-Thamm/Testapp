@@ -2,14 +2,13 @@
 // Media Design School
 // Auckland
 // New Zealand
-//
+// 
 // (c) 2021 Media Design School
 //
 // File Name   : Skybox.cpp
-// Description : Implements methods for the Skybox class
+// Description : Implementation file
 // Author      : Nerys Thamm
 // Mail        : nerys.thamm@mds.ac.nz
-
 #include "Skybox.h"
 
 // ********************************************************************************
@@ -24,8 +23,8 @@ Skybox::Skybox(Camera* _camera, std::string _filepaths[6])
 {
 	//Set camera and program
 	m_Camera = _camera;
-	m_Program = ShaderLoader::CreateProgram("Resources/Shaders/SkyBox.vs",
-		"Resources/Shaders/SkyBox.fs");
+	m_Program = ShaderLoader::CreateProgram("Resources/Shaders/SkyBox.vert",
+		"Resources/Shaders/SkyBox.frag");
 
 	//Load the cubemap
 	m_Cubemap = TextureLoader::LoadCubeMap(_filepaths);

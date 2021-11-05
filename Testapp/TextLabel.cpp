@@ -2,14 +2,13 @@
 // Media Design School
 // Auckland
 // New Zealand
-//
+// 
 // (c) 2021 Media Design School
 //
 // File Name   : TextLabel.cpp
-// Description : Implementation file for the TextLabel class
+// Description : Implementation file
 // Author      : Nerys Thamm
 // Mail        : nerys.thamm@mds.ac.nz
-
 #include "TextLabel.h"
 
 // ********************************************************************************
@@ -107,13 +106,13 @@ TextLabel::TextLabel(std::string Text, std::string Font, glm::ivec2 PixelSize, g
 	switch (Effect)
 	{
 	case TextLabel::TextEffect::NONE:
-		Program_Text = ShaderLoader::CreateProgram("Resources/Shaders/Text.vs", "Resources/Shaders/Text.fs");
+		Program_Text = ShaderLoader::CreateProgram("Resources/Shaders/Text.vert", "Resources/Shaders/Text.frag");
 		break;
 	case TextLabel::TextEffect::MARQUEE:
-		Program_Text = ShaderLoader::CreateProgram("Resources/Shaders/TextMarquee.vs", "Resources/Shaders/TextMarquee.fs");
+		Program_Text = ShaderLoader::CreateProgram("Resources/Shaders/TextMarquee.vert", "Resources/Shaders/TextMarquee.frag");
 		break;
 	case TextLabel::TextEffect::SCALE_BOUNCE:
-		Program_Text = ShaderLoader::CreateProgram("Resources/Shaders/Text.vs", "Resources/Shaders/Text.fs");
+		Program_Text = ShaderLoader::CreateProgram("Resources/Shaders/Text.vert", "Resources/Shaders/Text.frag");
 		m_scaleBouncing = true;
 		break;
 	default:

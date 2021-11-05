@@ -2,11 +2,11 @@
 // Media Design School
 // Auckland
 // New Zealand
-//
+// 
 // (c) 2021 Media Design School
 //
 // File Name   : Testapp.cpp
-// Description : Main file for OpenGL application
+// Description : Implementation file
 // Author      : Nerys Thamm
 // Mail        : nerys.thamm@mds.ac.nz
 
@@ -43,6 +43,7 @@
 #include "CameraHolder.h"
 #include "MouseLook.h"
 #include "CharacterMotor.h"
+#include "TessRenderer.h"
 
 
 //Pointer to window
@@ -70,6 +71,7 @@ GLuint program_reflectivefog;
 GLuint program_reflectiverim;
 GLuint program_postprocess;
 GLuint program_geostar;
+GLuint program_tesselationtest;
 
 //TIME
 float current_time;
@@ -117,11 +119,10 @@ GLuint frameBuffer;
 std::vector<Renderable3D> testcubes;
 
 CEntity* entityTest = nullptr;
-CEntity* childEntityTest = nullptr;
-CEntity* otherEntityTest = nullptr;
-CEntity* rootBone = nullptr;
-CEntity* secondBone = nullptr;
-CEntity* thirdBone = nullptr;
+
+CEntity* tessEntity = nullptr;
+
+CEntity* tessEntityLOD = nullptr;
 
 CEntity* playerEntity = nullptr, *cameraGimbal = nullptr, *cameraHolder = nullptr;
 
@@ -256,47 +257,54 @@ void InitialSetup()
 	
 
 	//Create programs
-	program_texture = ShaderLoader::CreateProgram("Resources/Shaders/ClipSpace.vs",
-		"Resources/Shaders/Texture.fs");
+	program_texture = ShaderLoader::CreateProgram("Resources/Shaders/ClipSpace.vert",
+		"Resources/Shaders/Texture.frag");
 
-	program_texture_interpolation = ShaderLoader::CreateProgram("Resources/Shaders/ClipSpace.vs",
-		"Resources/Shaders/TextureMix.fs");
+	program_texture_interpolation = ShaderLoader::CreateProgram("Resources/Shaders/ClipSpace.vert",
+		"Resources/Shaders/TextureMix.frag");
 
-	program_fixed_color = ShaderLoader::CreateProgram("Resources/Shaders/ClipSpace.vs",
-		"Resources/Shaders/FixedColor.fs");
+	program_fixed_color = ShaderLoader::CreateProgram("Resources/Shaders/ClipSpace.vert",
+		"Resources/Shaders/FixedColor.frag");
 
-	program_texture_wave = ShaderLoader::CreateProgram("Resources/Shaders/ClipSpace.vs",
-		"Resources/Shaders/TextureWave.fs");
+	program_texture_wave = ShaderLoader::CreateProgram("Resources/Shaders/ClipSpace.vert",
+		"Resources/Shaders/TextureWave.frag");
 
-	program_worldspace = ShaderLoader::CreateProgram("Resources/Shaders/ClipSpace.vs",
-		"Resources/Shaders/Texture.fs");
+	program_worldspace = ShaderLoader::CreateProgram("Resources/Shaders/ClipSpace.vert",
+		"Resources/Shaders/Texture.frag");
 
-	program_normals = ShaderLoader::CreateProgram("Resources/Shaders/3D_Normals.vs",
-		"Resources/Shaders/3DLight_Phong.fs");
+	program_normals = ShaderLoader::CreateProgram("Resources/Shaders/3D_Normals.vert",
+		"Resources/Shaders/3DLight_Phong.frag");
 
-	program_blinnphong = ShaderLoader::CreateProgram("Resources/Shaders/3D_Normals.vs",
-		"Resources/Shaders/3DLight_BlinnPhong.fs");
+	program_blinnphong = ShaderLoader::CreateProgram("Resources/Shaders/3D_Normals.vert",
+		"Resources/Shaders/3DLight_BlinnPhong.frag");
 
-	program_blinnphongrim = ShaderLoader::CreateProgram("Resources/Shaders/3D_Normals.vs",
-		"Resources/Shaders/3DLight_BlinnPhongRim.fs");
+	program_blinnphongrim = ShaderLoader::CreateProgram("Resources/Shaders/3D_Normals.vert",
+		"Resources/Shaders/3DLight_BlinnPhongRim.frag");
 
-	program_reflective = ShaderLoader::CreateProgram("Resources/Shaders/3D_Normals.vs",
-		"Resources/Shaders/3DLight_Reflective.fs");
+	program_reflective = ShaderLoader::CreateProgram("Resources/Shaders/3D_Normals.vert",
+		"Resources/Shaders/3DLight_Reflective.frag");
 
-	program_reflectiverim = ShaderLoader::CreateProgram("Resources/Shaders/3D_Normals.vs",
-		"Resources/Shaders/3DLight_ReflectiveRim.fs");
+	program_reflectiverim = ShaderLoader::CreateProgram("Resources/Shaders/3D_Normals.vert",
+		"Resources/Shaders/3DLight_ReflectiveRim.frag");
 
-	program_blinnphongfog = ShaderLoader::CreateProgram("Resources/Shaders/3D_Normals.vs",
-		"Resources/Shaders/3DLight_BlinnPhongFog.fs");
+	program_blinnphongfog = ShaderLoader::CreateProgram("Resources/Shaders/3D_Normals.vert",
+		"Resources/Shaders/3DLight_BlinnPhongFog.frag");
 
-	program_reflectivefog = ShaderLoader::CreateProgram("Resources/Shaders/3D_Normals.vs",
-		"Resources/Shaders/3DLight_ReflectiveFog.fs");
+	program_reflectivefog = ShaderLoader::CreateProgram("Resources/Shaders/3D_Normals.vert",
+		"Resources/Shaders/3DLight_ReflectiveFog.frag");
 	
-	program_postprocess = ShaderLoader::CreateProgram("Resources/Shaders/3D_Normals.vs",
-		"Resources/Shaders/PostProcessing.fs");
+	program_postprocess = ShaderLoader::CreateProgram("Resources/Shaders/3D_Normals.vert",
+		"Resources/Shaders/PostProcessing.frag");
 
-	program_geostar = ShaderLoader::CreateProgram("Resources/Shaders/GeoShader.vs",
-		"Resources/Shaders/GeoShader.fs", "Resources/Shaders/StarGeoShader.gs");
+	program_geostar = ShaderLoader::CreateProgram("Resources/Shaders/GeoShader.vert",
+		"Resources/Shaders/GeoShader.frag", "Resources/Shaders/StarGeoShader.geom");
+
+	program_tesselationtest = ShaderLoader::CreateProgram({
+		ShaderLoader::ShaderFile{"Resources/Shaders/TessVert.vert", GL_VERTEX_SHADER},
+		ShaderLoader::ShaderFile{"Resources/Shaders/TessFrag.frag", GL_FRAGMENT_SHADER},
+		ShaderLoader::ShaderFile{"Resources/Shaders/TessEval.tese", GL_TESS_EVALUATION_SHADER},
+		ShaderLoader::ShaderFile{"Resources/Shaders/TessControl.tesc", GL_TESS_CONTROL_SHADER}
+		});
 
 	//Cull poly not facing viewport
 	glCullFace(GL_BACK);
@@ -324,49 +332,19 @@ void InitialSetup()
 
 	//Create objects
 	
-	/*rootBone = new CEntity();
-	secondBone = new CEntity(rootBone);
-	thirdBone = new CEntity(secondBone);
-
-	entityTest = new CEntity(rootBone);
-	entityTest->AddBehaviour<MeshRenderer>();
-	entityTest->GetBehaviour<MeshRenderer>()->SetMesh(Cube3D::GetMesh());
-	entityTest->GetBehaviour<MeshRenderer>()->SetMaterial(Lighting::GetMaterial("EntityTest"));
-	entityTest->GetBehaviour<MeshRenderer>()->SetShader(program_blinnphong);
-	entityTest->GetBehaviour<MeshRenderer>()->SetTexture(TextureLoader::LoadTexture("Yellow.jpg"));
-
-	
-
-	childEntityTest = new CEntity(secondBone);
-	childEntityTest->AddBehaviour<MeshRenderer>();
-	childEntityTest->GetBehaviour<MeshRenderer>()->SetMesh(Cube3D::GetMesh());
-	childEntityTest->GetBehaviour<MeshRenderer>()->SetMaterial(Lighting::GetMaterial("EntityTest"));
-	childEntityTest->GetBehaviour<MeshRenderer>()->SetShader(program_blinnphong);
-	childEntityTest->GetBehaviour<MeshRenderer>()->SetTexture(TextureLoader::LoadTexture("Yellow.jpg"));
-
-	otherEntityTest = new CEntity(thirdBone);
-	otherEntityTest->AddBehaviour<MeshRenderer>();
-	otherEntityTest->GetBehaviour<MeshRenderer>()->SetMesh(Cube3D::GetMesh());
-	otherEntityTest->GetBehaviour<MeshRenderer>()->SetMaterial(Lighting::GetMaterial("EntityTest"));
-	otherEntityTest->GetBehaviour<MeshRenderer>()->SetShader(program_blinnphong);
-	otherEntityTest->GetBehaviour<MeshRenderer>()->SetTexture(TextureLoader::LoadTexture("Yellow.jpg"));
-
-	rootBone->AddBehaviour<TestBehaviour>();
-	secondBone->AddBehaviour<TestBehaviour>();
-	thirdBone->AddBehaviour<TestBehaviour>();*/
 
 	entityTest = new CEntity();
 	entityTest->AddBehaviour<GeometryRenderer>();
 	entityTest->GetBehaviour<GeometryRenderer>()->SetShader(program_geostar);
-	entityTest->m_transform.position = glm::vec3(0.0f, 3.0f, 0.0f);
+	entityTest->m_transform.position = glm::vec3(0.0f, 1.5f, 0.0f);
 	entityTest->AddBehaviour<TestBehaviour>();
 
 	playerEntity = new CEntity();
 	playerEntity->AddBehaviour<MeshRenderer>();
-	playerEntity->GetBehaviour<MeshRenderer>()->SetMesh(Cube3D::GetMesh());
+	playerEntity->GetBehaviour<MeshRenderer>()->SetMesh(Sphere3D::GetMesh(0.5f, 20));
 	playerEntity->GetBehaviour<MeshRenderer>()->SetMaterial(Lighting::GetMaterial("EntityTest"));
 	playerEntity->GetBehaviour<MeshRenderer>()->SetShader(program_blinnphong);
-	playerEntity->GetBehaviour<MeshRenderer>()->SetTexture(TextureLoader::LoadTexture("Yellow.jpg"));
+	playerEntity->GetBehaviour<MeshRenderer>()->SetTexture(TextureLoader::LoadTexture("FlushedNew.png"));
 	playerEntity->AddBehaviour<CharacterMotor>();
 	playerEntity->GetBehaviour<CharacterMotor>()->SetWindow(main_window);
 	playerEntity->AddBehaviour<MouseLook>();
@@ -383,12 +361,16 @@ void InitialSetup()
 	cameraHolder = new CEntity(cameraGimbal);
 	cameraHolder->AddBehaviour<CameraHolder>()->SetCamera(playerCam);
 	cameraHolder->m_transform.position = glm::vec3(0.0f, 1.0f, -10.0f);
-	
 
-	shape_cube = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Chrome"));
-	shape_stencilcube = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Glossy"));
-	shape_3Dbutton_fwd = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Default"));
-	shape_3Dbutton_bck = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Default"));
+	tessEntityLOD = new CEntity();
+	tessEntityLOD->AddBehaviour<TessRenderer>()->SetShader(program_tesselationtest);
+	tessEntityLOD->GetBehaviour<TessRenderer>()->SetUseLOD(true);
+	tessEntityLOD->m_transform.position = glm::vec3(4.0f, 1.0f, 0.0f);
+
+	tessEntity = new CEntity();
+	tessEntity->AddBehaviour<TessRenderer>()->SetShader(program_tesselationtest);
+	tessEntity->m_transform.position = glm::vec3(2.0f, 1.0f, 0.0f);
+	
 	shape_renderquad = new Renderable3D(Quad3D::GetMesh(), Lighting::GetMaterial("Default"));
 
 	Terrain3D::LoadFromRaw("AucklandHarbor2.raw", 1081, 0.1f, 0.025f);
@@ -396,25 +378,8 @@ void InitialSetup()
 	terrain_auckland = new Renderable3D(Terrain3D::GetTerrainMesh("AucklandHarbor2.raw"), Lighting::GetMaterial("Default"));
 	
 
-	shape_cube->Position(glm::vec3(0.0f, 3.8f, 2.0f));
-	shape_cube->Scale(glm::vec3(2.0f, 2.0f, 2.0f));
+	
 
-	shape_3Dbutton_fwd->Position(glm::vec3(-4.0f, 5.0f, 2.0f));
-	shape_3Dbutton_fwd->Scale(glm::vec3(2.0f, 2.0f, 2.0f));
-	shape_3Dbutton_bck->Position(glm::vec3(4.0f, 5.0f, 2.0f));
-	shape_3Dbutton_bck->Scale(glm::vec3(2.0f, 2.0f, 2.0f));
-	
-	/*
-	
-	entityTest->m_transform.scale = glm::vec3(5.0f, 2.0f, 2.0f);
-	childEntityTest->m_transform.scale = glm::vec3(5.0f, 1.5f, 1.5f);
-	childEntityTest->m_transform.position = glm::vec3(2.5f, 0.0f, 0.0f);
-	otherEntityTest->m_transform.scale = glm::vec3(5.0f, 1.0f, 1.0f);
-	otherEntityTest->m_transform.position = glm::vec3(2.5f, 0.0f, 0.0f);
-	secondBone->m_transform.position = glm::vec3(2.5f, 0.0f, 0.0f);
-	thirdBone->m_transform.position = glm::vec3(5.0f, 0.0f, 0.0f);
-	rootBone->m_transform.position = glm::vec3(6.0f, 4.0f, 8.0f);
-	*/
 
 	shape_seafloor = new Renderable3D(Quad3D::GetMesh(), Lighting::GetMaterial("Default"));
 	shape_sea = new Renderable3D(Quad3D::GetMesh(), Lighting::GetMaterial("Glossy"));
@@ -432,27 +397,13 @@ void InitialSetup()
 	terrain_auckland->Scale(glm::vec3(1.0f, 1.0f, 1.0f));
 	terrain_auckland->Rotation(glm::vec3(0.0f, 0.0f, 0.0f));
 	
-	/*for (int i = 0; i < 100; i++)
-	{
-		for (int j = 0; j < 100; j++)
-		{
-			Renderable3D cube(Cube3D::GetMesh(), Lighting::GetMaterial("Default"));
-			float groundHeight = Terrain3D::GetTerrain("AucklandHarbor2.raw")->GetHeightFromWorldPos(terrain_auckland->Position(), terrain_auckland->Rotation(), glm::vec3(i, 0.0f, j));
-			cube.Position(glm::vec3(i, groundHeight, j));
-			testcubes.push_back(cube);
-		}
-	}*/
+
 
 	
 
 
 	//Set textures of objects
-	shape_cube->AddTexture(TextureLoader::LoadTexture("SciFi_Albedo.jpg"));
-	shape_cube->AddTexture(TextureLoader::LoadTexture("SciFi_Metallic.jpg"));
-	shape_stencilcube->AddTexture(TextureLoader::LoadTexture("Yellow.jpg"));
-	shape_stencilcube->AddTexture(TextureLoader::LoadTexture("Grey.jpg"));
-	shape_3Dbutton_fwd->AddTexture(TextureLoader::LoadTexture("Yellow.jpg"));
-	shape_3Dbutton_bck->AddTexture(TextureLoader::LoadTexture("Grey.jpg"));
+
 	terrain_auckland->AddTexture(TextureLoader::LoadTexture("map.png"));
 	
 	
@@ -527,16 +478,7 @@ void ResetScene()
 
 	//Create new objects and set position + orientation
 
-	shape_cube = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Chrome"));
-	shape_stencilcube = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Glossy"));
-	shape_3Dbutton_fwd = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Default"));;
-	shape_3Dbutton_bck = new Renderable3D(Cube3D::GetMesh(), Lighting::GetMaterial("Default"));;
-	shape_cube->Position(glm::vec3(0.0f, 3.8f, 2.0f));
-	shape_cube->Scale(glm::vec3(2.0f, 2.0f, 2.0f));
-	shape_3Dbutton_fwd->Position(glm::vec3(-4.0f, 5.0f, 2.0f));
-	shape_3Dbutton_fwd->Scale(glm::vec3(2.0f, 2.0f, 2.0f));
-	shape_3Dbutton_bck->Position(glm::vec3(4.0f, 5.0f, 2.0f));
-	shape_3Dbutton_bck->Scale(glm::vec3(2.0f, 2.0f, 2.0f));
+	
 	shape_seafloor = new Renderable3D(Quad3D::GetMesh(), Lighting::GetMaterial("Default"));
 	shape_sea = new Renderable3D(Quad3D::GetMesh(), Lighting::GetMaterial("Glossy"));
 	shape_seafloor->Position(glm::vec3(0.0f, 3.5f, 0.0f));
@@ -548,12 +490,7 @@ void ResetScene()
 
 
 	//Set textures of objects
-	shape_cube->AddTexture(TextureLoader::LoadTexture("SciFi_Albedo.jpg"));
-	shape_cube->AddTexture(TextureLoader::LoadTexture("SciFi_Metallic.jpg"));
-	shape_stencilcube->AddTexture(TextureLoader::LoadTexture("Yellow.jpg"));
-	shape_stencilcube->AddTexture(TextureLoader::LoadTexture("Grey.jpg"));
-	shape_3Dbutton_fwd->AddTexture(TextureLoader::LoadTexture("Yellow.jpg"));
-	shape_3Dbutton_bck->AddTexture(TextureLoader::LoadTexture("Grey.jpg"));
+	
 	shape_seafloor->AddTexture(TextureLoader::LoadTexture("beachsand.jpg"));
 	shape_sea->AddTexture(TextureLoader::LoadTexture("WaterTransparent2.png"));
 	shape_sea->AddTexture(TextureLoader::LoadTexture("WaterSpecular.png"));
@@ -694,17 +631,13 @@ void Update()
 	//Make camera follow cube
 	camera->m_cameraTargetPos = ppQuad->Position();
 
-	/*playerCam->m_cameraTargetPos = playerEntity->m_globalTransform.position;
-	playerCam->m_lookAtTarget = true;*/
+	
 
-	shape_cube->Rotation(shape_cube->Rotation() + glm::vec3(0.0f, delta_time * 2, 0.0f));
-	shape_cube->Position(shape_cube->Position() + glm::vec3(0.0f, ((sin(current_time)/4) * delta_time), 0.0f));
+	
 
 	shape_sea->Rotation(shape_sea->Rotation() + glm::vec3(0.0f, 0.0f, delta_time));
 
-	shape_stencilcube->Position(shape_cube->Position());
-	shape_stencilcube->Scale(shape_cube->Scale() + glm::vec3(0.2f, 0.2f, 0.2f));
-	shape_stencilcube->Rotation(shape_cube->Rotation());
+	
 
 	float groundHeight = Terrain3D::GetTerrain("AucklandHarbor2.raw")->GetHeightFromWorldPos(terrain_auckland->Position(), terrain_auckland->Rotation(), playerEntity->m_transform.position);
 	playerEntity->m_transform.position.y = groundHeight + 0.5f;
@@ -827,46 +760,23 @@ void Render()
 
 	//Render objects
 
-	
 
-	/*if (stencilEnabled)
-	{
-		glEnable(GL_STENCIL_TEST);
-		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-		glStencilFunc(GL_ALWAYS, 1, 0xFF);
-		glStencilMask(0xFF);
-		shape_cube->Render(*freecam->GetCamera(), program_blinnphongfog);
-		glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-		glStencilMask(0x00);
-		shape_stencilcube->Render(*freecam->GetCamera(), program_reflective);
-		glStencilMask(0x00);
-		glDisable(GL_STENCIL_TEST);
-		glStencilMask(0xFF);
-	}
-	else
-	{
-		shape_cube->Render(*freecam->GetCamera(), program_blinnphongfog);
-	}*/
-	
-
-	shape_3Dbutton_bck->Render(*freecam->GetCamera(), program_blinnphong);
-	shape_3Dbutton_fwd->Render(*freecam->GetCamera(), program_blinnphong);
-
-	
-	/*entityTest->GetBehaviour<MeshRenderer>()->Render(freecam->GetCamera());
-	childEntityTest->GetBehaviour<MeshRenderer>()->Render(freecam->GetCamera());
-	otherEntityTest->GetBehaviour<MeshRenderer>()->Render(freecam->GetCamera());*/
 	
 	
 	entityTest->GetBehaviour<GeometryRenderer>()->Render(playerCam);
 
 	playerEntity->GetBehaviour<MeshRenderer>()->Render(playerCam);
-	
-	//Render the floor
 
-	//shape_seafloor->Render(*freecam->GetCamera(), program_blinnphongfog);
+	//Render Tesselated Quads
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	tessEntity->GetBehaviour<TessRenderer>()->Render(playerCam);
+	tessEntityLOD->GetBehaviour<TessRenderer>()->Render(playerCam);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	
+
+	
 	terrain_auckland->Render(*playerCam, program_blinnphongfog);
-	//std::for_each(testcubes.begin(), testcubes.end(), [](Renderable3D r) {r.Render(*freecam->GetCamera(), program_blinnphong); });
+	
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	shape_sea->Render(*playerCam, program_reflectivefog);
@@ -876,7 +786,7 @@ void Render()
 	glDisable(GL_DEPTH_TEST);
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
-	//ppQuad->Render(*freecam->GetCamera(), program_texture);
+	
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	shape_renderquad->Render(*camera, program_postprocess);
 	if (SceneManager::m_isWireframe)

@@ -1,3 +1,15 @@
+// Bachelor of Software Engineering
+// Media Design School
+// Auckland
+// New Zealand
+// 
+// (c) 2021 Media Design School
+//
+// File Name   : imgui_impl_glfw.cpp
+// Description : Implementation file
+// Author      : Nerys Thamm
+// Mail        : nerys.thamm@mds.ac.nz
+
 // dear imgui: Platform Backend for GLFW
 // This needs to be used along with a Renderer (e.g. OpenGL3, Vulkan, WebGPU..)
 // (Info: GLFW is a cross-platform general purpose library for handling windows, inputs, OpenGL/Vulkan graphics context creation, etc.)

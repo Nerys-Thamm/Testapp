@@ -1,3 +1,14 @@
+// Bachelor of Software Engineering
+// Media Design School
+// Auckland
+// New Zealand
+// 
+// (c) 2021 Media Design School
+//
+// File Name   : Cloth.cpp
+// Description : Implementation file
+// Author      : Nerys Thamm
+// Mail        : nerys.thamm@mds.ac.nz
 #include "Cloth.h"
 
 void ClothParticle::ApplyForce(glm::vec3 _forceVector)
