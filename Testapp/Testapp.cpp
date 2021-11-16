@@ -111,7 +111,9 @@ CEntity* railEntity = nullptr;
 //GUI variables
 bool bWireFrameMode = false;
 float clothLength = 40.0f;
-float clothWidth = 40.0f;
+float clothWidth = 50.0f;
+int clothDensityX = 10.0f;
+int clothDensityY = 10.0f;
 float clothRotation = 0.0f;
 
 int numberOfHooks = 4;
@@ -311,7 +313,7 @@ void InitialSetup()
 	//Create objects
 	clothEntity = new CEntity();
 	std::shared_ptr<ClothRenderer> clothrenderer = clothEntity->AddBehaviour<ClothRenderer>();
-	clothrenderer->SetCloth(new Cloth(glm::vec2(clothWidth, clothLength), glm::ivec2(50, 50), 1000, 4, clothStiffness));
+	clothrenderer->SetCloth(new Cloth(glm::vec2(clothWidth, clothLength), glm::ivec2(clothDensityX, clothDensityY), 1000, 4, clothStiffness));
 	clothrenderer->SetMaterial(Lighting::GetMaterial("EntityTest"));
 	clothrenderer->SetShader(program_blinnphong);
 	clothrenderer->SetTexture(TextureLoader::LoadTexture("tartan.jpg"));
@@ -326,7 +328,7 @@ void InitialSetup()
 	meshrenderer->SetShader(program_blinnphong);
 	meshrenderer->SetTexture(TextureLoader::LoadTexture("Rayman.jpg"));
 	meshrenderer->SetMesh(Sphere3D::GetMesh(10.0f, 10));
-	ballEntity->m_transform.position = glm::vec3(0.0f, 0.0f, -120.0f);
+	ballEntity->m_transform.position = glm::vec3(0.0f, 0.0f, -110.0f);
 
 	floorQuadEntity = new CEntity();
 	floorQuadEntity->AddBehaviour<MeshRenderer>();
@@ -355,28 +357,18 @@ void InitialSetup()
 	camera->m_cameraPos = glm::vec3(0.0f, 0.0f, 1.0f);
 	clothCam->m_cameraPos = glm::vec3(0.0f, 0.0f, 1.0f);
 	
-	//camera->m_cameraTargetPos = shape_renderquad->Position();
-	//camera->m_lookAtTarget = true;
 	orthocamera->m_cameraPos = glm::vec3(0.0f, 0.0f, 1.0f);
 	freecam->GetCamera()->m_cameraPos.y = 5.0f;
-	
-
-
 
 	//Setup Audio
 	audio_main = Audiosystem::GetInstance();
 
-
-
 	//Download sounds if they dont already exist
 	audio_main->AddSound("Track_BeachAmbience.mp3", "Track_BeachAmbience");
-	
 	
 	//Start playing background track
 	audio_main->PlaySound("Track_BeachAmbience", 0.5f, true);
 
-
-	
 	Lighting::DirectionalLights[0].Direction = glm::vec3(0.0f, -1.0f, -1.0f);
 	Lighting::DirectionalLights[0].Color = glm::vec3(0.5f, 0.5f, 0.5f);
 	Lighting::DirectionalLights[0].AmbientStrength = 0.25f;
@@ -405,16 +397,16 @@ void InitialSetup()
 //Resets the scene
 void ResetScene()
 {
-	clothLength = 30.0f;
+	clothLength = 10.0f;
 
-	clothWidth = 30.0f;
+	clothWidth = 10.0f;
 
 	numberOfHooks = 4;
 
 	hookDistance = 60.0f;
 
 	clothStiffness = 0.5f;
-	clothEntity->GetBehaviour<ClothRenderer>()->SetCloth(new Cloth(glm::vec2(clothWidth, clothLength), glm::ivec2(50, 50), 1000, numberOfHooks, clothStiffness));
+	clothEntity->GetBehaviour<ClothRenderer>()->SetCloth(new Cloth(glm::vec2(clothWidth, clothLength), glm::ivec2(clothDensityX, clothDensityY), 1000, numberOfHooks, clothStiffness));
 	dropped = false;
 }
 
@@ -476,9 +468,11 @@ void Update()
 	CObjectController::UpdateObjects();
 	if(!dropped)clothEntity->GetBehaviour<ClothRenderer>()->GetCloth()->SetPegDistance(hookDistance);
 	
+	
 	clothEntity->GetBehaviour<ClothRenderer>()->GetCloth()->AddWind(glm::vec3(sin(windDirection * (M_PI/180.0f)) * windStrength, 0.0f, sin(windDirection * (M_PI / 180.0f)) * windStrength));
-	CEntityManager::UpdateEntities();
 	clothEntity->GetBehaviour<ClothRenderer>()->GetCloth()->SphereCollision(ballEntity->m_transform.position, 10.0f);
+	CEntityManager::UpdateEntities();
+	
 	
 	//Poll events for GLFW input
 	glfwPollEvents();
@@ -559,6 +553,13 @@ void RenderGUI()
 	ImGui::SliderFloat("Cloth Length", &clothLength, 1.0f, 50.0f);
 
 	ImGui::SliderFloat("Cloth Width", &clothWidth, 1.0f, 200.0f);
+
+	ImGui::Text("Cloth Quality: (Warning, only use high numbers in release build)");
+
+	ImGui::SliderInt("Cloth X Density", &clothDensityX, 1.0f, 100.0f);
+
+	ImGui::SliderInt("Cloth Y Density", &clothDensityY, 1.0f, 100.0f);
+
 	ImGui::SliderFloat("Cloth Rotation", &clothRotation, 0.0f, 360.0f);
 
 	clothEntity->m_transform.rotation = glm::vec3(0.0f, clothRotation, 0.0f);
@@ -588,7 +589,7 @@ void RenderGUI()
 		}
 		if (ImGui::Button("Create Cloth with Params"))
 		{
-			clothEntity->GetBehaviour<ClothRenderer>()->SetCloth(new Cloth(glm::vec2(clothWidth, clothLength), glm::ivec2(50, 50), 1000, numberOfHooks, clothStiffness));
+			clothEntity->GetBehaviour<ClothRenderer>()->SetCloth(new Cloth(glm::vec2(clothWidth, clothLength), glm::ivec2(clothDensityX, clothDensityY), 1000, numberOfHooks, clothStiffness));
 			dropped = false;
 		}
 		if (ImGui::Button("Drop the Cloth"))
@@ -651,23 +652,12 @@ void Render()
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	//Render the skybox
-	//SceneManager::GetCurrentSkybox()->Render();
-
-
-	//Render objects
-
-	
-
+	//Render Objects
 	floorQuadEntity->GetBehaviour<MeshRenderer>()->Render(camera);
 	clothEntity->GetBehaviour<ClothRenderer>()->Render(camera);
 	ballEntity->GetBehaviour<MeshRenderer>()->Render(camera);
 	railEntity->GetBehaviour<MeshRenderer>()->Render(camera);
 	
-	//Render the floor
-
-	
-
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glDisable(GL_DEPTH_TEST);
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);

@@ -92,7 +92,7 @@ void ClothParticleConstraint::Constrain()
 // ********************************************************************************
 void Cloth::SphereCollision(glm::vec3 _origin, float _radius)
 {
-    
+    _origin = _origin - m_worldPos;
     for (int i = 0; i < (int)m_particles.size(); i++)
     {
         if (!m_particles[i].Dynamic())
@@ -101,10 +101,13 @@ void Cloth::SphereCollision(glm::vec3 _origin, float _radius)
         }
         glm::vec3 particlePos = m_particles[i].Pos();
         float len = glm::distance(_origin, particlePos);
-        if (len > _radius) continue;
+        if (len > _radius * 1.1f) continue;
         glm::vec3 AB = particlePos - _origin;
         AB = glm::normalize(AB);
-        m_particles[i].Pos(particlePos + ((len - _radius) * AB));
+
+        m_particles[i].Accel({0.0f, 0.0f, 0.0f});
+        m_particles[i].ApplyForce(AB * m_particles[i].Mass() * 1.1f);
+        m_particles[i].Pos(_origin + (AB * (_radius * 1.1f)));
     }
 }
 

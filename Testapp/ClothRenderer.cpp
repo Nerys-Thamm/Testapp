@@ -166,6 +166,7 @@ void ClothRenderer::OnUpdate(float _fDeltaTime)
 	
 	if (m_cloth != nullptr) //If the cloth is not null
 	{
+		m_cloth->SetWorldPos(m_entity.m_globalTransform.position);
 		m_cloth->Update(_fDeltaTime); //Update the cloth
 
 		if (m_tris.size() == 0) //If there are no Tris, make them

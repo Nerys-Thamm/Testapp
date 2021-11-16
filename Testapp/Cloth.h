@@ -49,13 +49,15 @@ public: //Public Methods
 
     //Getters and Setters
     glm::vec3& Pos() { return m_pos; }
-    void Pos(glm::vec3 _newPos) { m_pos = _newPos; }
+    void Pos(glm::vec3 _newPos) { m_lastPos = m_pos; m_pos = _newPos; }
     glm::vec3& LocalPos() { return m_localPos; }
     void LocalPos(glm::vec3 _newPos) { m_localPos = _newPos; }
     glm::vec3& Accel() { return m_accel; }
     void Accel(glm::vec3 _newAccel) { m_accel = _newAccel; }
     void Dynamic(bool _isDynamic) { m_dynamic = _isDynamic; }
     bool Dynamic() { return m_dynamic; }
+    float Mass() { return m_particleMass; }
+    void Mass(float _mass) { m_particleMass = _mass; }
 private: //Private Methods
 };
 
@@ -99,6 +101,7 @@ private: //Private Vars
     std::vector<ClothParticleConstraint> m_shearConstraints;
     std::vector<ClothParticleConstraint> m_bendConstraints;
     std::vector<int> m_pegXIndexes;
+    glm::vec3 m_worldPos;
     int m_numOfPegs;
     float m_pegDistance;
     float& m_stiffness;
@@ -110,6 +113,7 @@ public: //Public Methods
     void ApplyGravity();
     void AddWind(glm::vec3 _force);
     void SphereCollision(glm::vec3 _origin, float _radius);
+    void SetWorldPos(glm::vec3 _pos) { m_worldPos = _pos; }
     glm::vec3 GetTriNormal(ClothParticle* _a, ClothParticle* _b, ClothParticle* _c);
     glm::vec3 GetTriNormal(int _a, int _b, int _c);
     void DropCloth();
