@@ -214,6 +214,7 @@ public:
 	/// <returns></returns>
 	// ********************************************************************************
 	Tri3D();
+	bool m_enabled = true;
 	void UpdateVertices(glm::vec3 _first, glm::vec3 _second, glm::vec3 _third, glm::vec3 _normal, glm::vec2 _texCoordA, glm::vec2 _texCoordB, glm::vec2 _texCoordC);
 private:
 	

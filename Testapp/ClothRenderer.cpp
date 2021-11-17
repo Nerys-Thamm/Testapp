@@ -85,7 +85,7 @@ void ClothRenderer::Render(Camera* _camera)
 	}
 	for (int i = 0; i < (int)m_tris.size(); i++)
 	{
-
+		if (!m_tris[i]->m_enabled) continue;
 
 		//Bind program and VAO
 		
@@ -209,13 +209,17 @@ void ClothRenderer::OnUpdate(float _fDeltaTime)
 			int Element = 0;
 			for (int i = 0; i < (int)m_tris.size(); i++)
 			{
-
+				
 				int indexA = m_indices[Element++];
 				int indexB = m_indices[Element++];
 				int indexC = m_indices[Element++];
 				glm::vec3 a = m_cloth->GetParticlePositionAtIndex(indexA);
 				glm::vec3 b = m_cloth->GetParticlePositionAtIndex(indexB);
 				glm::vec3 c = m_cloth->GetParticlePositionAtIndex(indexC);
+				if (!m_cloth->GetParticleIsEnabledAtIndex(indexA) || !m_cloth->GetParticleIsEnabledAtIndex(indexB) || !m_cloth->GetParticleIsEnabledAtIndex(indexC))
+				{
+					m_tris[i]->m_enabled = false;
+				}
 				m_tris[i]->UpdateVertices(
 					a,
 					b,

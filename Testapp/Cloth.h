@@ -29,7 +29,7 @@
 class ClothParticle
 {
 public: //Public Vars
-
+    bool m_isEnabled = true;
 private: //Private Vars
     glm::vec3 m_pos;
     glm::vec3 m_localPos;
@@ -93,6 +93,8 @@ public: //Public Vars
     int GetSize() { return m_particles.size(); }
     glm::ivec2 m_particleDensity;
     glm::vec3 GetParticlePositionAtIndex(int _index) { return m_particles[_index].Pos(); }
+    bool GetParticleIsEnabledAtIndex(int _index) { return m_particles[_index].m_isEnabled; }
+    ClothParticle* RaycastParticle(glm::vec3 _origin, glm::vec3 _direction, float _tolerance = 0.1f);
     void SetPegDistance(float _distance);
 private: //Private Vars
     

@@ -56,6 +56,8 @@ void ClothParticle::Update(float _fDeltaTime)
 // ********************************************************************************
 void ClothParticleConstraint::Constrain()
 {
+    if (!m_firstParticle->m_isEnabled || !m_secondParticle->m_isEnabled) return;
+    
     //Get the particle positions
     glm::vec3 firstPos = m_firstParticle->Pos();
     glm::vec3 secondPos = m_secondParticle->Pos();
@@ -109,6 +111,38 @@ void Cloth::SphereCollision(glm::vec3 _origin, float _radius)
         m_particles[i].ApplyForce(AB * m_particles[i].Mass() * 1.1f);
         m_particles[i].Pos(_origin + (AB * (_radius * 1.1f)));
     }
+}
+
+// Find the particle with the largest dot product with the normal
+ClothParticle* Cloth::RaycastParticle(glm::vec3 _origin, glm::vec3 _direction, float _tolerance)
+{
+    _origin = _origin - m_worldPos;
+    float maxDot = 0.0f;
+    ClothParticle* maxParticle = nullptr;
+    for (int i = 0; i < (int)m_particles.size(); i++)
+    {
+        
+        glm::vec3 particlePos = m_particles[i].Pos();
+        glm::vec3 AB = particlePos - _origin;
+        
+        
+        glm::vec3 normal = glm::normalize(AB);
+        float dot = glm::dot(normal, _direction);
+        if (dot > maxDot)
+        {
+            maxDot = dot;
+            maxParticle = &m_particles[i];
+        }
+    }
+    if (maxDot > _tolerance)
+    {
+        return maxParticle;
+    }
+    else
+    {
+        return nullptr;
+    }
+    
 }
 
 // ********************************************************************************

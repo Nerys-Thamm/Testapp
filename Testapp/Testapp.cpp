@@ -488,7 +488,8 @@ void Update()
 	//Process mouse input and Mouse picking
 	if (glfwGetMouseButton(CObjectController::GetMainWindow(), GLFW_MOUSE_BUTTON_1) == GLFW_PRESS)
 	{
-		
+		ClothParticle* c = clothEntity->GetBehaviour<ClothRenderer>()->GetCloth()->RaycastParticle(camera->m_cameraPos, rayDirection, 0.001f);
+		if (c != nullptr) c->m_isEnabled = false;
 	}
 	//Perform actions on key press
 	if (glfwGetKey(CObjectController::GetMainWindow(), GLFW_KEY_R) && !pressedLastFrame) ResetScene();
