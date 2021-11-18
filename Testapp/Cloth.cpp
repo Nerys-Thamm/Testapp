@@ -11,6 +11,8 @@
 // Mail        : nerys.thamm@mds.ac.nz
 #include "Cloth.h"
 
+
+
 // ********************************************************************************
 /// <summary>
 /// Applies force to the Particle
@@ -19,7 +21,7 @@
 // ********************************************************************************
 void ClothParticle::ApplyForce(glm::vec3 _forceVector)
 {
-    if (!m_dynamic) return;
+    if (!m_dynamic || !m_isEnabled) return;
     m_accel += _forceVector / m_particleMass;
 }
 
@@ -30,8 +32,8 @@ void ClothParticle::ApplyForce(glm::vec3 _forceVector)
 // ********************************************************************************
 void ClothParticle::ApplyGravity()
 {
-    if (!m_dynamic) return;
-    m_accel += -glm::vec3(0.0f, (9.8f/2.0f), 0.0f);
+    if (!m_dynamic || !m_isEnabled) return;
+    m_accel += -glm::vec3(0.0f, (9.8f/5.0f), 0.0f);
 }
 
 // ********************************************************************************
@@ -42,9 +44,9 @@ void ClothParticle::ApplyGravity()
 // ********************************************************************************
 void ClothParticle::Update(float _fDeltaTime)
 {
-    if (!m_dynamic) return;
+    if (!m_dynamic || !m_isEnabled) return;
     glm::vec3 currPos = m_pos;
-    m_pos += (m_pos - m_lastPos) * (1.0f - 0.5f) + m_accel * _fDeltaTime;
+    m_pos += (m_pos - m_lastPos) * (1.0f - 0.01f) + m_accel * _fDeltaTime;
     m_lastPos = currPos;
     m_accel = glm::vec3{ 0.0f, 0.0f, 0.0f };
 }
@@ -63,26 +65,33 @@ void ClothParticleConstraint::Constrain()
     glm::vec3 secondPos = m_secondParticle->Pos();
 
     //Find the vector between the particles
-    glm::vec3 AB = secondPos - firstPos;
+    glm::vec3 AB = firstPos - secondPos;
 
     //Find the distance between the particles
     float len = glm::distance(secondPos, firstPos);
 
-    //Get the normalised direction vector
-    AB = glm::normalize(AB);
-    
-    //Get the correction vector
-    glm::vec3 halfCorrection = (AB * (len - m_desiredSeperation)) * (0.5f*m_stiffness);
+    if ((len > (m_desiredSeperation * 50) + ((m_isBendConstraint ? 30 : 50) * m_desiredSeperation * (1.0f - m_stiffness))) && (m_firstParticle->Dynamic() && m_secondParticle->Dynamic()))
+    {
+        m_firstParticle->m_isEnabled = false;
+        m_secondParticle->m_isEnabled = false;
+        return;
+    }
+
+    float diff = (m_desiredSeperation - len) / len;
+    float m1 = 1.0f / m_firstParticle->Mass();
+    float m2 = 1.0f / m_secondParticle->Mass();
 
     //Lock this method to protect thread safety when multithreading the simulation
     std::lock_guard<std::mutex> guard(*cloth_constraint_mutex);
 
     //Apply the Constraint
-    if (m_firstParticle->Dynamic() && m_firstParticle->Pos().y < -50.0f) m_firstParticle->Pos(glm::vec3((firstPos + halfCorrection).x, -50.0f, (firstPos + halfCorrection).z));
-    else if (m_firstParticle->Dynamic()) m_firstParticle->Pos(firstPos + halfCorrection);
-    if (m_secondParticle->Dynamic() && m_secondParticle->Pos().y < -50.0f) m_secondParticle->Pos(glm::vec3((secondPos - halfCorrection).x, -50.0f, (secondPos - halfCorrection).z));
-    else if(m_secondParticle->Dynamic()) m_secondParticle->Pos(secondPos - halfCorrection);
+    
+    if (m_firstParticle->Dynamic()) m_firstParticle->Pos(firstPos + AB * (m1 / (m1 + m2)) * m_stiffness * diff);
    
+    if(m_secondParticle->Dynamic()) m_secondParticle->Pos(secondPos - AB * (m2 / (m2 + m1)) * m_stiffness * diff);
+    
+    if (m_firstParticle->Dynamic() && m_firstParticle->Pos().y < -50.0f) m_firstParticle->Pos(glm::vec3(m_firstParticle->Pos().x, -50.0f, m_firstParticle->Pos().z));
+    if (m_secondParticle->Dynamic() && m_secondParticle->Pos().y < -50.0f) m_secondParticle->Pos(glm::vec3(m_secondParticle->Pos().x, -50.0f, m_secondParticle->Pos().z));
 }
 
 // ********************************************************************************
@@ -97,7 +106,7 @@ void Cloth::SphereCollision(glm::vec3 _origin, float _radius)
     _origin = _origin - m_worldPos;
     for (int i = 0; i < (int)m_particles.size(); i++)
     {
-        if (!m_particles[i].Dynamic())
+        if (!m_particles[i].Dynamic() || !m_particles[i].m_isEnabled)
         {
             continue;
         }
@@ -128,13 +137,13 @@ ClothParticle* Cloth::RaycastParticle(glm::vec3 _origin, glm::vec3 _direction, f
         
         glm::vec3 normal = glm::normalize(AB);
         float dot = glm::dot(normal, _direction);
-        if (dot > maxDot)
+        if (dot > maxDot && m_particles[i].m_isEnabled)
         {
             maxDot = dot;
             maxParticle = &m_particles[i];
         }
     }
-    if (maxDot > _tolerance)
+    if (maxDot > 1.0f-_tolerance)
     {
         return maxParticle;
     }
@@ -144,6 +153,25 @@ ClothParticle* Cloth::RaycastParticle(glm::vec3 _origin, glm::vec3 _direction, f
     }
     
 }
+
+// ********************************************************************************
+/// <summary>
+/// Move a particle to a new position based on ray
+/// </summary>
+/// <param name="_origin"></param>
+/// <param name="_direction"></param>
+// ********************************************************************************
+void Cloth::MoveToRay(glm::vec3 _origin, glm::vec3 _rayDir, ClothParticle* _particle)
+{
+    _origin = _origin - m_worldPos;
+    glm::vec3 particlePos = _particle->Pos();
+    float len = glm::distance(_origin, particlePos);
+    _particle->Pos(_origin + (_rayDir * len));
+    _particle->SetPrevPos(_origin + (_rayDir * len));
+    _particle->Accel({ 0.0f, 0.0f, 0.0f });
+    
+}
+
 
 // ********************************************************************************
 /// <summary>
@@ -203,13 +231,13 @@ Cloth::Cloth(glm::vec2 _scale, glm::ivec2 _density, float _mass, int _pegs, floa
     {
         for (int y = 0; y < m_particleDensity.y; y++)
         {
-            if (x < (m_particleDensity.x - 2)) m_bendConstraints.push_back(ClothParticleConstraint(GetParticleAtIndex(x, y), GetParticleAtIndex(x + 2, y), m_stiffness));
-            if (y < (m_particleDensity.y - 2)) m_bendConstraints.push_back(ClothParticleConstraint(GetParticleAtIndex(x, y), GetParticleAtIndex(x, y + 2), m_stiffness));
+            if (x < (m_particleDensity.x - 2)) m_bendConstraints.push_back(ClothParticleConstraint(GetParticleAtIndex(x, y), GetParticleAtIndex(x + 2, y), m_stiffness, true));
+            if (y < (m_particleDensity.y - 2)) m_bendConstraints.push_back(ClothParticleConstraint(GetParticleAtIndex(x, y), GetParticleAtIndex(x, y + 2), m_stiffness, true));
 
             if (x < (m_particleDensity.x - 2) && (y < m_particleDensity.y - 2))
             {
-                m_bendConstraints.push_back(ClothParticleConstraint(GetParticleAtIndex(x, y), GetParticleAtIndex(x + 2, y + 2), m_stiffness));
-                m_bendConstraints.push_back(ClothParticleConstraint(GetParticleAtIndex(x + 2, y), GetParticleAtIndex(x, y + 2), m_stiffness));
+                m_bendConstraints.push_back(ClothParticleConstraint(GetParticleAtIndex(x, y), GetParticleAtIndex(x + 2, y + 2), m_stiffness, true));
+                m_bendConstraints.push_back(ClothParticleConstraint(GetParticleAtIndex(x + 2, y), GetParticleAtIndex(x, y + 2), m_stiffness, true));
             }
         }
     }
@@ -238,24 +266,11 @@ Cloth::Cloth(glm::vec2 _scale, glm::ivec2 _density, float _mass, int _pegs, floa
 // ********************************************************************************
 void Cloth::Update(float _fDeltaTime)
 {
-    
-    
-}
-
-// ********************************************************************************
-/// <summary>
-/// Called at a fixed timestep
-/// </summary>
-// ********************************************************************************
-void Cloth::FixedUpdate()
-{
-   
-    //Update the Particles
     ApplyGravity();
-    std::for_each(m_particles.begin(), m_particles.end(), [&](ClothParticle& _p) { _p.Update(1.0f/60.0f); _p.LocalPos(_p.Pos() - m_particles[0].Pos()); });
+    std::for_each(m_particles.begin(), m_particles.end(), [&](ClothParticle& _p) { _p.Update(_fDeltaTime); _p.LocalPos(_p.Pos() - m_particles[0].Pos()); });
     //Apply the constraints
-    
-    for (int i = 0; i < 2; i++)
+
+    for (int i = 0; i < 1; i++)
     {
         for (int i = 0; i < (int)m_structuralConstraints.size(); i++)
         {
@@ -270,6 +285,20 @@ void Cloth::FixedUpdate()
             m_bendConstraints[i].Constrain();
         }
     }
+}
+
+// ********************************************************************************
+/// <summary>
+/// Called at a fixed timestep
+/// </summary>
+// ********************************************************************************
+void Cloth::FixedUpdate()
+{
+   
+    //Update the Particles
+    
+   
+    
   
 }
 
@@ -306,8 +335,8 @@ void Cloth::AddWind(glm::vec3 _force)
     {
         for (int y = 0; y < m_particleDensity.y - 1; y++)
         {
-            ApplyWindForce(GetParticleAtIndex(x + 1, y), GetParticleAtIndex(x, y), GetParticleAtIndex(x, y + 1), _force);
-            ApplyWindForce(GetParticleAtIndex(x + 1, y + 1), GetParticleAtIndex(x + 1, y), GetParticleAtIndex(x, y + 1), _force);
+            ApplyWindForce(GetParticleAtIndex(x + 1, y), GetParticleAtIndex(x, y), GetParticleAtIndex(x, y + 1), _force/10.0f);
+            ApplyWindForce(GetParticleAtIndex(x + 1, y + 1), GetParticleAtIndex(x + 1, y), GetParticleAtIndex(x, y + 1), _force/10.0f);
         }
     }
 }

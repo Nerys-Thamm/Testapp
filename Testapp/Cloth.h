@@ -41,7 +41,6 @@ private: //Private Vars
 public: //Public Methods
     ClothParticle(glm::vec3 _pos) : m_pos(_pos), m_lastPos(_pos), m_accel({ 0.0f,0.0f,0.0f }), m_particleMass(0.1f), m_dynamic(true) {}
     ClothParticle(glm::vec3 _pos, float _mass) : m_pos(_pos), m_lastPos(_pos), m_accel({ 0.0f,0.0f,0.0f }), m_particleMass(_mass), m_dynamic(true) {}
-
     void ApplyForce(glm::vec3 _forceVector);
     void ApplyGravity();
     void SetMass(float _mass) { m_particleMass = _mass; }
@@ -49,7 +48,8 @@ public: //Public Methods
 
     //Getters and Setters
     glm::vec3& Pos() { return m_pos; }
-    void Pos(glm::vec3 _newPos) { m_lastPos = m_pos; m_pos = _newPos; }
+    void Pos(glm::vec3 _newPos) { m_pos = _newPos; }
+    void SetPrevPos(glm::vec3 _prevPos) { m_lastPos = _prevPos; }
     glm::vec3& LocalPos() { return m_localPos; }
     void LocalPos(glm::vec3 _newPos) { m_localPos = _newPos; }
     glm::vec3& Accel() { return m_accel; }
@@ -66,17 +66,19 @@ class ClothParticleConstraint
 public: //Public Vars
     ClothParticle* m_firstParticle, * m_secondParticle;
     std::mutex* cloth_constraint_mutex;
+    bool m_isBendConstraint = false;
 private: //Private Vars
     float m_desiredSeperation;
     float m_maxStretch;
     float& m_stiffness;
 public: //Public Methods
-    ClothParticleConstraint(ClothParticle* _firstParticle, ClothParticle* _secondParticle, float& _stiffness) :
+    ClothParticleConstraint(ClothParticle* _firstParticle, ClothParticle* _secondParticle, float& _stiffness, bool _bendConstraint = false) :
         m_firstParticle(_firstParticle),
         m_secondParticle(_secondParticle),
         m_desiredSeperation(glm::distance(_firstParticle->Pos(), _secondParticle->Pos())),
         m_maxStretch(3.0f),
         m_stiffness(_stiffness),
+        m_isBendConstraint(_bendConstraint),
         cloth_constraint_mutex(new std::mutex())
     {}
 
@@ -95,6 +97,7 @@ public: //Public Vars
     glm::vec3 GetParticlePositionAtIndex(int _index) { return m_particles[_index].Pos(); }
     bool GetParticleIsEnabledAtIndex(int _index) { return m_particles[_index].m_isEnabled; }
     ClothParticle* RaycastParticle(glm::vec3 _origin, glm::vec3 _direction, float _tolerance = 0.1f);
+    void MoveToRay(glm::vec3 _origin, glm::vec3 _rayDir, ClothParticle* _particle);
     void SetPegDistance(float _distance);
 private: //Private Vars
     

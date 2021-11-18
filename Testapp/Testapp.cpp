@@ -120,7 +120,7 @@ int numberOfHooks = 4;
 float hookDistance = 20.0f;
 float clothStiffness = 0.5f;
 
-const char* mouseModeItems[]{ "Pull", "Push", "Tear", "Fire", "Pin" };
+const char* mouseModeItems[]{ "Grab", "Pull", "Push", "Tear", "Fire", "Pin" };
 int selectedMouseMode = 0;
 
 const char* collisionItems[]{ "No Object", "Sphere", "Capsule", "Pyramid" };
@@ -313,7 +313,7 @@ void InitialSetup()
 	//Create objects
 	clothEntity = new CEntity();
 	std::shared_ptr<ClothRenderer> clothrenderer = clothEntity->AddBehaviour<ClothRenderer>();
-	clothrenderer->SetCloth(new Cloth(glm::vec2(clothWidth, clothLength), glm::ivec2(clothDensityX, clothDensityY), 1000, 4, clothStiffness));
+	clothrenderer->SetCloth(new Cloth(glm::vec2(clothWidth, clothLength), glm::ivec2(clothDensityX, clothDensityY), 20, 4, clothStiffness));
 	clothrenderer->SetMaterial(Lighting::GetMaterial("EntityTest"));
 	clothrenderer->SetShader(program_blinnphong);
 	clothrenderer->SetTexture(TextureLoader::LoadTexture("tartan.jpg"));
@@ -328,7 +328,7 @@ void InitialSetup()
 	meshrenderer->SetShader(program_blinnphong);
 	meshrenderer->SetTexture(TextureLoader::LoadTexture("Rayman.jpg"));
 	meshrenderer->SetMesh(Sphere3D::GetMesh(10.0f, 10));
-	ballEntity->m_transform.position = glm::vec3(0.0f, 0.0f, -110.0f);
+	ballEntity->m_transform.position = glm::vec3(0.0f, 0.0f, -100.0f);
 
 	floorQuadEntity = new CEntity();
 	floorQuadEntity->AddBehaviour<MeshRenderer>();
@@ -340,14 +340,14 @@ void InitialSetup()
 	floorQuadEntity->m_transform.scale = glm::vec3(100.0f, 100.0f, 1.0f);
 	floorQuadEntity->m_transform.position = glm::vec3(0.0f, -20.1f, -100.0f);
 
-	railEntity = new CEntity();
+	railEntity = new CEntity(clothEntity);
 	railEntity->AddBehaviour<MeshRenderer>();
 	railEntity->GetBehaviour<MeshRenderer>()->SetMesh(Quad3D::GetMesh());
 	railEntity->GetBehaviour<MeshRenderer>()->SetMaterial(Lighting::GetMaterial("Default"));
 	railEntity->GetBehaviour<MeshRenderer>()->SetShader(program_blinnphong);
 	railEntity->GetBehaviour<MeshRenderer>()->SetTexture(TextureLoader::LoadTexture("ShowerTiles.jpg"));
 	railEntity->m_transform.scale = glm::vec3(100.0f, 1.0f, 1.0f);
-	railEntity->m_transform.position = glm::vec3(0.0f, 30.0f, -99.0f);
+	railEntity->m_transform.position = glm::vec3(50.0f, 0.0f, 0.0f);
 
 
 
@@ -459,7 +459,7 @@ bool CheckAABBIntersect(glm::vec3 _origin, glm::vec3 _direction, glm::vec3 _boxP
 }
 
 bool stencilEnabled = true, scissorEnabled = true, cullingEnabled = true, pressedLastFrame = false;;
-
+ClothParticle* c = nullptr;
 
 //Update all objects and run the processes
 void Update()
@@ -469,9 +469,7 @@ void Update()
 	if(!dropped)clothEntity->GetBehaviour<ClothRenderer>()->GetCloth()->SetPegDistance(hookDistance);
 	
 	
-	clothEntity->GetBehaviour<ClothRenderer>()->GetCloth()->AddWind(glm::vec3(sin(windDirection * (M_PI/180.0f)) * windStrength, 0.0f, sin(windDirection * (M_PI / 180.0f)) * windStrength));
-	clothEntity->GetBehaviour<ClothRenderer>()->GetCloth()->SphereCollision(ballEntity->m_transform.position, 10.0f);
-	CEntityManager::UpdateEntities();
+	
 	
 	
 	//Poll events for GLFW input
@@ -488,9 +486,47 @@ void Update()
 	//Process mouse input and Mouse picking
 	if (glfwGetMouseButton(CObjectController::GetMainWindow(), GLFW_MOUSE_BUTTON_1) == GLFW_PRESS)
 	{
-		ClothParticle* c = clothEntity->GetBehaviour<ClothRenderer>()->GetCloth()->RaycastParticle(camera->m_cameraPos, rayDirection, 0.001f);
-		if (c != nullptr) c->m_isEnabled = false;
+		
+		if (c != nullptr)
+		{
+			switch (selectedMouseMode)
+			{
+				case 0:
+					clothEntity->GetBehaviour<ClothRenderer>()->GetCloth()->MoveToRay(camera->m_cameraPos, rayDirection, c);
+					break;
+				case 1:
+					c = clothEntity->GetBehaviour<ClothRenderer>()->GetCloth()->RaycastParticle(camera->m_cameraPos, rayDirection, 0.001f);
+					if (c != nullptr)
+						c->ApplyForce(-rayDirection * 100.0f);
+					break;
+				case 2:
+					c = clothEntity->GetBehaviour<ClothRenderer>()->GetCloth()->RaycastParticle(camera->m_cameraPos, rayDirection, 0.001f);
+					if (c != nullptr)
+						c->ApplyForce(rayDirection * 100.0f);
+					
+					break;
+				case 3:
+					c->m_isEnabled = false;
+					c = nullptr;
+					break;
+			default:
+				break;
+			}
+			
+		}
+		else c = clothEntity->GetBehaviour<ClothRenderer>()->GetCloth()->RaycastParticle(camera->m_cameraPos, rayDirection, 0.001f);
 	}
+	else
+	{
+		c = nullptr;
+	}
+
+	clothEntity->GetBehaviour<ClothRenderer>()->GetCloth()->AddWind(glm::vec3(sin(windDirection * (M_PI / 180.0f)) * windStrength, 0.0f, sin(windDirection * (M_PI / 180.0f)) * windStrength));
+	clothEntity->GetBehaviour<ClothRenderer>()->GetCloth()->SphereCollision(ballEntity->m_transform.position, 10.0f);
+	
+	CEntityManager::UpdateEntities();
+
+
 	//Perform actions on key press
 	if (glfwGetKey(CObjectController::GetMainWindow(), GLFW_KEY_R) && !pressedLastFrame) ResetScene();
 	if (glfwGetKey(CObjectController::GetMainWindow(), GLFW_KEY_T) && !pressedLastFrame)
@@ -590,7 +626,7 @@ void RenderGUI()
 		}
 		if (ImGui::Button("Create Cloth with Params"))
 		{
-			clothEntity->GetBehaviour<ClothRenderer>()->SetCloth(new Cloth(glm::vec2(clothWidth, clothLength), glm::ivec2(clothDensityX, clothDensityY), 1000, numberOfHooks, clothStiffness));
+			clothEntity->GetBehaviour<ClothRenderer>()->SetCloth(new Cloth(glm::vec2(clothWidth, clothLength), glm::ivec2(clothDensityX, clothDensityY), 200, numberOfHooks, clothStiffness));
 			dropped = false;
 		}
 		if (ImGui::Button("Drop the Cloth"))

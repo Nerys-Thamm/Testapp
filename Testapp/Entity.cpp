@@ -68,7 +68,7 @@ CEntity::~CEntity()
 	}
 	else
 	{
-		m_parent->m_children.erase(std::remove_if(m_parent->m_children.begin(), m_parent->m_children.end(), [&](std::shared_ptr<CEntity> e) {return e == std::shared_ptr<CEntity>(this); }));
+		//m_parent->m_children.erase(std::remove_if(m_parent->m_children.begin(), m_parent->m_children.end(), [&](std::shared_ptr<CEntity> e) {return e == std::shared_ptr<CEntity>(this); }));
 	}
 }
 
