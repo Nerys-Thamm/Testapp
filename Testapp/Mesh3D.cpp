@@ -690,3 +690,6 @@ void Tri3D::UpdateVertices(glm::vec3 _first, glm::vec3 _second, glm::vec3 _third
 	glInvalidateBufferData(GL_ARRAY_BUFFER);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(m_vertices), m_vertices, GL_STREAM_DRAW);
 }
+
+
+

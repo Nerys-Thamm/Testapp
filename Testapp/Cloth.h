@@ -65,7 +65,6 @@ class ClothParticleConstraint
 {
 public: //Public Vars
     ClothParticle* m_firstParticle, * m_secondParticle;
-    std::mutex* cloth_constraint_mutex;
     bool m_isBendConstraint = false;
 private: //Private Vars
     float m_desiredSeperation;
@@ -78,8 +77,7 @@ public: //Public Methods
         m_desiredSeperation(glm::distance(_firstParticle->Pos(), _secondParticle->Pos())),
         m_maxStretch(3.0f),
         m_stiffness(_stiffness),
-        m_isBendConstraint(_bendConstraint),
-        cloth_constraint_mutex(new std::mutex())
+        m_isBendConstraint(_bendConstraint) 
     {}
 
     void Constrain();

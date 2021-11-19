@@ -231,6 +231,8 @@ void ClothRenderer::OnUpdate(float _fDeltaTime)
 				);
 			}
 			
+
+			
 		}
 	}
 }

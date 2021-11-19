@@ -132,6 +132,8 @@ float windStrength = 10.0f;
 float timeOfDay = 0.0f;
 bool dropped = false;
 
+float collisionShapeZ = 0.0f;
+
 //----------------------------------------------------
 
 void ShutDown()
@@ -397,16 +399,16 @@ void InitialSetup()
 //Resets the scene
 void ResetScene()
 {
-	clothLength = 10.0f;
+	clothLength = 40.0f;
 
-	clothWidth = 10.0f;
+	clothWidth = 50.0f;
 
 	numberOfHooks = 4;
 
 	hookDistance = 60.0f;
 
 	clothStiffness = 0.5f;
-	clothEntity->GetBehaviour<ClothRenderer>()->SetCloth(new Cloth(glm::vec2(clothWidth, clothLength), glm::ivec2(clothDensityX, clothDensityY), 1000, numberOfHooks, clothStiffness));
+	clothEntity->GetBehaviour<ClothRenderer>()->SetCloth(new Cloth(glm::vec2(clothWidth, clothLength), glm::ivec2(clothDensityX, clothDensityY), 20, 4, clothStiffness));
 	dropped = false;
 }
 
@@ -514,15 +516,15 @@ void Update()
 			}
 			
 		}
-		else c = clothEntity->GetBehaviour<ClothRenderer>()->GetCloth()->RaycastParticle(camera->m_cameraPos, rayDirection, 0.001f);
+		else c = clothEntity->GetBehaviour<ClothRenderer>()->GetCloth()->RaycastParticle(camera->m_cameraPos, rayDirection, 0.002f);
 	}
 	else
 	{
 		c = nullptr;
 	}
-
+	ballEntity->m_transform.position.z = collisionShapeZ - 100.0f;
 	clothEntity->GetBehaviour<ClothRenderer>()->GetCloth()->AddWind(glm::vec3(sin(windDirection * (M_PI / 180.0f)) * windStrength, 0.0f, sin(windDirection * (M_PI / 180.0f)) * windStrength));
-	clothEntity->GetBehaviour<ClothRenderer>()->GetCloth()->SphereCollision(ballEntity->m_transform.position, 10.0f);
+	clothEntity->GetBehaviour<ClothRenderer>()->GetCloth()->SphereCollision((ballEntity->m_transform - clothEntity->m_transform).position, 10.0f);
 	
 	CEntityManager::UpdateEntities();
 
@@ -640,7 +642,7 @@ void RenderGUI()
 
 	ImGui::Combo("Selected Object: ", &selectedCollision, collisionItems, IM_ARRAYSIZE(collisionItems));
 
-
+	ImGui::SliderFloat("Object Z pos:", &collisionShapeZ, -50.0f, 50.0f);
 
 	ImGui::Text("Wind:");
 

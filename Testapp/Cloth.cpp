@@ -70,7 +70,7 @@ void ClothParticleConstraint::Constrain()
     //Find the distance between the particles
     float len = glm::distance(secondPos, firstPos);
 
-    if ((len > (m_desiredSeperation * 50) + ((m_isBendConstraint ? 30 : 50) * m_desiredSeperation * (1.0f - m_stiffness))) && (m_firstParticle->Dynamic() && m_secondParticle->Dynamic()))
+    if ((len > (m_desiredSeperation * 80) + ((m_isBendConstraint ? 10 : 20) * m_desiredSeperation * (1.0f - m_stiffness))) && (m_firstParticle->Dynamic() && m_secondParticle->Dynamic()))
     {
         m_firstParticle->m_isEnabled = false;
         m_secondParticle->m_isEnabled = false;
@@ -81,8 +81,7 @@ void ClothParticleConstraint::Constrain()
     float m1 = 1.0f / m_firstParticle->Mass();
     float m2 = 1.0f / m_secondParticle->Mass();
 
-    //Lock this method to protect thread safety when multithreading the simulation
-    std::lock_guard<std::mutex> guard(*cloth_constraint_mutex);
+    
 
     //Apply the Constraint
     
@@ -103,7 +102,7 @@ void ClothParticleConstraint::Constrain()
 // ********************************************************************************
 void Cloth::SphereCollision(glm::vec3 _origin, float _radius)
 {
-    _origin = _origin - m_worldPos;
+    //_origin = _origin - m_worldPos;
     for (int i = 0; i < (int)m_particles.size(); i++)
     {
         if (!m_particles[i].Dynamic() || !m_particles[i].m_isEnabled)
