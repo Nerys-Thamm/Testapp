@@ -70,7 +70,7 @@ void ClothParticleConstraint::Constrain()
     //Find the distance between the particles
     float len = glm::distance(secondPos, firstPos);
 
-    if ((len > (m_desiredSeperation * 80) + ((m_isBendConstraint ? 10 : 20) * m_desiredSeperation * (1.0f - m_stiffness))) && (m_firstParticle->Dynamic() && m_secondParticle->Dynamic()))
+    if ((len > (m_desiredSeperation * 40) + ((m_isBendConstraint ? 10 : 20) * m_desiredSeperation * (1.0f - m_stiffness))) && (m_firstParticle->Dynamic() && m_secondParticle->Dynamic()))
     {
         m_firstParticle->m_isEnabled = false;
         m_secondParticle->m_isEnabled = false;
@@ -121,13 +121,20 @@ void Cloth::SphereCollision(glm::vec3 _origin, float _radius)
     }
 }
 
+// ********************************************************************************
+/// <summary>
 // Find the particle with the largest dot product with the normal
+/// </summary>
+/// <param name="_origin"></param>
+/// <param name="_direction"></param>
+/// /// <param name="_tolerance"></param>
+// ********************************************************************************
 ClothParticle* Cloth::RaycastParticle(glm::vec3 _origin, glm::vec3 _direction, float _tolerance)
 {
-    _origin = _origin - m_worldPos;
+    _origin = _origin - m_worldPos; //Transform to object space
     float maxDot = 0.0f;
     ClothParticle* maxParticle = nullptr;
-    for (int i = 0; i < (int)m_particles.size(); i++)
+    for (int i = 0; i < (int)m_particles.size(); i++) //Check the dot product of the vector between each particle and the camera with the ray
     {
         
         glm::vec3 particlePos = m_particles[i].Pos();
@@ -294,10 +301,6 @@ void Cloth::Update(float _fDeltaTime)
 void Cloth::FixedUpdate()
 {
    
-    //Update the Particles
-    
-   
-    
   
 }
 

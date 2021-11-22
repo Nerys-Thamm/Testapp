@@ -120,14 +120,14 @@ int numberOfHooks = 4;
 float hookDistance = 20.0f;
 float clothStiffness = 0.5f;
 
-const char* mouseModeItems[]{ "Grab", "Pull", "Push", "Tear", "Fire", "Pin" };
+const char* mouseModeItems[]{ "Grab", "Pull", "Push", "Tear" };
 int selectedMouseMode = 0;
 
-const char* collisionItems[]{ "No Object", "Sphere", "Capsule", "Pyramid" };
+const char* collisionItems[]{ "Sphere" };
 int selectedCollision = 0;
 
 float windDirection = 0.0f;
-float windStrength = 10.0f;
+float windStrength = 0.0f;
 
 float timeOfDay = 0.0f;
 bool dropped = false;
@@ -471,9 +471,6 @@ void Update()
 	if(!dropped)clothEntity->GetBehaviour<ClothRenderer>()->GetCloth()->SetPegDistance(hookDistance);
 	
 	
-	
-	
-	
 	//Poll events for GLFW input
 	glfwPollEvents();
 	MousePassive();
@@ -493,21 +490,21 @@ void Update()
 		{
 			switch (selectedMouseMode)
 			{
-				case 0:
+				case 0: //Move selected particle to ray determined by mouse position
 					clothEntity->GetBehaviour<ClothRenderer>()->GetCloth()->MoveToRay(camera->m_cameraPos, rayDirection, c);
 					break;
-				case 1:
+				case 1: //Apply force to selected particle
 					c = clothEntity->GetBehaviour<ClothRenderer>()->GetCloth()->RaycastParticle(camera->m_cameraPos, rayDirection, 0.001f);
 					if (c != nullptr)
 						c->ApplyForce(-rayDirection * 100.0f);
 					break;
-				case 2:
+				case 2: //Apply force to selected particle
 					c = clothEntity->GetBehaviour<ClothRenderer>()->GetCloth()->RaycastParticle(camera->m_cameraPos, rayDirection, 0.001f);
 					if (c != nullptr)
 						c->ApplyForce(rayDirection * 100.0f);
 					
 					break;
-				case 3:
+				case 3: //Disable selected particle
 					c->m_isEnabled = false;
 					c = nullptr;
 					break;
@@ -648,7 +645,7 @@ void RenderGUI()
 
 	ImGui::SliderFloat("Wind Direction (Degrees):", &windDirection, 0.0f, 360.0f);
 
-	ImGui::SliderFloat("Wind Strength:", &windStrength, 0.0f, 10.0f);
+	ImGui::SliderFloat("Wind Strength:", &windStrength, 0.0f, 4.0f);
 
 		if (ImGui::Button("Reset Wind"))
 
