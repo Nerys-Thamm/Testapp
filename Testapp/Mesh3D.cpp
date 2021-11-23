@@ -588,7 +588,7 @@ Terrain3D::Terrain3D(std::string _name, int _size, float _xScale, float _yScale,
 		//Generate the heightmap data using Perlin Noise
 		Noise n = Noise::getInstance();
 		n.SetSeed(std::time(NULL));
-		n.PopulateHeightMap(data, _size, _size, 8, 0.3f, 0.005f);
+		n.PopulateHeightMap(data, _size, _size, 8, 0.5f, 0.01f);
 		
 	}
 
@@ -599,24 +599,27 @@ Terrain3D::Terrain3D(std::string _name, int _size, float _xScale, float _yScale,
 	m_heightMap = new float[TerrainPointCount];
 
 	//Box Filter the heightmap
+
 	for (int z = 0; z < _size; ++z)
 	{
 		for (int x = 0; x < _size; ++x)
 		{
 			float height = 0.0f;
-			for (int i = 0; i < 3; ++i)
+			int nums = 0;
+			for (int i = -2; i <= 2; i++)
 			{
-				for (int j = 0; j < 3; ++j)
+				for (int j = -2; j <= 2; j++)
 				{
 					//check if in bounds
-					if (x + i - 1 >= 0 && x + i - 1 < _size && z + j - 1 >= 0 && z + j - 1 < _size)
+					if ((z + i) * _size + (x + j) >= 0 && (z + i) * _size + (x + j) <= TerrainPointCount)
 					{
-						height += data[(z + j - 1) * _size + (x + i - 1)];
+						height += data[(z + i) * _size + (x + j)];
+						nums++;
 					}
 					
 				}
 			}
-			height /= 9.0f;
+			height /= nums;
 			Heights[z * _size + x] = height;
 		}
 	}

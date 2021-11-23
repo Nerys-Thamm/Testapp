@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <random>
 
 //Noise singleton class
 class Noise
@@ -25,6 +26,7 @@ private:
     //Constructor
     Noise();
     static Noise* m_instance;
-    float m_seed;
+    int m_seed;
+    
 
 };

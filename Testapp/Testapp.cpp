@@ -308,7 +308,7 @@ void InitialSetup()
 	manager->SetMainCamera(freecam->GetCamera());
 
 	//Create Skybox
-	std::string SkyboxFilepaths[] = {"MountainOutpost/Right.jpg","MountainOutpost/Left.jpg","MountainOutpost/Up.jpg","MountainOutpost/Down.jpg","MountainOutpost/Back.jpg","MountainOutpost/Front.jpg"};
+	std::string SkyboxFilepaths[] = {"CloudySky/Right.jpg","CloudySky/Left.jpg","CloudySky/Up.jpg","CloudySky/Down.jpg","CloudySky/Back.jpg","CloudySky/Front.jpg"};
 	
 	SceneManager::SetCurrentSkybox(new Skybox(playerCam, SkyboxFilepaths));
 
@@ -363,7 +363,7 @@ void InitialSetup()
 	shape_renderquad = new Renderable3D(Quad3D::GetMesh(), Lighting::GetMaterial("Default"));
 
 	//Terrain3D::LoadFromRaw("AucklandHarbor2.raw", 1081, 0.1f, 0.025f); //Load the terrain
-	Terrain3D::LoadFromNoise("NoiseTerrain", 1000, 0.1f, 0.1f); //Load the terrain
+	Terrain3D::LoadFromNoise("NoiseTerrain", 2000, 0.5f, 0.5f); //Load the terrain
 
 	terrain_auckland = new Renderable3D(Terrain3D::GetTerrainMesh("NoiseTerrain"), Lighting::GetMaterial("Default"));
 	
@@ -378,7 +378,7 @@ void InitialSetup()
 	shape_seafloor->Scale(glm::vec3(100.0f, 100.0f, 1.0f));
 	shape_seafloor->Rotation(glm::vec3(271.0f, 0.0f, 0.0f));
 
-	shape_sea->Position(glm::vec3(0.0f, 0.01f, 0.0f));
+	shape_sea->Position(glm::vec3(0.0f, 1.1f, 0.0f));
 	shape_sea->Scale(glm::vec3(500.0f, 500.0f, 1.0f));
 	shape_sea->Rotation(glm::vec3(270.0f, 0.0f, 0.0f));
 
@@ -426,7 +426,7 @@ void InitialSetup()
 
 
 	
-	Lighting::DirectionalLights[0].Direction = glm::vec3(-1.0f, -1.0f, -1.0f);
+	Lighting::DirectionalLights[0].Direction = glm::vec3(-1.0f, -1.0f, 0.0f);
 	Lighting::DirectionalLights[0].Color = glm::vec3(1.0f, 0.8f, 0.8f);
 	Lighting::DirectionalLights[0].AmbientStrength = 0.55f;
 	Lighting::DirectionalLights[0].SpecularStrength = 1.0f;

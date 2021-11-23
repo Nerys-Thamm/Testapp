@@ -127,9 +127,9 @@ void main()
     vec4 prefog = vec4(LightOutput, 1.0f) * texture(ImageTexture, FragTexCoords);
 
     //Add fog effect
-    vec4 vFogColor = vec4(0.5f, 0.5f, 0.5f, 1.0f);
+    vec4 vFogColor = vec4(0.2f, 0.2f, 0.2f, 1.0f);
     float d = distance(mWorldPos.xyz, CameraPos);
-    float lerp = (d - 10.0f)/120.0f;
+    float lerp = (d - 60.0f)/190.0f;
     lerp = clamp(lerp, 0.0f, 1.0f);
 
 	FinalColor = mix(prefog, vFogColor, lerp);

@@ -20,7 +20,6 @@ Noise& Noise::getInstance()
     if (!m_instance)
     {
         m_instance = new Noise();
-        srand(std::time(NULL));
     }
     return *m_instance;
     
@@ -29,7 +28,9 @@ Noise& Noise::getInstance()
 
 float Noise::RandXY(int _x, int _y)
 {
-    int n = _x + _y * 57 + (rand() % 10);
+    
+
+    int n = _x + _y * m_seed;
     n = (n << 13) ^ n;
     return (1.0f - ((n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0f);
 }
@@ -106,7 +107,7 @@ void Noise::PopulateHeightMap(std::vector<unsigned char>& heightMap, int width, 
     {
         for (int x = 0; x < width; x++)
         {
-            heightMap[x + y * width] = (unsigned char)(GenerateNoise(x, y, octaves, persistence, scale) * 255);
+            heightMap[x + y * width] = (unsigned char)(GenerateNoise(x, y, octaves, persistence, scale) * 150);
         }
     }
 }
@@ -115,4 +116,8 @@ Noise* Noise::m_instance = nullptr;
 
 void Noise::SetSeed(float _seed)
 {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> distr(30, 100);
+    m_seed = distr(gen);
 }
