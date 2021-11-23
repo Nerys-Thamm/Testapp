@@ -19,7 +19,7 @@ void main()
     float PI = 6.28318530718; //2*PI because thats a circle
     float Directions = 32.0; //Number of directions to sample
     float Quality = 10.0; // Times to sample
-    float Size = 0.8; // Radius of circle to sample from surrounding pixels
+    float Size = 0.2; // Radius of circle to sample from surrounding pixels
     vec2 Radius = vec2(Size, Size);
 
    
@@ -56,5 +56,7 @@ void main()
    	
  
     //Calculate final colour
-    FinalColor = vec4(col,1.0);
+    //FinalColor = vec4(col,1.0);
+
+    FinalColor = texture( ImageTexture, uv );
 }

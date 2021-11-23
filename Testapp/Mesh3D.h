@@ -25,6 +25,7 @@
 #include <string>
 #include "SceneManager.h"
 #include <fstream>
+#include "Noise.h"
 
 class Mesh3D
 {
@@ -251,13 +252,14 @@ class Terrain3D : public Mesh3D
 {
 public:
 	static void LoadFromRaw(std::string _name, int _size, float _xScale, float _yScale);
+	static void LoadFromNoise(std::string _name, int _size, float _xScale, float _yScale);
 	static Mesh3D* GetTerrainMesh(std::string _name);
 	static Terrain3D* GetTerrain(std::string _name);
 	float GetHeightAt(int _x, int _y);
 	float GetHeightFromWorldPos(glm::vec3 _terrainPos, glm::vec3 _terrainRotation, glm::vec3 _queryPos);
 private:
 	static std::map<std::string, Terrain3D*> m_terrains;
-	Terrain3D(std::string _name, int _size, float _xScale, float _yScale);
+	Terrain3D(std::string _name, int _size, float _xScale, float _yScale, bool _fromFile = true);
 	int DrawType;
 	float m_xScale, m_yScale;
 	float* m_heightMap;

@@ -362,9 +362,10 @@ void InitialSetup()
 
 	shape_renderquad = new Renderable3D(Quad3D::GetMesh(), Lighting::GetMaterial("Default"));
 
-	Terrain3D::LoadFromRaw("AucklandHarbor2.raw", 1081, 0.1f, 0.025f); //Load the terrain
+	//Terrain3D::LoadFromRaw("AucklandHarbor2.raw", 1081, 0.1f, 0.025f); //Load the terrain
+	Terrain3D::LoadFromNoise("NoiseTerrain", 1000, 0.1f, 0.1f); //Load the terrain
 
-	terrain_auckland = new Renderable3D(Terrain3D::GetTerrainMesh("AucklandHarbor2.raw"), Lighting::GetMaterial("Default"));
+	terrain_auckland = new Renderable3D(Terrain3D::GetTerrainMesh("NoiseTerrain"), Lighting::GetMaterial("Default"));
 	
 
 	
@@ -393,7 +394,7 @@ void InitialSetup()
 
 	//Set textures of objects
 
-	terrain_auckland->AddTexture(TextureLoader::LoadTexture("map.png"));
+	terrain_auckland->AddTexture(TextureLoader::LoadTexture("grass2.png"));
 	shape_seafloor->AddTexture(TextureLoader::LoadTexture("beachsand.jpg"));
 	shape_sea->AddTexture(TextureLoader::LoadTexture("WaterTransparent2.png"));
 	shape_sea->AddTexture(TextureLoader::LoadTexture("WaterSpecular.png"));
@@ -427,7 +428,7 @@ void InitialSetup()
 	
 	Lighting::DirectionalLights[0].Direction = glm::vec3(-1.0f, -1.0f, -1.0f);
 	Lighting::DirectionalLights[0].Color = glm::vec3(1.0f, 0.8f, 0.8f);
-	Lighting::DirectionalLights[0].AmbientStrength = 0.15f;
+	Lighting::DirectionalLights[0].AmbientStrength = 0.55f;
 	Lighting::DirectionalLights[0].SpecularStrength = 1.0f;
 
 	//Post Processing
@@ -572,14 +573,14 @@ void Update()
 	//Process mouse input and Mouse picking
 	if (glfwGetMouseButton(CObjectController::GetMainWindow(), GLFW_MOUSE_BUTTON_1) == GLFW_PRESS)
 	{
-		if (CheckAABBIntersect(camera->m_cameraPos, rayDirection, shape_3Dbutton_fwd->Position(), shape_3Dbutton_fwd->Scale()))
+		/*if (CheckAABBIntersect(camera->m_cameraPos, rayDirection, shape_3Dbutton_fwd->Position(), shape_3Dbutton_fwd->Scale()))
 		{
 			camera->m_cameraPos.z += delta_time * 2.0f;
 		}
 		if (CheckAABBIntersect(camera->m_cameraPos, rayDirection, shape_3Dbutton_bck->Position(), shape_3Dbutton_bck->Scale()))
 		{
 			camera->m_cameraPos.z -= delta_time * 2.0f;
-		}
+		}*/
 	}
 	//Perform actions on key press
 	if (glfwGetKey(CObjectController::GetMainWindow(), GLFW_KEY_R) && !pressedLastFrame) ResetScene();
@@ -621,7 +622,7 @@ void Update()
 
 	
 	//Make Players y position conform to terrain
-	float groundHeight = Terrain3D::GetTerrain("AucklandHarbor2.raw")->GetHeightFromWorldPos(terrain_auckland->Position(), terrain_auckland->Rotation(), playerEntity->m_transform.position);
+	float groundHeight = Terrain3D::GetTerrain("NoiseTerrain")->GetHeightFromWorldPos(terrain_auckland->Position(), terrain_auckland->Rotation(), playerEntity->m_transform.position);
 	playerEntity->m_transform.position.y = groundHeight + 0.5f;
 
 	//Set lighting

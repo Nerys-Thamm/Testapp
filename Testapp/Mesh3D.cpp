@@ -457,6 +457,21 @@ void Terrain3D::LoadFromRaw(std::string _name, int _size, float _xScale, float _
 
 // ********************************************************************************
 /// <summary>
+/// Loads a Heightmap from noise
+/// </summary>
+/// <param name="_name"></param>
+/// <param name="_size"></param>
+/// <param name="_xScale"></param>
+/// <param name="_yScale"></param>
+// ********************************************************************************
+void Terrain3D::LoadFromNoise(std::string _name, int _size, float _xScale, float _yScale)
+{
+	Terrain3D* newTerr = new Terrain3D(_name, _size, _xScale, _yScale, false);
+	Terrain3D::m_terrains.emplace(_name, newTerr);
+}
+
+// ********************************************************************************
+/// <summary>
 /// Gets a Terrain Mesh
 /// </summary>
 /// <param name="_name"></param>
@@ -547,7 +562,7 @@ float Terrain3D::GetHeightFromWorldPos(glm::vec3 _terrainPos, glm::vec3 _terrain
 /// <param name="_yScale"></param>
 /// <returns></returns>
 // ********************************************************************************
-Terrain3D::Terrain3D(std::string _name, int _size, float _xScale, float _yScale)
+Terrain3D::Terrain3D(std::string _name, int _size, float _xScale, float _yScale, bool _fromFile)
 {
 	m_xScale = _xScale;
 	m_yScale = _yScale;
@@ -559,9 +574,23 @@ Terrain3D::Terrain3D(std::string _name, int _size, float _xScale, float _yScale)
 	//Create a vector to store the data
 	std::vector<unsigned char> data(_size * _size);
 	
-	//Open the file in Binary mode
-	std::ifstream rawFile;
-	rawFile.open((Path + _name).c_str(), std::ios_base::binary);
+	if(_fromFile)
+	{
+		//Open the file in Binary mode
+		std::ifstream rawFile;
+		rawFile.open((Path + _name).c_str(), std::ios_base::binary);
+		//Read the data
+		rawFile.read((char*)&data[0],(std::streamsize)data.size());
+		rawFile.close();
+	}
+	else
+	{
+		//Generate the heightmap data using Perlin Noise
+		Noise n = Noise::getInstance();
+		n.SetSeed(std::time(NULL));
+		n.PopulateHeightMap(data, _size, _size, 8, 0.3f, 0.005f);
+		
+	}
 
 	// Create the vertex array to hold the correct number of elements
 	int VertexCount = _size * _size * VertexAttrib;
@@ -569,9 +598,29 @@ Terrain3D::Terrain3D(std::string _name, int _size, float _xScale, float _yScale)
 	float* Heights = new float[TerrainPointCount];
 	m_heightMap = new float[TerrainPointCount];
 
-	//Read the data
-	rawFile.read((char*)&data[0],(std::streamsize)data.size());
-	rawFile.close();
+	//Box Filter the heightmap
+	for (int z = 0; z < _size; ++z)
+	{
+		for (int x = 0; x < _size; ++x)
+		{
+			float height = 0.0f;
+			for (int i = 0; i < 3; ++i)
+			{
+				for (int j = 0; j < 3; ++j)
+				{
+					//check if in bounds
+					if (x + i - 1 >= 0 && x + i - 1 < _size && z + j - 1 >= 0 && z + j - 1 < _size)
+					{
+						height += data[(z + j - 1) * _size + (x + i - 1)];
+					}
+					
+				}
+			}
+			height /= 9.0f;
+			Heights[z * _size + x] = height;
+		}
+	}
+
 
 	GLfloat* Vertices = new GLfloat[VertexCount];
 	int Element = 0;
@@ -585,7 +634,7 @@ Terrain3D::Terrain3D(std::string _name, int _size, float _xScale, float _yScale)
 		{
 			//Get the position of the vertex by casting the binary data as a float
 			float x = ((float)j - (_size/2))*m_xScale;
-			float y = m_heightMap[terrainPoint] = ((float)data[terrainPoint++]*m_yScale);
+			float y = m_heightMap[terrainPoint] = (Heights[terrainPoint++]*m_yScale);
 			float z = ((float)i - (_size / 2))*m_xScale;
 
 
@@ -596,8 +645,8 @@ Terrain3D::Terrain3D(std::string _name, int _size, float _xScale, float _yScale)
 			Vertices[Element++] = z;
 
 			// Set the texture coordinates of the current vertex point
-			Vertices[Element++] = (float)j / (_size - 1);
-			Vertices[Element++] = 1 - ((float)i / (_size - 1)); // 1 minus in order to flip the direction of 0-1 (0 at the bottom)
+			Vertices[Element++] = (float)j / 10 * m_xScale;
+			Vertices[Element++] = (float)i / 10 * m_xScale; 
 
 			// Set the normal direction of the current vertex point
 			if (j <= 1 || i <= 1 || j == (_size - 1) || i == (_size - 1))
@@ -609,10 +658,10 @@ Terrain3D::Terrain3D(std::string _name, int _size, float _xScale, float _yScale)
 			else
 			{
 				//Get the normal
-				float t = (float)data[(i - 1) * _size + j];
-				float b = (float)data[(i + 1) * _size + j];
-				float l = (float)data[i * _size + j - 1];
-				float r = (float)data[i * _size + j + 1];
+				float t = m_heightMap[(i - 1) * _size + j];
+				float b = m_heightMap[(i + 1) * _size + j];
+				float l = m_heightMap[i * _size + j - 1];
+				float r = m_heightMap[i * _size + j + 1];
 
 				glm::vec3 tanZ(0.0f, (t - b) * 0.5f, 1.0f);
 				glm::vec3 tanX(1.0f, (r - l) * 0.5f, 0.0f);
