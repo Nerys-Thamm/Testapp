@@ -10,7 +10,7 @@
 // Author      : Nerys Thamm
 // Mail        : nerys.thamm@mds.ac.nz
 #pragma once
-#include "Entity.h""
+#include "Entity.h"
 #include "Camera.h"
 #include "Lighting.h"
 class TessRenderer :

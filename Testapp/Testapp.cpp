@@ -44,6 +44,7 @@
 #include "MouseLook.h"
 #include "CharacterMotor.h"
 #include "TessRenderer.h"
+#include "ParticleSystem.h"
 
 
 //Pointer to window
@@ -320,8 +321,9 @@ void InitialSetup()
 	geostarEntity = new CEntity();
 	geostarEntity->AddBehaviour<GeometryRenderer>();
 	geostarEntity->GetBehaviour<GeometryRenderer>()->SetShader(program_geostar);
-	geostarEntity->m_transform.position = glm::vec3(0.0f, 1.5f, 0.0f);
+	geostarEntity->m_transform.position = glm::vec3(0.0f, 5.5f, 0.0f);
 	geostarEntity->AddBehaviour<TestBehaviour>();
+	
 
 	//Create Player Entity
 	playerEntity = new CEntity();
@@ -335,6 +337,21 @@ void InitialSetup()
 	playerEntity->AddBehaviour<MouseLook>(); //Add horizontal mouselook rotation
 	playerEntity->GetBehaviour<MouseLook>()->SetWindow(main_window, glm::vec2(cfWINDOW_WIDTH(), cfWINDOW_HEIGHT()));
 	playerEntity->GetBehaviour<MouseLook>()->SetAxisLockState(false, true);
+	
+	playerEntity->AddBehaviour<ParticleSystem>();
+	playerEntity->GetBehaviour<ParticleSystem>()->SetParticleTexture(TextureLoader::LoadTexture("fire.png"));
+	playerEntity->GetBehaviour<ParticleSystem>()->SetParticleCount(4000);
+	playerEntity->GetBehaviour<ParticleSystem>()->SetParticleLifetime(0.7f);
+	playerEntity->GetBehaviour<ParticleSystem>()->SetParticleSpeed(1.0f);
+	playerEntity->GetBehaviour<ParticleSystem>()->SetParticleSize(1.0f);
+	playerEntity->GetBehaviour<ParticleSystem>()->SetParticleEndSize(1.0f);
+
+	playerEntity->GetBehaviour<ParticleSystem>()->SetParticleColour(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+	playerEntity->GetBehaviour<ParticleSystem>()->SetParticleEndColour(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+	playerEntity->GetBehaviour<ParticleSystem>()->SetGravity(-10.0f);
+	playerEntity->GetBehaviour<ParticleSystem>()->SetEmissionRate(100.0f);
+	playerEntity->GetBehaviour<ParticleSystem>()->Init();
+	playerEntity->GetBehaviour<ParticleSystem>()->Start();
 	
 	//Create a Camera gimbal for vertical third person camera rotation
 	cameraGimbal = new CEntity(playerEntity);
@@ -675,6 +692,7 @@ void Render()
 	geostarEntity->GetBehaviour<GeometryRenderer>()->Render(playerCam);
 
 	playerEntity->GetBehaviour<MeshRenderer>()->Render(playerCam);
+	
 
 	//Render Tesselated Quads
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -686,11 +704,12 @@ void Render()
 	
 	terrain_auckland->Render(*playerCam, program_blinnphongfog);
 	
+	
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	shape_sea->Render(*playerCam, program_reflectivefog);
 	glDisable(GL_BLEND);
-
+	playerEntity->GetBehaviour<ParticleSystem>()->Render(*playerCam);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0); //Unbind the framebuffer
 	glDisable(GL_DEPTH_TEST);
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);

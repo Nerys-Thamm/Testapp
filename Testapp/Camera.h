@@ -44,6 +44,7 @@ public:
 	Camera(float _fWindowWidth, float _fWindowHeight, GLfloat& _fCurrTime, bool _bPerspective = true);
 
 	glm::mat4 GetPVM(glm::mat4 _modelmat);
+	glm::mat4 GetPV();
 private:
 	GLfloat* m_pCurrentTime;
 };

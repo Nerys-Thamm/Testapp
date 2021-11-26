@@ -41,3 +41,9 @@ glm::mat4 Camera::GetPVM(glm::mat4 _modelmat)
 	m_viewMat = glm::lookAt(m_cameraPos, (m_lookAtTarget ? m_cameraTargetPos : m_cameraPos + m_cameraLookDir), m_cameraUpDir);
 	return m_projectionMat * m_viewMat * _modelmat;
 }
+
+glm::mat4 Camera::GetPV()
+{
+	m_viewMat = glm::lookAt(m_cameraPos, (m_lookAtTarget ? m_cameraTargetPos : m_cameraPos + m_cameraLookDir), m_cameraUpDir);
+	return m_projectionMat * m_viewMat;
+}
