@@ -22,7 +22,7 @@ public:
 	
 
 	void Update(float _fDeltaTime);
-	void Reset();
+	void Reset(glm::vec3 _pos);
 	glm::vec3 GetPosition() { return m_position; }
 	glm::vec4 GetColour() { return glm::mix(m_colour, m_endColour, 1.0f - (m_lifetime / m_initLifetime)); }
 	float GetSize() { return glm::mix(m_size, m_endSize, 1.0f - (m_lifetime / m_initLifetime)); }

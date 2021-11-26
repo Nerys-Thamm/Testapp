@@ -99,9 +99,9 @@ void ParticleSystem::OnUpdate(float _fDeltaTime)
         m_particles[i].Update(_fDeltaTime);
         if (!m_particles[i].IsAlive())
         {
-            m_particles[i].Reset();
+            m_particles[i].Reset(m_entity.m_globalTransform.position);
         }
-        m_particlePositions[i] = m_particles[i].GetPosition() + m_entity.m_globalTransform.position;
+        m_particlePositions[i] = m_particles[i].GetPosition();
         SetBufferArrayPos(i, m_particlePositions[i]);
         SetBufferArrayColour(i, m_particles[i].GetColour());
         SetBufferArrayParticleSize(i, m_particles[i].GetSize());
@@ -261,10 +261,10 @@ Particle::Particle(glm::vec3 _position, glm::vec3 _velocity, glm::vec4 _colour, 
 }
 
 
-void Particle::Reset()
+void Particle::Reset(glm::vec3 _pos)
 {
     //Add randomness to the particle
-    m_position = m_initPos + (glm::normalize( glm::vec3(rand() % 10 - 5, rand() % 10 - 5, rand() % 10 - 5)) * 0.1f );
+    
     m_lifetime = m_initLifetime;
     m_alive = true;
     m_velocity = glm::vec3(
@@ -272,6 +272,7 @@ void Particle::Reset()
                  glm::sin(glm::radians((float)(rand() % 360))),
                  glm::cos(glm::radians((float)(rand() % 360)))
                  ) * m_initSpeed;
+    m_position = _pos + m_velocity;
     
 }
 
