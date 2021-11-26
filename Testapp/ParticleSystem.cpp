@@ -263,7 +263,8 @@ Particle::Particle(glm::vec3 _position, glm::vec3 _velocity, glm::vec4 _colour, 
 
 void Particle::Reset()
 {
-    m_position = m_initPos;
+    //Add randomness to the particle
+    m_position = m_initPos + (glm::normalize( glm::vec3(rand() % 10 - 5, rand() % 10 - 5, rand() % 10 - 5)) * 0.1f );
     m_lifetime = m_initLifetime;
     m_alive = true;
     m_velocity = glm::vec3(

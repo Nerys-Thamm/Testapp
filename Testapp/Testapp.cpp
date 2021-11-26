@@ -341,14 +341,14 @@ void InitialSetup()
 	playerEntity->AddBehaviour<ParticleSystem>();
 	playerEntity->GetBehaviour<ParticleSystem>()->SetParticleTexture(TextureLoader::LoadTexture("fire.png"));
 	playerEntity->GetBehaviour<ParticleSystem>()->SetParticleCount(4000);
-	playerEntity->GetBehaviour<ParticleSystem>()->SetParticleLifetime(0.7f);
-	playerEntity->GetBehaviour<ParticleSystem>()->SetParticleSpeed(1.0f);
-	playerEntity->GetBehaviour<ParticleSystem>()->SetParticleSize(1.0f);
-	playerEntity->GetBehaviour<ParticleSystem>()->SetParticleEndSize(1.0f);
+	playerEntity->GetBehaviour<ParticleSystem>()->SetParticleLifetime(2.0f);
+	playerEntity->GetBehaviour<ParticleSystem>()->SetParticleSpeed(0.2f);
+	playerEntity->GetBehaviour<ParticleSystem>()->SetParticleSize(0.5f);
+	playerEntity->GetBehaviour<ParticleSystem>()->SetParticleEndSize(0.0f);
 
-	playerEntity->GetBehaviour<ParticleSystem>()->SetParticleColour(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-	playerEntity->GetBehaviour<ParticleSystem>()->SetParticleEndColour(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-	playerEntity->GetBehaviour<ParticleSystem>()->SetGravity(-10.0f);
+	playerEntity->GetBehaviour<ParticleSystem>()->SetParticleColour(glm::vec4(1.0f, 1.0f, 1.0f, 0.3f));
+	playerEntity->GetBehaviour<ParticleSystem>()->SetParticleEndColour(glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
+	playerEntity->GetBehaviour<ParticleSystem>()->SetGravity(-2.0f);
 	playerEntity->GetBehaviour<ParticleSystem>()->SetEmissionRate(100.0f);
 	playerEntity->GetBehaviour<ParticleSystem>()->Init();
 	playerEntity->GetBehaviour<ParticleSystem>()->Start();

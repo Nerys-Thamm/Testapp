@@ -48,6 +48,6 @@ void buildQuad(float size, mat4 vp){
 }
 
 void main() {
-    buildQuad(1.0, vp);
+    buildQuad( gs_in[0].Size, vp);
     
 }
