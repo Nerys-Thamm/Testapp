@@ -611,7 +611,7 @@ Terrain3D::Terrain3D(std::string _name, int _size, float _xScale, float _yScale,
 				for (int j = -2; j <= 2; j++)
 				{
 					//check if in bounds
-					if ((z + i) * _size + (x + j) >= 0 && (z + i) * _size + (x + j) <= TerrainPointCount)
+					if ((z + i) * _size + (x + j) >= 0 && (z + i) * _size + (x + j) < TerrainPointCount)
 					{
 						height += data[(z + i) * _size + (x + j)];
 						nums++;

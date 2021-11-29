@@ -386,7 +386,7 @@ void InitialSetup()
 	shape_renderquad = new Renderable3D(Quad3D::GetMesh(), Lighting::GetMaterial("Glossy"));
 
 	//Terrain3D::LoadFromRaw("AucklandHarbor2.raw", 1081, 0.1f, 0.025f); //Load the terrain
-	Terrain3D::LoadFromNoise("NoiseTerrain", 2000, 0.5f, 0.5f); //Load the terrain
+	Terrain3D::LoadFromNoise("NoiseTerrain", 1000, 0.5f, 0.5f); //Load the terrain
 
 	terrain_auckland = new Renderable3D(Terrain3D::GetTerrainMesh("NoiseTerrain"), Lighting::GetMaterial("Default"));
 	
