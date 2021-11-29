@@ -126,6 +126,7 @@ CEntity* tessEntity = nullptr;
 CEntity* tessEntityLOD = nullptr;
 
 CEntity* playerEntity = nullptr, *cameraGimbal = nullptr, *cameraHolder = nullptr;
+CEntity* snowEntity = nullptr;
 
 //---------------------------------------------------------------
 //GUI variables
@@ -347,7 +348,7 @@ void InitialSetup()
 	playerEntity->GetBehaviour<ParticleSystem>()->SetParticleEndSize(0.0f);
 
 	playerEntity->GetBehaviour<ParticleSystem>()->SetParticleColour(glm::vec4(1.0f, 1.0f, 1.0f, 0.3f));
-	playerEntity->GetBehaviour<ParticleSystem>()->SetParticleEndColour(glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
+	playerEntity->GetBehaviour<ParticleSystem>()->SetParticleEndColour(glm::vec4(0.3f, 0.0f, 0.0f, 0.0f));
 	playerEntity->GetBehaviour<ParticleSystem>()->SetGravity(-9.0f);
 	playerEntity->GetBehaviour<ParticleSystem>()->SetEmissionRate(50.0f);
 	playerEntity->GetBehaviour<ParticleSystem>()->Init();
@@ -376,8 +377,13 @@ void InitialSetup()
 	tessEntity->AddBehaviour<TessRenderer>()->SetShader(program_tesselationtest);
 	tessEntity->m_transform.position = glm::vec3(2.0f, 1.0f, 0.0f);
 	
+	//Create the snow particles
 
-	shape_renderquad = new Renderable3D(Quad3D::GetMesh(), Lighting::GetMaterial("Default"));
+	snowEntity = new CEntity();
+	snowEntity->AddBehaviour<GPUParticleSystem>()->Init();
+
+
+	shape_renderquad = new Renderable3D(Quad3D::GetMesh(), Lighting::GetMaterial("Glossy"));
 
 	//Terrain3D::LoadFromRaw("AucklandHarbor2.raw", 1081, 0.1f, 0.025f); //Load the terrain
 	Terrain3D::LoadFromNoise("NoiseTerrain", 2000, 0.5f, 0.5f); //Load the terrain
@@ -411,7 +417,7 @@ void InitialSetup()
 
 	//Set textures of objects
 
-	terrain_auckland->AddTexture(TextureLoader::LoadTexture("grass2.png"));
+	terrain_auckland->AddTexture(TextureLoader::LoadTexture("snow2.jpg"));
 	shape_seafloor->AddTexture(TextureLoader::LoadTexture("beachsand.jpg"));
 	shape_sea->AddTexture(TextureLoader::LoadTexture("WaterTransparent2.png"));
 	shape_sea->AddTexture(TextureLoader::LoadTexture("WaterSpecular.png"));
@@ -443,10 +449,10 @@ void InitialSetup()
 
 
 	
-	Lighting::DirectionalLights[0].Direction = glm::vec3(-1.0f, -1.0f, 0.0f);
-	Lighting::DirectionalLights[0].Color = glm::vec3(1.0f, 0.8f, 0.8f);
+	Lighting::DirectionalLights[0].Direction = glm::vec3(-0.5f, 0.1f, 0.5f);
+	Lighting::DirectionalLights[0].Color = glm::vec3(1.0f, 1.0f, 1.0f);
 	Lighting::DirectionalLights[0].AmbientStrength = 0.55f;
-	Lighting::DirectionalLights[0].SpecularStrength = 1.0f;
+	Lighting::DirectionalLights[0].SpecularStrength = 0.4f;
 
 	//Post Processing
 	TextureLoader::CreateFrameBuffer(cfWINDOW_WIDTH(), cfWINDOW_HEIGHT(), renderTexture, frameBuffer);
@@ -689,20 +695,14 @@ void Render()
 
 
 	//Render objects
-	geostarEntity->GetBehaviour<GeometryRenderer>()->Render(playerCam);
+	
 
 	playerEntity->GetBehaviour<MeshRenderer>()->Render(playerCam);
 	
-
-	//Render Tesselated Quads
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	tessEntity->GetBehaviour<TessRenderer>()->Render(playerCam);
-	tessEntityLOD->GetBehaviour<TessRenderer>()->Render(playerCam);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	
-
-	
 	terrain_auckland->Render(*playerCam, program_blinnphongfog);
+	
+	snowEntity->GetBehaviour<GPUParticleSystem>()->Render(*playerCam);
+	
 	
 	
 	glEnable(GL_BLEND);

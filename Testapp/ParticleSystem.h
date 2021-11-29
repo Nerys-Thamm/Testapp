@@ -94,5 +94,33 @@ private:
 	void OnLateUpdate(float _fDeltaTime);
 };
 
+class GPUParticleSystem :
+	public IBehaviour
+{
+public:
+	GPUParticleSystem(CEntity& _parent);
+	void SetParticleLifetime(float _fLifetime) { m_fParticleLifetime = _fLifetime; }
+	void Init();
+	void Start();
+	void Stop();
+	void Render(Camera& _camera);
+private:
+	std::vector<Particle> m_particles;
+	std::vector<glm::vec4> m_particlePositions;
+	std::vector<glm::vec4> m_initPositions;
+	std::vector<glm::vec4> m_initVelocities;
+	std::vector<GLfloat> m_bufferarray;
+	bool m_emmiterActive;
+	bool m_initialized = false;
+	float m_fParticleLifetime;
+	GLuint m_posVBO, m_velVBO, m_initVelVBO, m_spoofVAO;
+	GLuint m_program, m_computeProgram;
+	void OnAwake();
+	void OnUpdate(float _fDeltaTime);
+	void OnFixedUpdate();
+	void OnLateUpdate(float _fDeltaTime);
+};
+
+
 
 

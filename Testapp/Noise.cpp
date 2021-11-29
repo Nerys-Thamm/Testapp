@@ -11,10 +11,16 @@
 // Mail        : nerys.thamm@mds.ac.nz
 #include "Noise.h"
 
+/// <summary>
+/// Initializes a new instance of the Noise class.
+/// </summary>
 Noise::Noise()
 {
 }
 
+/// <summary>
+/// Gets an instance of the Noise class.
+/// </summary>
 Noise& Noise::getInstance()
 {
     if (!m_instance)
@@ -26,6 +32,14 @@ Noise& Noise::getInstance()
 }
 
 
+// ********************************************************************************
+/// <summary>
+///  Gets the noise value.
+/// </summary>
+/// <param name="_x"></param>
+/// <param name="_y"></param>
+/// <returns></returns>
+// ********************************************************************************
 float Noise::RandXY(int _x, int _y)
 {
     
@@ -36,6 +50,14 @@ float Noise::RandXY(int _x, int _y)
 }
 
 
+// ********************************************************************************
+/// <summary>
+///  Gets the smooth noise value.
+/// </summary>
+/// <param name="_x"></param>
+/// <param name="_y"></param>
+/// <returns></returns>
+// ********************************************************************************
 float Noise::SmoothNoise(int _x, int _y)
 {
     float corners = (RandXY(_x - 1, _y - 1) + RandXY(_x + 1, _y - 1) + RandXY(_x - 1, _y + 1) + RandXY(_x + 1, _y + 1)) / 16;
@@ -45,6 +67,14 @@ float Noise::SmoothNoise(int _x, int _y)
 }
 
 
+// ********************************************************************************
+/// <summary>
+///  Gets the interpolated noise value.
+/// </summary>
+/// <param name="_x"></param>
+/// <param name="_y"></param>
+/// <returns></returns>
+// ********************************************************************************
 float Noise::PerlinNoise(float _x, float _y)
 {
     float fractional_X = _x - (int)_x;
@@ -62,12 +92,30 @@ float Noise::PerlinNoise(float _x, float _y)
 }
 
 
+// ********************************************************************************
+/// <summary>
+///  LERP between two values
+/// </summary>
+/// <param name="_a"></param>
+/// <param name="_b"></param>
+/// <param name="_t"></param>
+/// <returns></returns>
+// ********************************************************************************
 float Noise::Lerp(float _a, float _b, float _t)
 {
     return _a + _t * (_b - _a);
 }
 
 
+// ********************************************************************************
+/// <summary>
+///  Cosine interpolation between two values
+/// </summary>
+/// <param name="_a"></param>
+/// <param name="_b"></param>
+/// <param name="_t"></param>
+/// <returns></returns>
+// ********************************************************************************
 float Noise::Coserp(float _a, float _b, float _t)
 {
     float ft = _t * 3.1415927f;
@@ -76,6 +124,17 @@ float Noise::Coserp(float _a, float _b, float _t)
 }
 
 
+// ********************************************************************************
+/// <summary>
+///  Cubic interpolation between two values
+/// </summary>
+/// <param name="_v0"></param>
+/// <param name="_v1"></param>
+/// <param name="_v2"></param>
+/// <param name="_v3"></param>
+/// <param name="_x"></param>
+/// <returns></returns>
+// ********************************************************************************
 float Noise::Cuberp(float _v0, float _v1, float _v2, float _v3, float _x)
 {
     float P = _v3 - _v2 - _v0 + _v1;
@@ -85,6 +144,17 @@ float Noise::Cuberp(float _v0, float _v1, float _v2, float _v3, float _x)
     return P * _x * _x * _x + Q * _x * _x + R * _x + S;
 }
 
+// ********************************************************************************
+/// <summary>
+///  Gets the perlin noise value.
+/// </summary>
+/// <param name="_x"></param>
+/// <param name="_y"></param>
+/// <param name="octaves"></param>
+/// <param name="persistence"></param>
+/// <param name="scale"></param>
+/// <returns></returns>
+// ********************************************************************************
 float Noise::GenerateNoise(int _x, int _y, int octaves, float persistence, float scale)
 {
     float total = 0;
@@ -101,6 +171,17 @@ float Noise::GenerateNoise(int _x, int _y, int octaves, float persistence, float
     return total / maxValue;
 }
 
+// ********************************************************************************
+/// <summary>
+///  Populates a heightmap with perlin noise.
+/// </summary>
+/// <param name="heightMap"></param>
+/// <param name="width"></param>
+/// <param name="height"></param>
+/// <param name="octaves"></param>
+/// <param name="persistence"></param>
+/// <param name="scale"></param>
+// ********************************************************************************
 void Noise::PopulateHeightMap(std::vector<unsigned char>& heightMap, int width, int height, int octaves, float persistence, float scale)
 {
     for (int y = 0; y < height; y++)
@@ -114,6 +195,12 @@ void Noise::PopulateHeightMap(std::vector<unsigned char>& heightMap, int width, 
 
 Noise* Noise::m_instance = nullptr;
 
+// ********************************************************************************
+/// <summary>
+///  Sets the random seed
+/// </summary>
+/// <param name="_seed"></param>
+// ********************************************************************************
 void Noise::SetSeed(float _seed)
 {
     std::random_device rd;

@@ -11,6 +11,7 @@
 // Mail        : nerys.thamm@mds.ac.nz
 
 #include "ParticleSystem.h"
+#define NUM_PARTICLES 128 * 20000
 
 //*********************************
 // BEHAVIOR | ParticleSystem 
@@ -132,6 +133,11 @@ void ParticleSystem::OnLateUpdate(float _fDeltaTime)
 }
 
 
+// ********************************************************************************
+/// <summary>
+/// 
+/// </summary>
+// ********************************************************************************
 void ParticleSystem::Start()
 {
     
@@ -141,6 +147,11 @@ void ParticleSystem::Start()
     
 }
 
+// ********************************************************************************
+/// <summary>
+/// 
+/// </summary>
+// ********************************************************************************
 void ParticleSystem::Stop()
 {
     m_emmiterActive = false;
@@ -148,6 +159,12 @@ void ParticleSystem::Stop()
     m_particlePositions.clear();
 }
 
+// ********************************************************************************
+/// <summary>
+/// 
+/// </summary>
+/// <param name="_camera"></param>
+// ********************************************************************************
 void ParticleSystem::Render(Camera& _camera)
 {
     //Calculate billboard vector
@@ -189,6 +206,11 @@ void ParticleSystem::Render(Camera& _camera)
     glDepthMask(GL_TRUE);
 }
 
+// ********************************************************************************
+/// <summary>
+/// 
+/// </summary>
+// ********************************************************************************
 void ParticleSystem::Init()
 {
     
@@ -205,9 +227,6 @@ void ParticleSystem::Init()
     glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * m_bufferarray.size(), &m_bufferarray[0], GL_STREAM_DRAW);
 
-    // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (GLvoid*)0);
-    // glEnableVertexAttribArray(0);
-
     glVertexAttribPointer(0, 3, GL_FLOAT, false, 8 * sizeof(GLfloat), (GLvoid*)0);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(1, 4, GL_FLOAT, false, 8 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
@@ -219,6 +238,13 @@ void ParticleSystem::Init()
     glBindVertexArray(0);
 }
 
+// ********************************************************************************
+/// <summary>
+/// 
+/// </summary>
+/// <param name="_index"></param>
+/// <param name="_pos"></param>
+// ********************************************************************************
 void ParticleSystem::SetBufferArrayPos(int _index, glm::vec3 _pos)
 {
     int elementOffset = 8 * _index;
@@ -227,6 +253,14 @@ void ParticleSystem::SetBufferArrayPos(int _index, glm::vec3 _pos)
     m_bufferarray[elementOffset + 1] = _pos.y;
     m_bufferarray[elementOffset + 2] = _pos.z;
 }
+
+// ********************************************************************************
+/// <summary>
+/// 
+/// </summary>
+/// <param name="_index"></param>
+/// <param name="_colour"></param>
+// ********************************************************************************
 void ParticleSystem::SetBufferArrayColour(int _index, glm::vec4 _colour)
 {
     int elementOffset = 8 * _index;
@@ -236,6 +270,14 @@ void ParticleSystem::SetBufferArrayColour(int _index, glm::vec4 _colour)
     m_bufferarray[elementOffset + 5] = _colour.b;
     m_bufferarray[elementOffset + 6] = _colour.a;
 }
+
+// ********************************************************************************
+/// <summary>
+/// 
+/// </summary>
+/// <param name="_index"></param>
+/// <param name="_size"></param>
+// ********************************************************************************
 void ParticleSystem:: SetBufferArrayParticleSize(int _index, float _size)
 {
     int elementOffset = 8 * _index;
@@ -244,6 +286,20 @@ void ParticleSystem:: SetBufferArrayParticleSize(int _index, float _size)
 }
 
 
+// ********************************************************************************
+/// <summary>
+/// 
+/// </summary>
+/// <param name="_position"></param>
+/// <param name="_velocity"></param>
+/// <param name="_colour"></param>
+/// <param name="_endColour"></param>
+/// <param name="_lifetime"></param>
+/// <param name="_size"></param>
+/// <param name="_endSize"></param>
+/// <param name="_gravity"></param>
+/// <returns></returns>
+// ********************************************************************************
 Particle::Particle(glm::vec3 _position, glm::vec3 _velocity, glm::vec4 _colour, glm::vec4 _endColour, float _lifetime, float _size, float _endSize, float _gravity)
 {
     m_initPos = _position;
@@ -257,25 +313,37 @@ Particle::Particle(glm::vec3 _position, glm::vec3 _velocity, glm::vec4 _colour, 
     m_alive = true;
     m_gravity = _gravity;
     m_initSpeed = glm::length(m_velocity);
-    m_initLifetime = _lifetime;
+    m_initLifetime = _lifetime + glm::cos(glm::radians((float)(rand() % 360))) * 0.01;
 }
 
 
+// ********************************************************************************
+/// <summary>
+/// 
+/// </summary>
+/// <param name="_pos"></param>
+// ********************************************************************************
 void Particle::Reset(glm::vec3 _pos)
 {
     //Add randomness to the particle
     
     m_lifetime = m_initLifetime;
     m_alive = true;
-    m_velocity = glm::vec3(
+    m_velocity = glm::normalize( glm::vec3(
                  glm::cos(glm::radians((float)(rand() % 360))),
                  glm::sin(glm::radians((float)(rand() % 360))),
                  glm::cos(glm::radians((float)(rand() % 360)))
-                 ) * m_initSpeed;
+                 )) * m_initSpeed;
     m_position = _pos + m_velocity;
     
 }
 
+// ********************************************************************************
+/// <summary>
+/// 
+/// </summary>
+/// <param name="_fDeltaTime"></param>
+// ********************************************************************************
 void Particle::Update(float _fDeltaTime)
 {
     m_velocity.y -= m_gravity * _fDeltaTime;
@@ -288,3 +356,191 @@ void Particle::Update(float _fDeltaTime)
         m_alive = false;
     }
 }
+
+
+// ********************************************************************************
+/// <summary>
+/// Constructor
+/// </summary>
+/// <param name="_parent"></param>
+/// <returns></returns>
+// ********************************************************************************
+GPUParticleSystem::GPUParticleSystem(CEntity& _parent) : IBehaviour(_parent)
+{
+    
+    
+}
+
+// ********************************************************************************
+/// <summary>
+/// 
+/// </summary>
+// ********************************************************************************
+void GPUParticleSystem::Init()
+{
+    m_program = ShaderLoader::CreateProgram(
+        {
+            ShaderLoader::ShaderFile{"Resources/Shaders/GPUParticle.vert", GL_VERTEX_SHADER}, 
+            ShaderLoader::ShaderFile{"Resources/Shaders/GPUParticle.frag", GL_FRAGMENT_SHADER}
+        });
+    m_computeProgram = ShaderLoader::CreateProgram(
+        {
+            ShaderLoader::ShaderFile{"Resources/Shaders/Particle.comp", GL_COMPUTE_SHADER}
+        });
+
+   
+
+
+
+    for (int i = 0; i < NUM_PARTICLES; i++)
+    {
+        float LO = -300.0f;
+        float HI = 300.0f;
+        m_initPositions.push_back(glm::vec4(
+            LO + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(HI-LO))),
+            -200.0f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (400.0f - -200.0f))),
+            LO + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(HI-LO))), 
+            (static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) + 0.125f
+            )
+            );
+        
+        m_initVelocities.push_back(glm::vec4(
+            glm::cos(glm::radians((float)(rand() % 360))) * 0.25f,
+            glm::sin(glm::radians((float)(rand() % 360))) * 0.01f,
+            glm::cos(glm::radians((float)(rand() % 360))) * 0.25f,
+            (static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) + 0.125f
+            )
+            );
+
+    }
+    glGenBuffers(1, &m_posVBO);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_posVBO);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4) * m_initPositions.size(), &m_initPositions[0], GL_DYNAMIC_DRAW);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_posVBO);
+
+    glGenBuffers(1, &m_velVBO);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_velVBO);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4) * m_initVelocities.size(), &m_initVelocities[0], GL_DYNAMIC_DRAW);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_velVBO);
+
+    glGenBuffers(1, &m_initVelVBO);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_initVelVBO);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4) * m_initVelocities.size(), &m_initVelocities[0], GL_DYNAMIC_DRAW);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_initVelVBO);
+
+    glGenVertexArrays(1, &m_spoofVAO);
+    glBindVertexArray(m_spoofVAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, m_posVBO);
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(0);
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+
+    m_initialized = true;
+
+}
+
+// ********************************************************************************
+/// <summary>
+/// Runs before the object is updated for the first time
+/// </summary>
+// ********************************************************************************
+void GPUParticleSystem::OnAwake()
+{
+}
+
+// ********************************************************************************
+/// <summary>
+/// Runs every frame
+/// </summary>
+/// <param name="_fDeltaTime"></param>
+// ********************************************************************************
+void GPUParticleSystem::OnUpdate(float _fDeltaTime)
+{
+   
+    
+}
+
+// ********************************************************************************
+/// <summary>
+/// Runs every frame, at a fixed interval
+/// </summary>
+// ********************************************************************************
+void GPUParticleSystem::OnFixedUpdate()
+{
+    
+}
+
+// ********************************************************************************
+/// <summary>
+/// Runs every frame, after all other updates have completed
+/// </summary>
+/// <param name="_fDeltaTime"></param>
+// ********************************************************************************
+void GPUParticleSystem::OnLateUpdate(float _fDeltaTime)
+{
+}
+
+
+// ********************************************************************************
+/// <summary>
+/// 
+/// </summary>
+// ********************************************************************************
+void GPUParticleSystem::Start()
+{
+    
+
+    m_emmiterActive = true;
+    
+    
+}
+
+// ********************************************************************************
+/// <summary>
+/// 
+/// </summary>
+// ********************************************************************************
+void GPUParticleSystem::Stop()
+{
+    m_emmiterActive = false;
+    
+}
+
+// ********************************************************************************
+/// <summary>
+/// 
+/// </summary>
+/// <param name="_camera"></param>
+// ********************************************************************************
+void GPUParticleSystem::Render(Camera& _camera)
+{
+    if(!m_initialized) return;
+    glUseProgram(m_computeProgram);
+    glDispatchCompute(NUM_PARTICLES / 128, 1, 1);
+    glMemoryBarrier(GL_ALL_BARRIER_BITS);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+    glUseProgram(m_program);
+    
+
+    glUniformMatrix4fv(glGetUniformLocation(m_program, "vp"), 1, GL_FALSE, glm::value_ptr(_camera.GetPV()));
+
+   
+
+    glBindBuffer(GL_ARRAY_BUFFER, m_posVBO);
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, NULL, 0);
+    glEnableVertexAttribArray(0);
+    
+    glDrawArrays(GL_POINTS,0, NUM_PARTICLES);
+
+    glDisableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glUseProgram(0);
+
+    
+}
+
