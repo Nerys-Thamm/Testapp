@@ -65,15 +65,16 @@ void ParticleSystem::OnUpdate(float _fDeltaTime)
 {
     if( m_emmiterActive && m_particles.size() < m_iParticleCount)
     {
+        // Check how many particles we need to create
         cumulativeSpawnTime += m_fEmissionRate * _fDeltaTime;
         int genThisFrame = std::floorf(cumulativeSpawnTime);
         cumulativeSpawnTime -= genThisFrame;
 
-        if (genThisFrame > m_iParticleCount - m_particles.size())
+        if (genThisFrame > m_iParticleCount - m_particles.size()) // Dont generate more than the max particles
         {
             genThisFrame = 0;
         }
-        for(int i = 0; i < genThisFrame; i++)
+        for(int i = 0; i < genThisFrame; i++) // Generate the particles
             {
                 //Generate random spherical direction vector using trigonometry
                 glm::vec3 direction = glm::vec3(
@@ -95,17 +96,17 @@ void ParticleSystem::OnUpdate(float _fDeltaTime)
                 
             }
     }
-    for (int i = 0; i < m_particles.size(); i++)
+    for (int i = 0; i < m_particles.size(); i++) // Update all particles
     {
-        m_particles[i].Update(_fDeltaTime);
-        if (!m_particles[i].IsAlive())
+        m_particles[i].Update(_fDeltaTime); // Update the particle
+        if (!m_particles[i].IsAlive()) 
         {
-            m_particles[i].Reset(m_entity.m_globalTransform.position);
+            m_particles[i].Reset(m_entity.m_globalTransform.position); // Reset the particle
         }
-        m_particlePositions[i] = m_particles[i].GetPosition();
-        SetBufferArrayPos(i, m_particlePositions[i]);
-        SetBufferArrayColour(i, m_particles[i].GetColour());
-        SetBufferArrayParticleSize(i, m_particles[i].GetSize());
+        m_particlePositions[i] = m_particles[i].GetPosition(); // Update the particle position
+        SetBufferArrayPos(i, m_particlePositions[i]); // Set the particle position in the buffer
+        SetBufferArrayColour(i, m_particles[i].GetColour()); // Set the particle colour in the buffer
+        SetBufferArrayParticleSize(i, m_particles[i].GetSize()); // Set the particle size in the buffer
         
         
     }
@@ -135,7 +136,7 @@ void ParticleSystem::OnLateUpdate(float _fDeltaTime)
 
 // ********************************************************************************
 /// <summary>
-/// 
+///  Starts the particle emmiter
 /// </summary>
 // ********************************************************************************
 void ParticleSystem::Start()
@@ -149,7 +150,7 @@ void ParticleSystem::Start()
 
 // ********************************************************************************
 /// <summary>
-/// 
+///  Stops the particle emmiter
 /// </summary>
 // ********************************************************************************
 void ParticleSystem::Stop()
@@ -161,7 +162,7 @@ void ParticleSystem::Stop()
 
 // ********************************************************************************
 /// <summary>
-/// 
+///  Render the particle system
 /// </summary>
 /// <param name="_camera"></param>
 // ********************************************************************************
@@ -179,13 +180,15 @@ void ParticleSystem::Render(Camera& _camera)
     vQuad2 = glm::cross(cameraDirection, vQuad1);
     vQuad2 = glm::normalize(vQuad2);
 
-    glUseProgram(m_program);
+    glUseProgram(m_program); // Use the shader program
 
+    //Set Uniforms
     glUniform3f(glGetUniformLocation(m_program, "vQuad1"), vQuad1.x, vQuad1.y, vQuad1.z);
     glUniform3f(glGetUniformLocation(m_program, "vQuad2"), vQuad2.x, vQuad2.y, vQuad2.z);
 
     glUniformMatrix4fv(glGetUniformLocation(m_program, "vp"), 1, GL_FALSE, glm::value_ptr(_camera.GetPV()));
 
+    //Bind Texture
     glActiveTexture(GL_TEXTURE0);
     glUniform1i(glGetUniformLocation(m_program, "Texture"), 0);
     glBindTexture(GL_TEXTURE_2D, m_iParticleTexture);
@@ -208,18 +211,19 @@ void ParticleSystem::Render(Camera& _camera)
 
 // ********************************************************************************
 /// <summary>
-/// 
+///  Initialise the particle system
 /// </summary>
 // ********************************************************************************
 void ParticleSystem::Init()
 {
     
-    for (int i = 0; i < m_iParticleCount; i++)
+    for (int i = 0; i < m_iParticleCount; i++) //Create vector to hold the particles
     {
         m_particlePositions.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
     }
     m_bufferarray.resize(m_iParticleCount * 8);
     
+    //Initialise OpenGL buffers
     glGenVertexArrays(1, &m_VAO);
     glBindVertexArray(m_VAO);
 
@@ -240,7 +244,7 @@ void ParticleSystem::Init()
 
 // ********************************************************************************
 /// <summary>
-/// 
+///  Set particle Position in buffer
 /// </summary>
 /// <param name="_index"></param>
 /// <param name="_pos"></param>
@@ -256,7 +260,7 @@ void ParticleSystem::SetBufferArrayPos(int _index, glm::vec3 _pos)
 
 // ********************************************************************************
 /// <summary>
-/// 
+///  Set particle Colour in buffer
 /// </summary>
 /// <param name="_index"></param>
 /// <param name="_colour"></param>
@@ -273,7 +277,7 @@ void ParticleSystem::SetBufferArrayColour(int _index, glm::vec4 _colour)
 
 // ********************************************************************************
 /// <summary>
-/// 
+///  Set particle Size in buffer
 /// </summary>
 /// <param name="_index"></param>
 /// <param name="_size"></param>
@@ -288,7 +292,7 @@ void ParticleSystem:: SetBufferArrayParticleSize(int _index, float _size)
 
 // ********************************************************************************
 /// <summary>
-/// 
+///  Create a new Particle
 /// </summary>
 /// <param name="_position"></param>
 /// <param name="_velocity"></param>
@@ -319,14 +323,12 @@ Particle::Particle(glm::vec3 _position, glm::vec3 _velocity, glm::vec4 _colour, 
 
 // ********************************************************************************
 /// <summary>
-/// 
+///  Reset the Particle
 /// </summary>
 /// <param name="_pos"></param>
 // ********************************************************************************
 void Particle::Reset(glm::vec3 _pos)
 {
-    //Add randomness to the particle
-    
     m_lifetime = m_initLifetime;
     m_alive = true;
     m_velocity = glm::normalize( glm::vec3(
@@ -340,7 +342,7 @@ void Particle::Reset(glm::vec3 _pos)
 
 // ********************************************************************************
 /// <summary>
-/// 
+///  Update the Particle
 /// </summary>
 /// <param name="_fDeltaTime"></param>
 // ********************************************************************************
@@ -373,11 +375,12 @@ GPUParticleSystem::GPUParticleSystem(CEntity& _parent) : IBehaviour(_parent)
 
 // ********************************************************************************
 /// <summary>
-/// 
+///  Initialise the Particle System
 /// </summary>
 // ********************************************************************************
 void GPUParticleSystem::Init()
 {
+    //Load Shader Programs
     m_program = ShaderLoader::CreateProgram(
         {
             ShaderLoader::ShaderFile{"Resources/Shaders/GPUParticle.vert", GL_VERTEX_SHADER}, 
@@ -388,10 +391,7 @@ void GPUParticleSystem::Init()
             ShaderLoader::ShaderFile{"Resources/Shaders/Particle.comp", GL_COMPUTE_SHADER}
         });
 
-   
-
-
-
+    //Create all the particles
     for (int i = 0; i < NUM_PARTICLES; i++)
     {
         float LO = -300.0f;
@@ -413,6 +413,8 @@ void GPUParticleSystem::Init()
             );
 
     }
+
+    //Create the buffers
     glGenBuffers(1, &m_posVBO);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_posVBO);
     glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(glm::vec4) * m_initPositions.size(), &m_initPositions[0], GL_DYNAMIC_DRAW);
@@ -487,7 +489,7 @@ void GPUParticleSystem::OnLateUpdate(float _fDeltaTime)
 
 // ********************************************************************************
 /// <summary>
-/// 
+///  Start the Particle System
 /// </summary>
 // ********************************************************************************
 void GPUParticleSystem::Start()
@@ -501,7 +503,7 @@ void GPUParticleSystem::Start()
 
 // ********************************************************************************
 /// <summary>
-/// 
+///  Stop the Particle System
 /// </summary>
 // ********************************************************************************
 void GPUParticleSystem::Stop()
@@ -512,30 +514,30 @@ void GPUParticleSystem::Stop()
 
 // ********************************************************************************
 /// <summary>
-/// 
+///  Render the Particle System
 /// </summary>
 /// <param name="_camera"></param>
 // ********************************************************************************
 void GPUParticleSystem::Render(Camera& _camera)
 {
-    if(!m_initialized) return;
-    glUseProgram(m_computeProgram);
-    glDispatchCompute(NUM_PARTICLES / 128, 1, 1);
-    glMemoryBarrier(GL_ALL_BARRIER_BITS);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+    if(!m_initialized) return; //If the system is not initialized, do not render
+    glUseProgram(m_computeProgram); //Use the compute shader program
+    glDispatchCompute(NUM_PARTICLES / 128, 1, 1); //Dispatch the compute shader
+    glMemoryBarrier(GL_ALL_BARRIER_BITS); //Wait for the compute shader to finish
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0); //Unbind the buffer
 
-    glUseProgram(m_program);
+    glUseProgram(m_program); //Use the Render shader program
     
-
+    //Set Uniforms
     glUniformMatrix4fv(glGetUniformLocation(m_program, "vp"), 1, GL_FALSE, glm::value_ptr(_camera.GetPV()));
 
    
-
-    glBindBuffer(GL_ARRAY_BUFFER, m_posVBO);
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, NULL, 0);
+    
+    glBindBuffer(GL_ARRAY_BUFFER, m_posVBO); //Bind the position buffer
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, NULL, 0); 
     glEnableVertexAttribArray(0);
     
-    glDrawArrays(GL_POINTS,0, NUM_PARTICLES);
+    glDrawArrays(GL_POINTS,0, NUM_PARTICLES); //Draw the points
 
     glDisableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);

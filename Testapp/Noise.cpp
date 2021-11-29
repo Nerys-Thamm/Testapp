@@ -44,9 +44,9 @@ float Noise::RandXY(int _x, int _y)
 {
     
 
-    int n = _x + _y * m_seed;
-    n = (n << 13) ^ n;
-    return (1.0f - ((n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0f);
+    int n = _x + _y * m_seed; //Generates a position based seed
+    n = (n << 13) ^ n; //Adds a bitwise shift to the seed
+    return (1.0f - ((n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0f); //Returns a float value between 0 and 1
 }
 
 
@@ -60,8 +60,8 @@ float Noise::RandXY(int _x, int _y)
 // ********************************************************************************
 float Noise::SmoothNoise(int _x, int _y)
 {
-    float corners = (RandXY(_x - 1, _y - 1) + RandXY(_x + 1, _y - 1) + RandXY(_x - 1, _y + 1) + RandXY(_x + 1, _y + 1)) / 16;
-    float sides = (RandXY(_x - 1, _y) + RandXY(_x + 1, _y) + RandXY(_x, _y - 1) + RandXY(_x, _y + 1)) / 8;
+    float corners = (RandXY(_x - 1, _y - 1) + RandXY(_x + 1, _y - 1) + RandXY(_x - 1, _y + 1) + RandXY(_x + 1, _y + 1)) / 16; 
+    float sides = (RandXY(_x - 1, _y) + RandXY(_x + 1, _y) + RandXY(_x, _y - 1) + RandXY(_x, _y + 1)) / 8; 
     float center = RandXY(_x, _y) / 4;
     return corners + sides + center;
 }
@@ -77,10 +77,10 @@ float Noise::SmoothNoise(int _x, int _y)
 // ********************************************************************************
 float Noise::PerlinNoise(float _x, float _y)
 {
-    float fractional_X = _x - (int)_x;
-    float fractional_Y = _y - (int)_y;
+    float fractional_X = _x - (int)_x; 
+    float fractional_Y = _y - (int)_y; 
 
-    float v1 = SmoothNoise((int)_x, (int)_y);
+    float v1 = SmoothNoise((int)_x, (int)_y); 
     float v2 = SmoothNoise((int)_x + 1, (int)_y);
     float v3 = SmoothNoise((int)_x, (int)_y + 1);
     float v4 = SmoothNoise((int)_x + 1, (int)_y + 1);
@@ -161,12 +161,12 @@ float Noise::GenerateNoise(int _x, int _y, int octaves, float persistence, float
     float frequency = scale;
     float amplitude = 1;
     float maxValue = 0;
-    for (int i = 0; i < octaves; i++)
+    for (int i = 0; i < octaves; i++) // For each octave
     {
-        total += Coserp(0, 1, PerlinNoise(_x * frequency, _y * frequency)) * amplitude;
-        maxValue += amplitude;
-        amplitude *= persistence;
-        frequency *= 2;
+        total += Coserp(0, 1, PerlinNoise(_x * frequency, _y * frequency)) * amplitude; // Add weighted noise value to final total
+        maxValue += amplitude; // Keep track of amplitude, for normalisation
+        amplitude *= persistence; // Update amplitude, for next octave
+        frequency *= 2; // Update frequency, for next octave
     }
     return total / maxValue;
 }
@@ -188,7 +188,7 @@ void Noise::PopulateHeightMap(std::vector<unsigned char>& heightMap, int width, 
     {
         for (int x = 0; x < width; x++)
         {
-            heightMap[x + y * width] = (unsigned char)(GenerateNoise(x, y, octaves, persistence, scale) * 150);
+            heightMap[x + y * width] = (unsigned char)(GenerateNoise(x, y, octaves, persistence, scale) * 150); // Generate noise value, convert to 0-255 and store in array
         }
     }
 }
@@ -203,8 +203,8 @@ Noise* Noise::m_instance = nullptr;
 // ********************************************************************************
 void Noise::SetSeed(float _seed)
 {
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> distr(30, 100);
-    m_seed = distr(gen);
+    std::random_device rd; // obtain a random number from hardware
+    std::mt19937 gen(rd()); // seed the generator
+    std::uniform_int_distribution<> distr(30, 100); // define the range
+    m_seed = distr(gen); // generate number
 }
